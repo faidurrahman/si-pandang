@@ -7,7 +7,11 @@ import { SERVICES } from '../constants';
 export const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'assistant', text: 'Halo! Saya PandangAI. Ada yang bisa saya bantu terkait persyaratan layanan kepegawaian?', timestamp: new Date() }
+    { 
+      role: 'assistant', 
+      text: 'Halo! Saya Asisten Virtual SI-PANDANG. Ada yang bisa saya bantu terkait persyaratan layanan kepegawaian di Kecamatan Ujung Pandang?', 
+      timestamp: new Date() 
+    }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -49,13 +53,13 @@ export const ChatBot: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-2xl w-80 sm:w-96 flex flex-col border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
           <div className="bg-blue-600 p-4 text-white flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center font-bold">P</div>
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center font-bold">SP</div>
               <div>
-                <h3 className="font-bold text-sm">PandangAI</h3>
+                <h3 className="font-bold text-sm">Asisten SI-PANDANG</h3>
                 <p className="text-[10px] text-blue-100">Siap melayani Anda</p>
               </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="hover:bg-blue-500 p-1 rounded-lg">
+            <button onClick={() => setIsOpen(false)} className="hover:bg-blue-500 p-1 rounded-lg transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -92,8 +96,8 @@ export const ChatBot: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Tanya PandangAI..."
-              className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+              placeholder="Tanya SI-PANDANG..."
+              className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             />
             <button 
               onClick={handleSend}
