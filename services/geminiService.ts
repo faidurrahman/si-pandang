@@ -1,24 +1,16 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 export async function askPandangAI(prompt: string, context: string) {
-  // Mendapatkan API Key secara aman dari environment variables
-  const apiKey = (window as any).process?.env?.API_KEY || (import.meta as any).env?.VITE_GOOGLE_GENERATIVE_AI_API_KEY;
-
-  if (!apiKey) {
-    console.error("Critical: API Key tidak ditemukan di environment variables.");
-    return "Maaf, fitur asisten AI belum dikonfigurasi dengan benar (API Key kosong).";
-  }
-
+  // Selalu gunakan GoogleGenAI dengan properti apiKey dari process.env.API_KEY
+  // Asumsikan variabel ini sudah disiapkan di level entry point (index.tsx)
   try {
-    // Selalu inisialisasi instance baru untuk memastikan kunci terbaru digunakan
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
     const systemInstruction = `
       Anda adalah Asisten Virtual SI-PANDANG (Sistem Informasi Pelayanan Administrasi Kepegawaian Kecamatan Ujung Pandang).
       Tugas Anda adalah membantu ASN/Pegawai dalam memahami persyaratan layanan kepegawaian di Kecamatan Ujung Pandang.
       
-      Berikut adalah data layanan yang tersedia:
+      Berikut adalah data layanan yang tersedia sebagai referensi:
       ${context}
 
       Gunakan bahasa Indonesia yang profesional, ramah, dan informatif. 
@@ -34,10 +26,10 @@ export async function askPandangAI(prompt: string, context: string) {
       },
     });
 
-    // Mengambil teks langsung dari properti .text (bukan metode)
+    // Mengambil teks langsung dari properti .text sesuai pedoman SDK
     return response.text || "Maaf, saya tidak bisa memberikan jawaban saat ini.";
   } catch (error) {
     console.error("Gemini SDK Error:", error);
-    return "Terjadi gangguan saat menghubungi asisten AI. Silakan coba lagi nanti.";
+    return "Terjadi gangguan saat menghubungi asisten AI SI-PANDANG. Silakan coba lagi nanti.";
   }
 }
