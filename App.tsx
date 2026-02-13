@@ -1,10 +1,8 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { SERVICES } from './constants';
 import { Service } from './types';
 import { ServiceCard } from './components/ServiceCard';
 import { ServiceModal } from './components/ServiceModal';
-import { ChatBot } from './components/ChatBot';
 import { ApplicationForm } from './components/ApplicationForm';
 import { InfoBoard } from './components/InfoBoard';
 
@@ -317,8 +315,6 @@ const App: React.FC = () => {
           isSubmitting={isSubmitting}
         />
       )}
-
-      <ChatBot />
     </div>
   );
 };
