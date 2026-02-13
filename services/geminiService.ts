@@ -5,19 +5,15 @@ import { GoogleGenAI } from "@google/genai";
  * Menggunakan model Gemini-3-Flash untuk memberikan informasi persyaratan administrasi.
  */
 export async function askPandangAI(prompt: string, context: string) {
-  /**
-   * Mengambil API Key dari process.env.API_KEY.
-   * Variabel ini telah diinisialisasi di index.tsx dari import.meta.env.VITE_GOOGLE_GENERATIVE_AI_API_KEY.
-   */
+  // Mengambil API Key dari environment variable process.env.API_KEY sesuai standar SDK
   const apiKey = process.env.API_KEY;
 
   if (!apiKey) {
-    console.error("SI-PANDANG Error: API Key tidak terdeteksi. Pastikan VITE_GOOGLE_GENERATIVE_AI_API_KEY telah diatur di environment Vercel.");
-    return "Maaf, asisten SI-PANDANG saat ini sedang tidak tersedia karena masalah konfigurasi sistem (API Key).";
+    console.error("SI-PANDANG: API Key tidak ditemukan di process.env.API_KEY");
+    return "Maaf, asisten SI-PANDANG belum dapat melayani karena konfigurasi API Key belum tersedia.";
   }
 
   try {
-    // Inisialisasi SDK dengan API Key dari environment sesuai pedoman terbaru
     const ai = new GoogleGenAI({ apiKey });
     
     const systemInstruction = `
@@ -42,10 +38,10 @@ export async function askPandangAI(prompt: string, context: string) {
       },
     });
 
-    // Mengambil teks respons langsung dari properti .text sesuai pedoman SDK @google/genai
-    return response.text || "Maaf, saya tidak dapat memberikan jawaban untuk saat ini.";
+    // Mengambil teks respons langsung dari properti .text sesuai pedoman
+    return response.text || "Maaf, saya tidak dapat memproses permintaan Anda saat ini.";
   } catch (error) {
     console.error("Gemini AI Error:", error);
-    return "Terjadi gangguan koneksi ke asisten AI SI-PANDANG. Silakan coba lagi beberapa saat lagi.";
+    return "Terjadi gangguan saat menghubungi asisten AI SI-PANDANG. Silakan coba sesaat lagi.";
   }
 }
