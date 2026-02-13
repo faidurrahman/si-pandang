@@ -11,7 +11,7 @@ export const InfoBoard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // ID Spreadsheet yang digunakan (Pastikan spreadsheet diset "Public/Anyone with link")
+  // ID Spreadsheet yang digunakan
   const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
   const GOOGLE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`; 
 
@@ -23,14 +23,9 @@ export const InfoBoard: React.FC = () => {
       if (!response.ok) throw new Error('Network response was not ok');
       
       const csvText = await response.text();
-      
-      // Parsing CSV sederhana namun kuat
-      // Menghapus karakter \r dan memisahkan berdasarkan baris baru
       const rows = csvText.replace(/\r/g, '').split('\n').filter(row => row.trim() !== '');
       
-      // Melewati baris pertama (header) dan memetakan data
       const data = rows.slice(1).map((row, index) => {
-        // Logika untuk membersihkan tanda kutip ganda yang sering muncul di export CSV
         let cleanText = row;
         if (row.startsWith('"') && row.endsWith('"')) {
           cleanText = row.substring(1, row.length - 1).replace(/""/g, '"');
@@ -56,14 +51,12 @@ export const InfoBoard: React.FC = () => {
 
   return (
     <div className="mb-12 bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-[0_10px_40px_rgba(0,0,0,0.02)] transition-all">
-      {/* Header Papan Pengumuman */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">
           <div className="w-1.5 h-6 bg-amber-400 rounded-full"></div>
           <h3 className="text-lg font-black text-[#0a192f] tracking-tight">Papan Pengumuman</h3>
         </div>
         
-        {/* Refresh Button */}
         <button 
           onClick={fetchAnnouncements}
           disabled={loading}
