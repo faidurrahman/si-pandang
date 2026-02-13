@@ -1,0 +1,7 @@
+{
+  "name": "SI-PANDANG - Ujung Pandang District",
+  "description": "Sistem Informasi Pelayanan Administrasi Kepegawaian Kecamatan Ujung Pandang. Portal layanan persyaratan pemberkasan kepegawaian.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
