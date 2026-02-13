@@ -1,32 +1,30 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-/**
- * Fungsi untuk berinteraksi dengan asisten AI SI-PANDANG.
- * Mengikuti aturan @google/genai: API Key diambil dari process.env.API_KEY.
- */
 export async function askPandangAI(prompt: string, context: string) {
-  // Pastikan API Key tersedia sebelum inisialisasi
-  if (!process.env.API_KEY) {
-    console.error("API Key tidak ditemukan di environment variables.");
-    return "Layanan asisten AI belum dikonfigurasi dengan benar (API Key kosong).";
+  // Ambil API Key dengan berbagai cara fallback untuk menjamin ketersediaan di Vite/Vercel
+  const apiKey = 
+    (process.env as any)?.API_KEY || 
+    (import.meta as any).env?.VITE_GOOGLE_GENERATIVE_AI_API_KEY;
+
+  if (!apiKey) {
+    console.warn("API Key tidak ditemukan. Pastikan VITE_GOOGLE_GENERATIVE_AI_API_KEY sudah disetel di Vercel.");
+    return "Maaf, fitur asisten AI belum siap (konfigurasi API Key tidak ditemukan).";
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
-  const systemInstruction = `
-    Anda adalah Asisten Virtual SI-PANDANG (Sistem Informasi Pelayanan Administrasi Kepegawaian Kecamatan Ujung Pandang).
-    Tugas Anda adalah membantu ASN/Pegawai dalam memahami persyaratan layanan kepegawaian di Kecamatan Ujung Pandang.
-    
-    Berikut adalah data layanan yang tersedia di SI-PANDANG:
-    ${context}
-
-    Gunakan gaya bahasa yang profesional, ramah, dan informatif dalam Bahasa Indonesia.
-    Sebutkan nama "SI-PANDANG" sesekali untuk memperkuat identitas sistem.
-    Jika ditanya tentang prosedur, jelaskan berdasarkan data yang ada atau berikan tips umum administrasi kepegawaian sesuai aturan BKN yang relevan.
-  `;
-
   try {
+    const ai = new GoogleGenAI({ apiKey });
+    
+    const systemInstruction = `
+      Anda adalah Asisten Virtual SI-PANDANG (Sistem Informasi Pelayanan Administrasi Kepegawaian Kecamatan Ujung Pandang).
+      Tugas Anda adalah membantu ASN/Pegawai dalam memahami persyaratan layanan kepegawaian.
+      
+      Gunakan data berikut sebagai referensi layanan:
+      ${context}
+
+      Gunakan bahasa Indonesia yang sopan, profesional, dan informatif.
+    `;
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
@@ -36,10 +34,9 @@ export async function askPandangAI(prompt: string, context: string) {
       },
     });
 
-    // Mengambil teks langsung dari properti .text sesuai pedoman SDK terbaru
-    return response.text || "Maaf, saya tidak bisa memberikan jawaban saat ini.";
+    return response.text || "Saya tidak dapat memberikan jawaban saat ini.";
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "Terjadi kesalahan saat menghubungi asisten AI. Silakan coba lagi nanti atau hubungi Admin.";
+    return "Terjadi gangguan pada sistem AI. Silakan hubungi admin atau coba lagi nanti.";
   }
 }
