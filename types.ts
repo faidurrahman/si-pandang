@@ -1,4 +1,3 @@
-
 export interface Requirement {
   id: string;
   label: string;
@@ -13,6 +12,19 @@ export interface Service {
   requirements: Requirement[];
   category: 'Kepegawaian' | 'Kesejahteraan' | 'Mutasi' | 'Pensiun';
   estimatedTime: string;
+}
+
+export type SubmissionStatus = 'Dalam Proses' | 'Selesai' | 'Ditolak' | 'Direvisi';
+
+export interface Submission {
+  id: string; // ID Unik dari Database (Google Sheets)
+  nama: string;
+  nip: string;
+  layanan: string;
+  tanggal: string;
+  status: SubmissionStatus;
+  filename: string;
+  fileUrl: string;
 }
 
 export interface ChatMessage {

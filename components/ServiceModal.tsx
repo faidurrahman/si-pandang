@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Service } from '../types';
 
@@ -7,6 +6,9 @@ interface ServiceModalProps {
   onClose: () => void;
   onApply: (service: Service) => void;
 }
+
+const WA_MESSAGE = encodeURIComponent("Halo Sub bagian Umum dan Kepegawaian, saya ingin bertanya tentang kelengkapan berkas.");
+const WA_LINK = `https://wa.me/6285242728901?text=${WA_MESSAGE}`;
 
 export const ServiceModal: React.FC<ServiceModalProps> = ({ service, onClose, onApply }) => {
   if (!service) return null;
@@ -85,13 +87,18 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ service, onClose, on
           >
             Tutup
           </button>
-          <button className="py-4 px-2 bg-[#22C55E] hover:bg-emerald-600 text-white rounded-2xl font-bold text-xs shadow-lg shadow-emerald-100 flex items-center justify-center transition-all">
+          <a 
+            href={WA_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-4 px-2 bg-[#22C55E] hover:bg-emerald-600 text-white rounded-2xl font-bold text-xs shadow-lg shadow-emerald-100 flex items-center justify-center transition-all"
+          >
             <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+              <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
               <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
             </svg>
             Hubungi Admin
-          </button>
+          </a>
           <button 
             onClick={() => onApply(service)}
             className="py-4 px-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold text-xs shadow-lg shadow-amber-100 transition-all"
