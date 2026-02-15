@@ -16,7 +16,8 @@ export const EditReportModal: React.FC<EditReportModalProps> = ({ submission, on
     nama: submission.nama,
     nip: submission.nip,
     layanan: submission.layanan,
-    status: submission.status
+    status: submission.status,
+    pengumuman: submission.pengumuman || ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,6 +107,17 @@ export const EditReportModal: React.FC<EditReportModalProps> = ({ submission, on
               <option value="Direvisi">Direvisi</option>
               <option value="Ditolak">Ditolak</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-[#0a192f] mb-2">Pengumuman (Akan tampil di Papan Pengumuman)</label>
+            <textarea 
+              disabled={isSubmitting}
+              placeholder="Isi pesan pengumuman jika ingin ditampilkan di depan..."
+              className="w-full px-5 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-700 focus:ring-2 focus:ring-amber-400 outline-none transition-all text-sm min-h-[100px] disabled:bg-slate-50"
+              value={formData.pengumuman}
+              onChange={(e) => setFormData({...formData, pengumuman: e.target.value})}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-100">

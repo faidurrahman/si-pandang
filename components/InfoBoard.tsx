@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 interface Announcement {
@@ -13,32 +12,76 @@ export const InfoBoard: React.FC = () => {
 
   // ID Spreadsheet yang digunakan
   const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
-  const GOOGLE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`; 
+  const GOOGLE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Pengajuan`;
+
+  /**
+   * Pembersih teks sel CSV
+   */
+  const cleanStr = (str: string) => {
+    if (!str) return '';
+    return str.toString()
+      .replace(/^"|"$/g, '') // Hapus kutip pembungkus
+      .replace(/""/g, '"') // Kembalikan double quote ter-escape
+      .replace(/\r/g, '')
+      .trim();
+  };
+
+  /**
+   * Parser CSV cerdas pendukung Multiline
+   */
+  const parseCSVData = (text: string) => {
+    const result: string[][] = [];
+    let row: string[] = [];
+    let field = '';
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else { field += c; }
+      } else {
+        if (c === '"') { inQuotes = true; }
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\n' || c === '\r') {
+          row.push(field);
+          if (row.length > 1 || row[0] !== '') result.push(row);
+          row = []; field = '';
+          if (c === '\r' && text[i + 1] === '\n') i++;
+        } else { field += c; }
+      }
+    }
+    if (row.length > 0 || field !== '') {
+      row.push(field);
+      result.push(row);
+    }
+    return result;
+  };
 
   const fetchAnnouncements = async () => {
     setLoading(true);
     setError(false);
     try {
-      const response = await fetch(GOOGLE_SHEET_URL);
+      const response = await fetch(`${GOOGLE_SHEET_URL}&t=${new Date().getTime()}`);
       if (!response.ok) throw new Error('Network response was not ok');
       
       const csvText = await response.text();
-      const rows = csvText.replace(/\r/g, '').split('\n').filter(row => row.trim() !== '');
+      const allRows = parseCSVData(csvText);
       
-      const data = rows.slice(1).map((row, index) => {
-        let cleanText = row;
-        if (row.startsWith('"') && row.endsWith('"')) {
-          cleanText = row.substring(1, row.length - 1).replace(/""/g, '"');
-        }
+      // Ambil kolom I (indeks 8)
+      const data = allRows.slice(1).map((columns, index) => {
+        const pengumumanText = columns.length > 8 ? cleanStr(columns[8]) : ''; 
         return {
           id: String(index),
-          text: cleanText.trim(),
+          text: pengumumanText,
         };
-      }).filter(item => item.text.length > 0);
+      }).filter(item => item.text && item.text.trim().length > 0);
 
-      setAnnouncements(data);
+      // Urutkan pengumuman terbaru di atas
+      setAnnouncements(data.reverse());
     } catch (err) {
-      console.error("Gagal mengambil data dari Google Sheets:", err);
+      console.error("Gagal mengambil data pengumuman:", err);
       setError(true);
     } finally {
       setLoading(false);
@@ -100,7 +143,7 @@ export const InfoBoard: React.FC = () => {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <p className="text-slate-600 text-[13px] font-medium leading-relaxed">
+                  <p className="text-slate-600 text-[13px] font-medium leading-relaxed whitespace-pre-wrap">
                     {item.text}
                   </p>
                 </div>

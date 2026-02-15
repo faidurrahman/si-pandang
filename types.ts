@@ -25,6 +25,7 @@ export interface Submission {
   status: SubmissionStatus;
   filename: string;
   fileUrl: string;
+  pengumuman?: string; // Kolom baru I
 }
 
 export interface ChatMessage {

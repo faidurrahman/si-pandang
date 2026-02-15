@@ -2,8 +2,7 @@ import React from 'react';
 import { Submission, SubmissionStatus } from '../types';
 
 interface ReportsTableProps {
-  submissions: Submission[];
-  onStatusChange: (id: string, newStatus: SubmissionStatus) => void;
+  submissions: Array<Submission>;
   onViewDetail: (submission: Submission) => void;
   onEdit: (submission: Submission) => void;
 }
@@ -20,14 +19,14 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ submissions, onViewD
   };
 
   return (
-    <div className="overflow-x-auto bg-white rounded-3xl border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)]">
+    <div className="overflow-x-auto bg-white rounded-3xl border border-slate-100 shadow-sm">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-slate-50/50 border-b border-slate-100">
+          <tr className="bg-slate-50 border-b border-slate-100">
             <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pegawai</th>
             <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Layanan</th>
             <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Tanggal</th>
-            <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status Laporan</th>
+            <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
             <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Aksi</th>
           </tr>
         </thead>
@@ -45,28 +44,28 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ submissions, onViewD
                   {sub.layanan}
                 </span>
               </td>
-              <td className="px-6 py-5 text-center">
-                <span className="text-[11px] font-medium text-slate-500">{sub.tanggal}</span>
+              <td className="px-6 py-5 text-center text-[11px] font-medium text-slate-500">
+                {sub.tanggal}
               </td>
               <td className="px-6 py-5 text-center">
-                <span className={`inline-block px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight border ${getStatusColor(sub.status)}`}>
+                <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight border inline-block min-w-[120px] ${getStatusColor(sub.status)}`}>
                   {sub.status === 'Selesai' ? 'Selesai/Setuju' : sub.status}
                 </span>
               </td>
               <td className="px-6 py-5">
                 <div className="flex items-center justify-center space-x-2">
-                  <button
-                    onClick={() => onEdit(sub)}
-                    className="w-9 h-9 bg-amber-500 text-white rounded-xl flex items-center justify-center hover:bg-amber-600 transition-all shadow-lg shadow-amber-900/10 active:scale-90"
-                    title="Edit Data"
+                  <button 
+                    onClick={() => onEdit(sub)} 
+                    className="w-9 h-9 bg-amber-500 text-white rounded-xl flex items-center justify-center hover:bg-amber-600 transition-all shadow-sm active:scale-90" 
+                    title="Edit Data & Update Status"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button
-                    onClick={() => onViewDetail(sub)}
-                    className="w-9 h-9 bg-[#0a192f] text-white rounded-xl flex items-center justify-center hover:bg-blue-600 transition-all shadow-lg shadow-blue-900/10 active:scale-90"
+                  <button 
+                    onClick={() => onViewDetail(sub)} 
+                    className="w-9 h-9 bg-[#0a192f] text-white rounded-xl flex items-center justify-center hover:bg-blue-600 transition-all shadow-sm active:scale-90" 
                     title="Lihat Detail & Berkas"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,11 +77,7 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ submissions, onViewD
             </tr>
           ))}
           {submissions.length === 0 && (
-            <tr>
-              <td colSpan={5} className="px-6 py-12 text-center">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Data laporan kosong</p>
-              </td>
-            </tr>
+            <tr><td colSpan={5} className="px-6 py-12 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">Data laporan tidak ditemukan</td></tr>
           )}
         </tbody>
       </table>

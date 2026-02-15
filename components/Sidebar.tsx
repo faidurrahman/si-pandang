@@ -5,12 +5,15 @@ interface SidebarProps {
   onClose: () => void;
   activeTab: 'layanan' | 'monitoring';
   onNavigate: (tab: 'layanan' | 'monitoring') => void;
+  isLoggedIn: boolean;
+  onLoginClick: () => void;
+  onLogout: () => void;
 }
 
 const WA_MESSAGE = encodeURIComponent("Halo Sub bagian Umum dan Kepegawaian, saya ingin bertanya tentang kelengkapan berkas.");
 const WA_LINK = `https://wa.me/6285242728901?text=${WA_MESSAGE}`;
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, onNavigate }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, onNavigate, isLoggedIn, onLoginClick, onLogout }) => {
   return (
     <>
       {/* Backdrop */}
@@ -52,19 +55,33 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
         {/* Menu Items */}
         <div className="px-4 py-6 flex-1 space-y-2 relative">
           <button 
-            onClick={() => { onNavigate('monitoring'); onClose(); }}
-            className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'monitoring' ? 'bg-amber-400 text-slate-900 font-black shadow-xl shadow-amber-900/20' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+            onClick={() => { onNavigate('layanan'); onClose(); }}
+            className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'layanan' ? 'bg-white/10 text-white font-black' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
           >
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'monitoring' ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'layanan' ? 'bg-amber-400 text-slate-900' : 'bg-white/5 group-hover:bg-white/10'}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
             </div>
-            <span className="text-xs uppercase tracking-widest">Monitoring</span>
+            <span className="text-xs uppercase tracking-widest">Beranda</span>
           </button>
 
+          {isLoggedIn && (
+            <button 
+              onClick={() => { onNavigate('monitoring'); onClose(); }}
+              className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'monitoring' ? 'bg-amber-400 text-slate-900 font-black shadow-xl shadow-amber-900/20' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'monitoring' ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <span className="text-xs uppercase tracking-widest">Monitoring</span>
+            </button>
+          )}
+
           <div className="pt-8 pb-4 px-4">
-             <div className="w-full h-px bg-white/10" />
+             <div className="w-full h-[1px] bg-white/10" />
           </div>
 
           <a 
@@ -77,6 +94,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
             </div>
             <span className="text-xs uppercase tracking-widest">Kontak Admin</span>
           </a>
+
+          {!isLoggedIn ? (
+            <button 
+              onClick={() => { onLoginClick(); onClose(); }}
+              className="w-full flex items-center p-4 rounded-2xl text-white/40 hover:bg-white/5 hover:text-white/60 font-bold transition-all group mt-8 border border-white/5"
+            >
+              <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-4 group-hover:bg-amber-500/10 group-hover:text-amber-400 transition-all">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+              </div>
+              <span className="text-xs uppercase tracking-widest">Login Admin</span>
+            </button>
+          ) : (
+            <button 
+              onClick={() => { onLogout(); onClose(); }}
+              className="w-full flex items-center p-4 rounded-2xl text-red-400 hover:bg-red-500/10 font-bold transition-all group mt-8 border border-red-500/10"
+            >
+              <div className="w-10 h-10 bg-red-500/5 rounded-xl flex items-center justify-center mr-4 group-hover:bg-red-500/20 transition-all">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </div>
+              <span className="text-xs uppercase tracking-widest">Keluar / Logout</span>
+            </button>
+          )}
         </div>
 
         {/* Footer */}
