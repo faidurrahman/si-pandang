@@ -14,29 +14,6 @@
             position: relative;
         }
 
-        .hero-icon-container {
-            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-            box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3);
-        }
-
-        .badge-portal {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-mulai {
-            background-color: #d4a017;
-            color: #0a1e3b;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .btn-mulai:hover {
-            background-color: #f1b61c;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(212, 160, 23, 0.4);
-        }
-
         .wave-bottom {
             position: absolute;
             bottom: 0;
@@ -54,6 +31,130 @@
 
         .wave-bottom .shape-fill {
             fill: #fafafa;
+        }
+
+        /* 1. Definisi Animasi Gabungan: Melayang + Berdenyut */
+        @keyframes asisten-animation {
+            0% {
+                transform: translateY(0px);
+                box-shadow: 0 0 0 0px rgba(255, 165, 0, 0.7);
+            }
+            50% {
+                transform: translateY(-10px);
+                box-shadow: 0 0 0 15px rgba(255, 165, 0, 0);
+            }
+            100% {
+                transform: translateY(0px);
+                box-shadow: 0 0 0 0px rgba(255, 165, 0, 0);
+            }
+        }
+
+        /* 2. Style Utama Tombol Asisten SI-PANDANG */
+        .btn-asisten-ai {
+            position: fixed;
+            bottom: 25px;
+            right: 20px;
+            z-index: 999;
+            background-color: #FFA500; /* Warna Orange Identitas */
+            color: #0a1e3b;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(255, 165, 0, 0.3);
+            animation: asisten-animation 3s ease-in-out infinite;
+        }
+
+        .btn-asisten-ai:hover {
+            transform: scale(1.1) translateY(-5px);
+            background-color: #e69500;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 3. Penyesuaian Header agar Logo di Kiri & Ikon di Kanan */
+        .header-container {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center;
+            flex-direction: row !important;
+            width: 100%;
+            padding: 10px 0;
+            min-height: 60px; /* Menjamin ketinggian area header */
+        }
+
+        .nav-icons-wrapper {
+            display: flex !important;
+            gap: 15px;
+            order: 2;
+            margin-left: auto; /* Memaksa ikon tetap ke kanan meskipun area kiri kosong */
+        }
+
+        .header-logo {
+            order: 1;
+            min-width: 1px; /* Spacer minimal */
+        }
+
+        /* 4. Border Tombol Mulai Layanan */
+        .btn-mulai-layanan {
+            background-color: #d4a017 !important; /* Warna emas/kuning */
+            color: #ffffff !important;
+            border: 2px solid #ffffff !important; /* Border putih tegas */
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-mulai-layanan:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(212, 160, 23, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px 20px !important;
+                background: rgba(10, 30, 59, 0.9);
+                backdrop-filter: blur(10px);
+                height: auto !important;
+            }
+
+            .header-logo img, .header-logo .logo-placeholder {
+                height: 35px !important;
+            }
+
+            .contact-section, .contact-container {
+                padding: 15px !important;
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            .contact-item {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                width: 100% !important;
+                padding: 16px !important;
+                margin-bottom: 12px !important;
+                gap: 16px !important;
+                box-sizing: border-box;
+                border-radius: 20px !important;
+            }
+
+            .contact-text p {
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                white-space: normal !important;
+            }
         }
 
         ::-webkit-scrollbar { width: 8px; }

@@ -2,31 +2,37 @@ import { GoogleGenAI } from "@google/genai";
 
 /**
  * Layanan AI untuk SI-PANDANG.
- * Menggunakan model Gemini-3-Flash untuk memberikan informasi persyaratan administrasi.
  */
 export async function askPandangAI(prompt: string, context: string) {
-  // Mengambil API Key dari environment variable process.env.API_KEY sesuai standar SDK
   const apiKey = process.env.API_KEY;
 
   if (!apiKey) {
-    console.error("SI-PANDANG: API Key tidak ditemukan di process.env.API_KEY");
-    return "Maaf, asisten SI-PANDANG belum dapat melayani karena konfigurasi API Key belum tersedia.";
+    console.error("SI-PANDANG: API Key tidak ditemukan");
+    return "Maaf, Asisten SI-PANDANG belum dapat melayani karena konfigurasi sistem belum lengkap.";
   }
 
   try {
     const ai = new GoogleGenAI({ apiKey });
     
     const systemInstruction = `
-      Anda adalah Asisten Virtual SI-PANDANG (Sistem Informasi Pelayanan Administrasi Kepegawaian Kecamatan Ujung Pandang).
-      Tugas utama Anda adalah membantu ASN dan Pegawai memahami syarat administrasi di wilayah Kecamatan Ujung Pandang.
-      
-      Gunakan data referensi berikut untuk menjawab:
-      ${context}
+      IDENTITAS:
+      Anda adalah "Asisten SI-PANDANG", asisten virtual resmi untuk aplikasi SI-PANDANG (Sistem Informasi Pelayanan Administrasi Kepegawaian) Kecamatan Ujung Pandang, Makassar.
 
-      Panduan Jawaban:
-      - Gunakan bahasa Indonesia yang santun, profesional, dan informatif.
-      - Selalu sebutkan bahwa Anda adalah bagian dari sistem "SI-PANDANG".
-      - Jika ditanya lokasi, arahkan ke Kantor Kecamatan Ujung Pandang di Jl. Samiun No. 15, Makassar.
+      ATURAN FORMAT JAWABAN (WAJIB DIPATUHI):
+      1. JANGAN PERNAH gunakan simbol Markdown seperti tanda bintang (*) atau pagar (#).
+      2. DILARANG KERAS menyertakan asteris (**) untuk menebalkan teks.
+      3. Gunakan HURUF KAPITAL untuk setiap judul layanan, istilah penting, atau poin utama agar terlihat jelas tanpa simbol.
+      4. Gunakan BARIS BARU (Enter ganda) yang cukup banyak untuk memisahkan setiap paragraf atau poin agar teks terlihat renggang dan sangat mudah dibaca di layar HP.
+      5. Gunakan penomoran manual (1., 2., 3.) untuk daftar persyaratan.
+      6. Pastikan jawaban Anda terlihat bersih, profesional, dan seperti pesan teks resmi yang rapi.
+
+      RUANG LINGKUP & KEBIJAKAN:
+      - Sapa dengan sopan: "Bapak/Ibu".
+      - Fokus pada prosedur administrasi ASN sesuai konteks: ${context}
+      - Pertanyaan layanan umum (KTP/KK) atau pengaduan warga arahkan secara santun ke aplikasi LONTARA+.
+      - Masalah strategis di luar administrasi arahkan ke Bapak Camat Ujung Pandang.
+      - JANGAN berikan data pribadi (NIP/Kontak) pegawai.
+      - Jika ditanya di luar wilayah Kecamatan Ujung Pandang, tolak dengan halus.
     `;
 
     const response = await ai.models.generateContent({
@@ -34,14 +40,17 @@ export async function askPandangAI(prompt: string, context: string) {
       contents: prompt,
       config: {
         systemInstruction,
-        temperature: 0.7,
+        temperature: 0.2, // Konsistensi tinggi
       },
     });
 
-    // Mengambil teks respons langsung dari properti .text sesuai pedoman
-    return response.text || "Maaf, saya tidak dapat memproses permintaan Anda saat ini.";
+    // Post-processing: Hapus semua karakter bintang yang mungkin masih terbuat oleh AI
+    let cleanText = response.text || "";
+    cleanText = cleanText.replace(/\*/g, ""); 
+    
+    return cleanText.trim() || "Mohon maaf Bapak/Ibu, saya tidak dapat memproses permintaan tersebut saat ini.";
   } catch (error) {
     console.error("Gemini AI Error:", error);
-    return "Terjadi gangguan saat menghubungi asisten AI SI-PANDANG. Silakan coba sesaat lagi.";
+    return "Mohon maaf Bapak/Ibu, terjadi gangguan teknis. Silakan hubungi admin melalui WhatsApp jika mendesak.";
   }
 }
