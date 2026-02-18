@@ -21,7 +21,7 @@ export async function askPandangAI(prompt: string, context: string) {
       ATURAN FORMAT JAWABAN (WAJIB DIPATUHI):
       1. JANGAN PERNAH gunakan simbol Markdown seperti tanda bintang (*) atau pagar (#).
       2. DILARANG KERAS menyertakan asteris (**) untuk menebalkan teks.
-      3. Gunakan HURUF KAPITAL untuk setiap judul layanan, istilah penting, atau poin utama agar terlihat jelas tanpa simbol.
+      3. Gunakan penulisan standar (Sentence Case) yang rapi. Jangan gunakan HURUF KAPITAL SEMUA (All Caps) kecuali untuk singkatan resmi (contoh: SK, KTP, NIP, ASN).
       4. Gunakan BARIS BARU (Enter ganda) yang cukup banyak untuk memisahkan setiap paragraf atau poin agar teks terlihat renggang dan sangat mudah dibaca di layar HP.
       5. Gunakan penomoran manual (1., 2., 3.) untuk daftar persyaratan.
       6. Pastikan jawaban Anda terlihat bersih, profesional, dan seperti pesan teks resmi yang rapi.

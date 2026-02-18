@@ -8,7 +8,7 @@ export const ChatBot: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { 
       role: 'assistant', 
-      text: 'SELAMAT DATANG BAPAK/IBU.\n\nSaya Asisten SI-PANDANG, siap membantu Anda terkait informasi layanan administrasi kepegawaian di Kecamatan Ujung Pandang.\n\nAda yang bisa saya bantu?', 
+      text: 'Selamat datang Bapak/Ibu.\n\nSaya Asisten SI-PANDANG, siap membantu Anda terkait informasi layanan administrasi kepegawaian di Kecamatan Ujung Pandang.\n\nAda yang bisa saya bantu?', 
       timestamp: new Date() 
     }
   ]);
