@@ -112,15 +112,15 @@ export const ChatBot: React.FC = () => {
       ) : (
         <button 
           onClick={() => setIsOpen(true)}
-          className="btn-asisten-ai"
+          className="btn-asisten-ai group"
+          title="Buka Asisten SI-PANDANG"
         >
           <div className="relative">
-             <svg className="w-6 h-6 text-[#0a1e3b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+             <svg className="w-8 h-8 text-[#0a1e3b] transform transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
              </svg>
-             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
+             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-[#FFA500] rounded-full animate-bounce"></span>
           </div>
-          <span className="uppercase tracking-[0.1em] text-[11px] font-black">Asisten SI-PANDANG</span>
         </button>
       )}
     </>

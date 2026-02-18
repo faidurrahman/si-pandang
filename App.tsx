@@ -238,7 +238,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
       <header className="absolute top-0 left-0 w-full z-[140] px-6 py-6 md:px-12 md:py-10">
-        <div className="header-container mx-auto max-w-7xl">
+        <div className="header-container w-full">
           {/* Bagian Logo dihilangkan teksnya, menyisakan div kosong untuk menjaga layout flex space-between */}
           <div className="header-logo flex items-center">
           </div>

@@ -20,7 +20,7 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ submissions, onViewD
 
   return (
     <div className="overflow-x-auto bg-white rounded-3xl border border-slate-100 shadow-sm">
-      <table className="w-full text-left border-collapse">
+      <table className="w-full text-left border-collapse min-w-[650px] md:min-w-full">
         <thead>
           <tr className="bg-slate-50 border-b border-slate-100">
             <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pegawai</th>
@@ -34,17 +34,19 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ submissions, onViewD
           {submissions.map((sub) => (
             <tr key={sub.id} className="hover:bg-slate-50/30 transition-colors">
               <td className="px-6 py-5">
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-[#0a192f]">{sub.nama}</span>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">NIP. {sub.nip}</span>
+                <div className="flex flex-col gap-1 min-w-[150px]">
+                  <span className="text-sm font-bold text-[#0a192f] leading-tight break-words">{sub.nama}</span>
+                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tight break-all">NIP. {sub.nip}</span>
                 </div>
               </td>
               <td className="px-6 py-5">
-                <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold border border-blue-100">
-                  {sub.layanan}
-                </span>
+                <div className="min-w-[140px] py-1">
+                  <span className="inline-block px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-extrabold border border-blue-100 leading-normal text-center w-full sm:w-auto shadow-sm">
+                    {sub.layanan}
+                  </span>
+                </div>
               </td>
-              <td className="px-6 py-5 text-center text-[11px] font-medium text-slate-500">
+              <td className="px-6 py-5 text-center text-[11px] font-medium text-slate-500 whitespace-nowrap">
                 {sub.tanggal}
               </td>
               <td className="px-6 py-5 text-center">
