@@ -29,14 +29,6 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({ submission
              <h2 className="text-white font-black text-lg uppercase tracking-tight">Detail Usulan</h2>
              <p className="text-amber-400 text-[9px] font-bold uppercase tracking-widest opacity-80">ID Transaksi: {submission.id}</p>
            </div>
-           <button 
-             onClick={onClose}
-             className="ml-auto p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all"
-           >
-             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-             </svg>
-           </button>
         </div>
 
         <div className="p-8 space-y-8">
@@ -70,29 +62,34 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({ submission
               <p className="text-[10px] font-black text-[#0a192f] uppercase tracking-[0.1em]">Berkas Lampiran</p>
             </div>
             
-            <a 
-              href={submission.fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center p-4 bg-[#f0f7ff] rounded-2xl border border-blue-100 group hover:bg-blue-600 hover:border-blue-600 transition-all duration-300"
-            >
-              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div className="ml-4 flex-1">
-                <p className="text-[11px] font-bold text-blue-900 group-hover:text-white transition-colors truncate max-w-[280px]">
-                  {submission.filename}
-                </p>
-                <p className="text-[9px] font-medium text-blue-400 group-hover:text-blue-100 transition-colors uppercase">
-                  Klik untuk membuka berkas
-                </p>
-              </div>
-              <svg className="w-4 h-4 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
+            <div className="space-y-3">
+              {(submission.additionalFiles && submission.additionalFiles.length > 0 ? submission.additionalFiles : [{ filename: submission.filename, url: submission.fileUrl }]).map((file, idx) => (
+                <a 
+                  key={idx}
+                  href={file.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center p-4 bg-[#f0f7ff] rounded-2xl border border-blue-100 group hover:bg-blue-600 hover:border-blue-600 transition-all duration-300"
+                >
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform flex-shrink-0">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4 flex-1 overflow-hidden">
+                    <p className="text-[11px] font-bold text-blue-900 group-hover:text-white transition-colors line-clamp-2 leading-tight">
+                      {file.filename}
+                    </p>
+                    <p className="text-[9px] font-medium text-blue-400 group-hover:text-blue-100 transition-colors uppercase mt-0.5">
+                      Klik untuk membuka berkas
+                    </p>
+                  </div>
+                  <svg className="w-4 h-4 text-blue-300 group-hover:text-white transition-colors flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 

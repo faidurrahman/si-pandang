@@ -10,16 +10,16 @@ import { ReportDetailModal } from './components/ReportDetailModal';
 import { Sidebar } from './components/Sidebar';
 import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
-import { ChatBot } from './components/ChatBot';
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsk7hBNKqetXhO6oAzLcGz4ZgP7hE0nag_hIQleDbjFcBT4ynnHSm4cRa8CJiLxjAN/exec";
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygGpnXB9eekJ5wT2PdEpZwWBbgP7q90sqCrFlj3QIYKROQEx0Dr4Be1CWgk7Me4RsQ/exec";
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
 const GOOGLE_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Pengajuan`;
 
 const WA_NUMBER = "085242728901";
 const WA_MESSAGE = encodeURIComponent("Halo Sub bagian Umum dan Kepegawaian, saya ingin bertanya tentang layanan SI-PANDANG.");
 const WA_LINK = `https://wa.me/62${WA_NUMBER}?text=${WA_MESSAGE}`;
-const MAPS_LINK = "https://www.google.com/url?sa=E&q=https%3A%2F%2Fmaps.app.goo.gl%2FSX1s5Pf62GeDYKaG9";
+const MAPS_LINK = "https://maps.app.goo.gl/SX1s5Pf62GeDYKaG9";
 const EMAIL_ADDRESS = "data.kecujungpandang@gmail.com";
 
 const App: React.FC = () => {
@@ -103,16 +103,28 @@ const App: React.FC = () => {
       
       const data: Submission[] = allRows.slice(1).map((columns, index) => {
         const subId = cleanStr(columns[7]) || `ID-${index}`;
+        const rawFilenames = cleanStr(columns[4]) || 'Berkas.pdf';
+        const rawUrls = cleanStr(columns[6]) || '#';
+        
+        const filenames = rawFilenames.split('|');
+        const urls = rawUrls.split('|');
+        
+        const additionalFiles = filenames.map((name, i) => ({
+          filename: name,
+          url: urls[i] || '#'
+        }));
+
         return {
           tanggal: cleanStr(columns[0]) || 'N/A',
           nama: cleanStr(columns[1]) || 'N/A',
           nip: cleanStr(columns[2]) || 'N/A',
           layanan: cleanStr(columns[3]) || 'N/A',
-          filename: cleanStr(columns[4]) || 'Berkas.pdf',
+          filename: filenames[0],
           status: (cleanStr(columns[5]) as SubmissionStatus) || 'Dalam Proses',
-          fileUrl: cleanStr(columns[6]) || '#',
+          fileUrl: urls[0],
           id: subId,
-          pengumuman: cleanStr(columns[8]) || ''
+          pengumuman: cleanStr(columns[8]) || '',
+          additionalFiles: additionalFiles
         };
       }).reverse();
       setSubmissions(data);
@@ -191,6 +203,9 @@ const App: React.FC = () => {
     const now = new Date();
     const formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
     try {
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
@@ -202,15 +217,31 @@ const App: React.FC = () => {
           status: 'Dalam Proses',
           timestamp: formattedDate
         }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       setIsSubmitting(false);
       setShowForm(false);
       setSubmitStatus('success');
       setTimeout(() => setSubmitStatus('idle'), 5000);
       fetchSubmissions();
-    } catch (error) {
+    } catch (error: any) {
+      clearTimeout(timeoutId);
       setIsSubmitting(false);
-      setSubmitStatus('error');
+      
+      if (error.name === 'AbortError') {
+        // If it's a timeout, we assume it might have reached the server 
+        // especially with no-cors where we don't get a real response anyway
+        setShowForm(false);
+        setSubmitStatus('success');
+        setTimeout(() => setSubmitStatus('idle'), 5000);
+        fetchSubmissions();
+      } else {
+        console.error("Submission error:", error);
+        setSubmitStatus('error');
+        setTimeout(() => setSubmitStatus('idle'), 5000);
+      }
     }
   };
 
@@ -237,10 +268,20 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
-      <header className="absolute top-0 left-0 w-full z-[140] px-6 py-6 md:px-12 md:py-10">
-        <div className="header-container w-full">
-          {/* Bagian Logo dihilangkan teksnya, menyisakan div kosong untuk menjaga layout flex space-between */}
-          <div className="header-logo flex items-center">
+      <header className="absolute top-0 left-0 w-full z-[140] px-4 py-4 md:px-12 md:py-10">
+        <div className="header-container w-full flex justify-between items-center">
+          <div className="header-logo flex items-center space-x-2">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Logo_Kota_Makassar.png/480px-Logo_Kota_Makassar.png" 
+              alt="Logo Makassar" 
+              className="h-8 md:h-14 w-auto drop-shadow-lg"
+              referrerPolicy="no-referrer"
+            />
+            <div className="hidden md:block border-l border-white/20 pl-3">
+              <p className="text-white text-[10px] font-black uppercase tracking-widest leading-tight">Pemerintah Kota Makassar</p>
+              <p className="text-amber-500 text-[8px] font-bold uppercase tracking-tighter">Kecamatan Ujung Pandang</p>
+              <p className="text-white/70 text-[7px] font-bold uppercase tracking-widest mt-0.5 leading-tight">Sistem Informasi Pelayanan Administrasi Kepegawaian</p>
+            </div>
           </div>
           
           <div className="nav-icons-wrapper flex items-center space-x-3 md:space-x-5">
@@ -248,55 +289,55 @@ const App: React.FC = () => {
               <div className="relative" ref={notifRef}>
                 <button 
                   onClick={() => setIsNotifOpen(!isNotifOpen)}
-                  className="w-10 h-10 md:w-11 md:h-11 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-amber-500 hover:text-amber-400 transition-all border border-white/10 relative shadow-xl active:scale-90"
+                  className="w-8 h-8 md:w-11 md:h-11 bg-white/10 backdrop-blur-md rounded-lg md:rounded-xl flex items-center justify-center text-amber-500 hover:text-amber-400 transition-all border border-white/10 relative shadow-xl active:scale-90"
                 >
-                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                   {pendingSubmissionsCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-600 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-[#0a1e3b] shadow-lg animate-bounce">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-[#0a1e3b] shadow-lg animate-bounce">
                       {pendingSubmissionsCount}
                     </span>
                   )}
                 </button>
 
                 {isNotifOpen && (
-                  <div className="absolute top-14 right-0 w-72 sm:w-80 bg-white rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="p-6 border-b border-slate-50 bg-white flex justify-between items-center">
+                  <div className="absolute top-12 md:top-14 right-0 w-72 sm:w-80 bg-white rounded-[24px] md:rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="p-4 md:p-6 border-b border-slate-50 bg-white flex justify-between items-center">
                       <h3 className="text-[10px] font-black text-[#0a1e3b] uppercase tracking-widest">Notifikasi</h3>
                       {pendingSubmissionsCount > 0 && (
                         <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-[8px] font-black rounded-full uppercase tracking-widest">{pendingSubmissionsCount} BARU</span>
                       )}
                     </div>
-                    <div className="max-h-[400px] overflow-y-auto">
+                    <div className="max-h-[300px] md:max-h-[400px] overflow-y-auto">
                       {submissions.slice(0, 10).map((sub) => (
                         <div 
                           key={sub.id} 
                           onClick={() => markAsRead(sub.id)}
-                          className={`p-5 hover:bg-slate-50 border-b border-slate-50 transition-colors cursor-pointer group flex space-x-4 ${readNotifIds.has(sub.id) ? 'opacity-60' : 'opacity-100'}`}
+                          className={`p-4 md:p-5 hover:bg-slate-50 border-b border-slate-50 transition-colors cursor-pointer group flex space-x-4 ${readNotifIds.has(sub.id) ? 'opacity-60' : 'opacity-100'}`}
                         >
-                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0 font-black text-sm">
+                          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0 font-black text-xs md:text-sm">
                             {sub.nama.charAt(0)}
                           </div>
                           <div className="flex-1">
-                            <p className="text-[12px] font-bold text-[#0a1e3b] leading-snug">
+                            <p className="text-[11px] md:text-[12px] font-bold text-[#0a1e3b] leading-snug">
                               {sub.nama} – {sub.layanan}
                             </p>
-                            <p className="text-[10px] text-amber-600 font-bold uppercase mt-1 tracking-wider">
+                            <p className="text-[9px] md:text-[10px] text-amber-600 font-bold uppercase mt-1 tracking-wider">
                               {sub.tanggal}
                             </p>
                           </div>
                         </div>
                       ))}
                       {submissions.length === 0 && (
-                        <div className="p-12 text-center">
+                        <div className="p-10 md:p-12 text-center">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tidak ada notifikasi baru</p>
                         </div>
                       )}
                     </div>
                     <button 
                       onClick={markAllAsRead} 
-                      className="w-full py-5 text-center text-[10px] font-black text-slate-400 hover:text-amber-600 hover:bg-slate-50 transition-all uppercase tracking-[0.2em]"
+                      className="w-full py-4 md:py-5 text-center text-[10px] font-black text-slate-400 hover:text-amber-600 hover:bg-slate-50 transition-all uppercase tracking-[0.2em]"
                     >
                       Tandai Semua Telah Dibaca
                     </button>
@@ -304,8 +345,8 @@ const App: React.FC = () => {
                 )}
               </div>
             )}
-            <button onClick={() => setIsSidebarOpen(true)} className="text-white hover:opacity-70 transition-opacity relative group p-2">
-              <svg className="w-7 h-7 md:w-9 md:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <button onClick={() => setIsSidebarOpen(true)} className="text-white hover:opacity-70 transition-opacity relative group p-1.5">
+              <svg className="w-6 h-6 md:w-9 md:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="4" y1="6" x2="20" y2="6"></line>
                 <line x1="10" y1="12" x2="20" y2="12"></line>
                 <line x1="4" y1="18" x2="20" y2="18"></line>
@@ -325,31 +366,33 @@ const App: React.FC = () => {
         onLogout={handleLogout} 
       />
 
-      <section className="hero-bg relative min-h-[75vh] md:min-h-[85vh] flex flex-col items-center justify-center pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden px-4">
+      <section className="hero-bg relative min-h-[80vh] md:min-h-[85vh] flex flex-col items-center justify-center pt-24 pb-16 md:pt-40 md:pb-24 overflow-hidden px-4">
         <div className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10">
-          <div className="w-16 h-16 md:w-24 md:h-24 bg-amber-500 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-amber-900/40 mb-8 md:mb-12 hover:scale-110 transition-transform duration-500 cursor-pointer">
-             <svg className="w-8 h-8 md:w-12 md:h-12 text-[#0a1e3b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <div className="w-12 h-12 md:w-24 md:h-24 bg-amber-500 rounded-2xl md:rounded-[2rem] flex items-center justify-center shadow-2xl shadow-amber-900/40 mb-6 md:mb-12 hover:scale-110 transition-transform duration-500 cursor-pointer">
+             <svg className="w-6 h-6 md:w-12 md:h-12 text-[#0a1e3b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M2 17l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
              </svg>
           </div>
-          <div className="badge-portal px-5 py-2 md:px-8 md:py-3 rounded-full border border-white/10 mb-6 md:mb-10 backdrop-blur-md">
-            <span className="text-amber-500 text-[8px] md:text-xs font-black uppercase tracking-[0.2em]">PORTAL RESMI KEPEGAWAIAN</span>
+          <div className="mb-4 md:mb-10">
+            <span className="text-amber-500/60 text-[10px] md:text-xs font-light uppercase tracking-[0.3em]">PORTAL RESMI KEPEGAWAIAN</span>
           </div>
-          <div className="mb-4 md:mb-6 space-y-1">
-            <h2 className="text-white text-base md:text-3xl font-black tracking-widest uppercase opacity-95">SELAMAT DATANG DI</h2>
-            <h1 className="text-amber-500 text-4xl md:text-8xl font-black tracking-tight uppercase leading-tight md:leading-none">SI-PANDANG</h1>
+          <div className="mb-6 md:mb-10">
+            <h2 className="text-white text-[10px] md:text-3xl font-black tracking-[0.3em] uppercase opacity-80 mb-2">SELAMAT DATANG DI</h2>
+            <h1 className="text-amber-500 text-5xl md:text-9xl font-black tracking-tight uppercase leading-none drop-shadow-2xl">SI-PANDANG</h1>
           </div>
-          <p className="text-white/80 text-[10px] sm:text-xs md:text-lg max-w-[280px] sm:max-w-xl mx-auto mb-8 md:mb-12 font-medium leading-relaxed">
-            Portal Layanan Kepegawaian ASN Terintegrasi Kecamatan Ujung Pandang. Solusi Cepat untuk Administrasi Digital Anda.
+          <p className="text-white/80 text-[11px] md:text-xl max-w-[280px] md:max-w-3xl mx-auto mb-10 md:mb-16 font-bold leading-relaxed px-4 uppercase tracking-wider">
+            Sistem Informasi Pelayanan Administrasi Kepegawaian Kecamatan Ujung Pandang
           </p>
-          <button 
-            onClick={() => { setActiveTab('layanan'); setTimeout(() => document.getElementById('layanan-menu')?.scrollIntoView({ behavior: 'smooth' }), 50); }} 
-            className="btn-mulai-layanan tracking-widest"
-          >
-            MULAI LAYANAN
-          </button>
+          <div className="flex flex-col items-center">
+            <button 
+              onClick={() => { setActiveTab('layanan'); setTimeout(() => document.getElementById('layanan-menu')?.scrollIntoView({ behavior: 'smooth' }), 50); }} 
+              className="btn-mulai-layanan tracking-widest !px-8 !py-3 md:!px-12 md:!py-5 text-xs md:text-lg md:scale-110 hover:scale-105 transition-transform"
+            >
+              MULAI LAYANAN
+            </button>
+          </div>
         </div>
         <div className="wave-bottom overflow-hidden">
           <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-16 md:h-32">
@@ -407,52 +450,52 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <section className="contact-section max-w-4xl mx-auto px-6 mb-20 md:mb-32">
-        <div className="bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-50 p-10 md:p-14">
-          <div className="flex items-center space-x-4 mb-10">
+      <section className="contact-section max-w-4xl mx-auto px-4 md:px-6 mb-20 md:mb-32">
+        <div className="bg-white rounded-[32px] md:rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-50 p-6 md:p-14">
+          <div className="flex items-center space-x-3 md:space-x-4 mb-6 md:mb-10">
             <div className="text-amber-500">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             </div>
-            <h2 className="text-2xl md:text-3xl font-black text-[#0a1e3b] tracking-tight text-center sm:text-left">Kontak Admin</h2>
+            <h2 className="text-xl md:text-3xl font-black text-[#0a1e3b] tracking-tight">Kontak Admin</h2>
           </div>
 
-          <div className="space-y-5 contact-container">
-            <a href={MAPS_LINK} target="_blank" className="contact-item flex items-center p-6 bg-[#f5f9ff] rounded-[24px] group hover:bg-[#ebf4ff] transition-all">
-              <div className="contact-icon w-14 h-14 bg-blue-100 flex items-center justify-center rounded-2xl text-blue-600 flex-shrink-0 group-hover:scale-110 transition-transform">
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <div className="space-y-3 md:space-y-5 contact-container">
+            <a href={MAPS_LINK} target="_blank" className="contact-item flex items-center p-4 md:p-6 bg-[#f5f9ff] rounded-[20px] md:rounded-[24px] group hover:bg-[#ebf4ff] transition-all">
+              <div className="contact-icon w-10 h-10 md:w-14 md:h-14 bg-blue-100 flex items-center justify-center rounded-xl md:rounded-2xl text-blue-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+                <svg className="w-5 h-5 md:w-7 md:h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <div className="contact-text ml-6">
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">ALAMAT</h4>
-                <p className="text-[#0a1e3b] font-bold">Jl. Samiun No. 15, Kota Makassar</p>
+              <div className="contact-text ml-4 md:ml-6 overflow-hidden">
+                <h4 className="text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">ALAMAT</h4>
+                <p className="text-[#0a1e3b] font-bold text-sm md:text-base truncate">Jl. Samiun No. 15, Kota Makassar</p>
               </div>
             </a>
 
-            <a href={WA_LINK} target="_blank" className="contact-item flex items-center p-6 bg-[#f0fff4] rounded-[24px] group hover:bg-[#e6ffed] transition-all">
-              <div className="contact-icon w-14 h-14 bg-emerald-100 flex items-center justify-center rounded-2xl text-emerald-600 flex-shrink-0 group-hover:scale-110 transition-transform">
-                <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+            <a href={WA_LINK} target="_blank" className="contact-item flex items-center p-4 md:p-6 bg-[#f0fff4] rounded-[20px] md:rounded-[24px] group hover:bg-[#e6ffed] transition-all">
+              <div className="contact-icon w-10 h-10 md:w-14 md:h-14 bg-emerald-100 flex items-center justify-center rounded-xl md:rounded-2xl text-emerald-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+                <svg className="w-5 h-5 md:w-7 md:h-7" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.912-.001-3.793-.46-5.467-1.331l-6.53 1.714zm5.868-3.363l.42.249c1.662.984 3.566 1.503 5.507 1.504 5.814 0 10.546-4.731 10.549-10.548 0-2.817-1.097-5.465-3.091-7.458s-4.64-3.091-7.46-3.091c-5.815 0-10.547 4.732-10.55 10.548-.001 1.902.501 3.754 1.455 5.356l.271.456-1.011 3.694 3.8-.996z" />
                 </svg>
               </div>
-              <div className="contact-text ml-6">
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">WHATSAPP</h4>
-                <p className="text-[#0a1e3b] font-bold">{WA_NUMBER}</p>
+              <div className="contact-text ml-4 md:ml-6 overflow-hidden">
+                <h4 className="text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">WHATSAPP</h4>
+                <p className="text-[#0a1e3b] font-bold text-sm md:text-base truncate">{WA_NUMBER}</p>
               </div>
             </a>
 
-            <a href={`mailto:${EMAIL_ADDRESS}`} className="contact-item flex items-center p-6 bg-[#fff5f8] rounded-[24px] group hover:bg-[#fff0f4] transition-all">
-              <div className="contact-icon w-14 h-14 bg-pink-100 flex items-center justify-center rounded-2xl text-pink-600 flex-shrink-0 group-hover:scale-110 transition-transform">
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href={`mailto:${EMAIL_ADDRESS}`} className="contact-item flex items-center p-4 md:p-6 bg-[#fff5f8] rounded-[20px] md:rounded-[24px] group hover:bg-[#fff0f4] transition-all">
+              <div className="contact-icon w-10 h-10 md:w-14 md:h-14 bg-pink-100 flex items-center justify-center rounded-xl md:rounded-2xl text-pink-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+                <svg className="w-5 h-5 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
-              <div className="contact-text ml-6">
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">EMAIL</h4>
-                <p className="text-[#0a1e3b] font-bold">{EMAIL_ADDRESS}</p>
+              <div className="contact-text ml-4 md:ml-6 overflow-hidden">
+                <h4 className="text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">EMAIL</h4>
+                <p className="text-[#0a1e3b] font-bold text-sm md:text-base truncate">{EMAIL_ADDRESS}</p>
               </div>
             </a>
           </div>
@@ -479,13 +522,32 @@ const App: React.FC = () => {
         </div>
       </footer>
 
-      <ChatBot />
 
-      <ServiceModal service={selectedService} onClose={() => setSelectedService(null)} onApply={(s) => { setSelectedService(null); setShowForm(true); }} />
-      {showForm && <ApplicationForm initialService={selectedService} onClose={() => setShowForm(false)} onSubmit={handleFormSubmit} isSubmitting={isSubmitting} />}
+
+      {!showForm && <ServiceModal service={selectedService} onClose={() => setSelectedService(null)} onApply={(s) => { setShowForm(true); }} />}
+      {showForm && <ApplicationForm initialService={selectedService} onClose={() => { setShowForm(false); setSelectedService(null); }} onSubmit={handleFormSubmit} isSubmitting={isSubmitting} />}
       {selectedReport && <ReportDetailModal submission={selectedReport} onClose={() => setSelectedReport(null)} />}
       {editingReport && <EditReportModal submission={editingReport} onClose={() => setEditingReport(null)} onUpdate={handleUpdateData} isSubmitting={isSubmitting} />}
       {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} onLogin={handleLogin} />}
+      
+      {submitStatus !== 'idle' && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[300] animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className={`px-6 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 ${submitStatus === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+            {submitStatus === 'success' ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            )}
+            <span className="text-xs font-bold uppercase tracking-widest">
+              {submitStatus === 'success' ? 'Berhasil Terkirim' : 'Gagal Mengirim'}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

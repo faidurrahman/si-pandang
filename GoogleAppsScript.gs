@@ -59,15 +59,29 @@ function findRowById(sheet, idToFind) {
  */
 function handleInsertNewSubmission(sheet, data) {
   try {
-    let fileUrl = "#";
+    let fileUrls = [];
+    let filenames = [];
     
-    if (data.file) {
-      const folder = getOrCreateFolder(FOLDER_NAME);
+    const folder = getOrCreateFolder(FOLDER_NAME);
+
+    if (data.files && data.files.length > 0) {
+      data.files.forEach(f => {
+        const blob = Utilities.newBlob(Utilities.base64Decode(f.data), f.mimetype || 'application/octet-stream', f.filename);
+        const file = folder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        fileUrls.push(file.getUrl());
+        filenames.push(f.filename);
+      });
+    } else if (data.file) {
       const blob = Utilities.newBlob(Utilities.base64Decode(data.file), data.mimetype || 'application/octet-stream', data.filename);
       const file = folder.createFile(blob);
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      fileUrl = file.getUrl();
+      fileUrls.push(file.getUrl());
+      filenames.push(data.filename);
     }
+
+    const finalFileUrl = fileUrls.length > 0 ? fileUrls.join('|') : "#";
+    const finalFilename = filenames.length > 0 ? filenames.join('|') : "Berkas.pdf";
 
     // Gunakan ID dari frontend
     const uniqueId = data.id || ("SIP-" + Math.floor(Math.random() * 1000000));
@@ -77,9 +91,9 @@ function handleInsertNewSubmission(sheet, data) {
       data.nama,           // B (1)
       "'" + data.nip,      // C (2) - Prefiks petik agar teks
       data.layanan,        // D (3)
-      data.filename,       // E (4)
+      finalFilename,       // E (4)
       "Dalam Proses",      // F (5)
-      fileUrl,             // G (6)
+      finalFileUrl,        // G (6)
       uniqueId,            // H (7)
       ""                   // I (8) - Kolom Pengumuman (kosong saat awal)
     ]);

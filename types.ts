@@ -26,10 +26,5 @@ export interface Submission {
   filename: string;
   fileUrl: string;
   pengumuman?: string; // Kolom baru I
-}
-
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  text: string;
-  timestamp: Date;
+  additionalFiles?: { filename: string; url: string }[];
 }
