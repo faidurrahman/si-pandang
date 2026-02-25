@@ -4,7 +4,7 @@ import { GoogleGenAI } from "@google/genai";
  * Layanan AI untuk SI-PANDANG.
  */
 export async function askPandangAI(prompt: string, context: string) {
-  const apiKey = process.env.API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
 
   if (!apiKey) {
     console.error("SI-PANDANG: API Key tidak ditemukan");
