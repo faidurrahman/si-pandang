@@ -6,7 +6,7 @@
 
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
 const SHEET_NAME = "Pengajuan";
-const FOLDER_NAME = "SI-PANDANG_BERKAS";
+const FOLDER_ID = "1wzYoeJmy95Tm8yAsAyyEx9RwWbDrClp-";
 
 function doPost(e) {
   try {
@@ -62,7 +62,7 @@ function handleInsertNewSubmission(sheet, data) {
     let fileUrls = [];
     let filenames = [];
     
-    const folder = getOrCreateFolder(FOLDER_NAME);
+    const folder = DriveApp.getFolderById(FOLDER_ID);
 
     if (data.files && data.files.length > 0) {
       data.files.forEach(f => {
@@ -139,11 +139,20 @@ function handleUpdateStatusOnly(sheet, data) {
   return ContentService.createTextOutput("ID Not Found").setMimeType(ContentService.MimeType.TEXT);
 }
 
-function getOrCreateFolder(folderName) {
-  const folders = DriveApp.getFoldersByName(folderName);
-  return folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
-}
-
 function doGet(e) {
-  return ContentService.createTextOutput("SI-PANDANG API is Active. Use POST for transactions.").setMimeType(ContentService.MimeType.TEXT);
+  try {
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      return ContentService.createTextOutput(JSON.stringify({ error: "Sheet not found" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const data = sheet.getDataRange().getValues();
+    return ContentService.createTextOutput(JSON.stringify({ data: data }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ error: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }

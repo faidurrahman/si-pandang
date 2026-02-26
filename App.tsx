@@ -12,9 +12,8 @@ import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
 
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygGpnXB9eekJ5wT2PdEpZwWBbgP7q90sqCrFlj3QIYKROQEx0Dr4Be1CWgk7Me4RsQ/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEehw7MuRO_leCLt_B1JfNHkzaxC6VgGX9HtlBmz2uAPsgua4alCOt5-VodnKp_cuz/exec";
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
-const GOOGLE_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Pengajuan`;
 
 const WA_NUMBER = "085242728901";
 const WA_MESSAGE = encodeURIComponent("Halo Sub bagian Umum dan Kepegawaian, saya ingin bertanya tentang layanan SI-PANDANG.");
@@ -63,45 +62,39 @@ const App: React.FC = () => {
       .trim();
   };
 
-  const parseCSVData = (text: string) => {
-    const result: string[][] = [];
-    let row: string[] = [];
-    let field = '';
-    let inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      if (inQuotes) {
-        if (c === '"') {
-          if (text[i + 1] === '"') { field += '"'; i++; }
-          else { inQuotes = false; }
-        } else { field += c; }
-      } else {
-        if (c === '"') { inQuotes = true; }
-        else if (c === ',') { row.push(field); field = ''; }
-        else if (c === '\n' || c === '\r') {
-          row.push(field);
-          if (row.length > 1 || row[0] !== '') result.push(row);
-          row = []; field = '';
-          if (c === '\r' && text[i + 1] === '\n') i++;
-        } else { field += c; }
-      }
-    }
-    if (row.length > 0 || field !== '') {
-      row.push(field);
-      result.push(row);
-    }
-    return result;
-  };
-
   const fetchSubmissions = useCallback(async () => {
     setIsLoadingReports(true);
     try {
-      const response = await fetch(`${GOOGLE_SHEET_CSV_URL}&t=${new Date().getTime()}`);
+      const response = await fetch(`${APPS_SCRIPT_URL}?action=getData&t=${new Date().getTime()}`);
       if (!response.ok) throw new Error('Gagal mengambil data');
-      const csvText = await response.text();
-      const allRows = parseCSVData(csvText);
       
-      const data: Submission[] = allRows.slice(1).map((columns, index) => {
+      const text = await response.text();
+      
+      // Check if the response is the old plain text response
+      if (text.startsWith('SI-PANDANG')) {
+        console.warn("Apps Script belum diupdate. Menampilkan data kosong sementara.");
+        setSubmissions([]);
+        return;
+      }
+
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch (e) {
+        console.error("Failed to parse JSON:", text);
+        throw new Error("Format data tidak valid. Pastikan Apps Script telah di-deploy ulang.");
+      }
+      
+      if (json.error) throw new Error(json.error);
+      
+      const allRows = json.data;
+      
+      if (!allRows || allRows.length === 0) {
+        setSubmissions([]);
+        return;
+      }
+
+      const data: Submission[] = allRows.slice(1).map((columns: any[], index: number) => {
         const subId = cleanStr(columns[7]) || `ID-${index}`;
         const rawFilenames = cleanStr(columns[4]) || 'Berkas.pdf';
         const rawUrls = cleanStr(columns[6]) || '#';
@@ -109,7 +102,7 @@ const App: React.FC = () => {
         const filenames = rawFilenames.split('|');
         const urls = rawUrls.split('|');
         
-        const additionalFiles = filenames.map((name, i) => ({
+        const additionalFiles = filenames.map((name: string, i: number) => ({
           filename: name,
           url: urls[i] || '#'
         }));
@@ -270,21 +263,20 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
       <header className="absolute top-0 left-0 w-full z-[140] px-4 py-4 md:px-12 md:py-10">
         <div className="header-container w-full flex justify-between items-center">
-          <div className="header-logo flex items-center space-x-2">
+          <div className="header-logo flex items-center space-x-2 md:space-x-3 justify-start">
             <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Logo_Kota_Makassar.png/480px-Logo_Kota_Makassar.png" 
-              alt="Logo Makassar" 
-              className="h-8 md:h-14 w-auto drop-shadow-lg"
+              src="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9" 
+              alt="Logo SI-PANDANG" 
+              className="h-10 md:h-16 w-auto drop-shadow-2xl object-contain"
               referrerPolicy="no-referrer"
             />
-            <div className="hidden md:block border-l border-white/20 pl-3">
-              <p className="text-white text-[10px] font-black uppercase tracking-widest leading-tight">Pemerintah Kota Makassar</p>
-              <p className="text-amber-500 text-[8px] font-bold uppercase tracking-tighter">Kecamatan Ujung Pandang</p>
-              <p className="text-white/70 text-[7px] font-bold uppercase tracking-widest mt-0.5 leading-tight">Sistem Informasi Pelayanan Administrasi Kepegawaian</p>
+            <div className="border-l border-white/20 pl-2 md:pl-3 flex flex-col justify-center text-left">
+              <p className="text-white text-[8px] md:text-[11px] font-black uppercase tracking-widest leading-tight">Pemerintah Kota Makassar</p>
+              <p className="text-amber-500 text-[7px] md:text-[9px] font-bold uppercase tracking-tighter">Kecamatan Ujung Pandang</p>
             </div>
           </div>
           
-          <div className="nav-icons-wrapper flex items-center space-x-3 md:space-x-5">
+          <div className="nav-icons-wrapper flex items-center space-x-3 md:space-x-5 justify-end">
             {isLoggedIn && (
               <div className="relative" ref={notifRef}>
                 <button 

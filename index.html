@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SI-PANDANG | Kecamatan Ujung Pandang</title>
-    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1O0K6-vP-I_o_X_Y2k7JzH2X3DqZ3u6zI">
-    <link rel="shortcut icon" type="image/png" href="https://lh3.googleusercontent.com/d/1O0K6-vP-I_o_X_Y2k7JzH2X3DqZ3u6zI">
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1O0K6-vP-I_o_X_Y2k7JzH2X3DqZ3u6zI">
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9">
+    <link rel="shortcut icon" type="image/png" href="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -51,22 +51,19 @@
             display: flex !important;
             gap: 15px;
             order: 2;
-            margin-left: auto; /* Memaksa ikon tetap ke kanan meskipun area kiri kosong */
         }
 
         .header-logo {
             order: 1;
-            min-width: 1px; /* Spacer minimal */
+            display: flex;
+            align-items: center;
         }
 
         /* Tampilan Desktop: Memindahkan navigasi ke ujung kanan atas */
         @media (min-width: 1024px) {
             .header-container {
-                justify-content: flex-end !important;
+                justify-content: space-between !important;
                 max-width: none !important; /* Hapus batasan lebar pada desktop agar bisa mencapai pojok */
-            }
-            .nav-icons-wrapper {
-                margin-left: 0 !important; /* Parent flex-end yang mengatur perataan */
             }
         }
 
@@ -178,7 +175,7 @@
           var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
           link.type = 'image/png';
           link.rel = 'shortcut icon';
-          link.href = 'https://lh3.googleusercontent.com/d/1O0K6-vP-I_o_X_Y2k7JzH2X3DqZ3u6zI';
+          link.href = 'https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9';
           document.getElementsByTagName('head')[0].appendChild(link);
       })();
     </script>
