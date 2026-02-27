@@ -10,6 +10,7 @@ import { ReportDetailModal } from './components/ReportDetailModal';
 import { Sidebar } from './components/Sidebar';
 import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
+import { PantauKGB } from './components/PantauKGB';
 
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEehw7MuRO_leCLt_B1JfNHkzaxC6VgGX9HtlBmz2uAPsgua4alCOt5-VodnKp_cuz/exec";
@@ -22,7 +23,7 @@ const MAPS_LINK = "https://maps.app.goo.gl/SX1s5Pf62GeDYKaG9";
 const EMAIL_ADDRESS = "data.kecujungpandang@gmail.com";
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring'>('layanan');
+  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb'>('layanan');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -352,7 +353,10 @@ const App: React.FC = () => {
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
         activeTab={activeTab} 
-        onNavigate={setActiveTab} 
+        onNavigate={(tab) => {
+          setActiveTab(tab);
+          setTimeout(() => document.getElementById('layanan-menu')?.scrollIntoView({ behavior: 'smooth' }), 50);
+        }} 
         isLoggedIn={isLoggedIn} 
         onLoginClick={() => setShowLoginModal(true)} 
         onLogout={handleLogout} 
@@ -420,7 +424,7 @@ const App: React.FC = () => {
               ))}
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'monitoring' ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 space-y-4 md:space-y-0">
                 <div>
@@ -439,6 +443,8 @@ const App: React.FC = () => {
              </div>
              <ReportsTable submissions={submissions} onViewDetail={setSelectedReport} onEdit={setEditingReport} />
           </div>
+        ) : (
+          <PantauKGB />
         )}
       </main>
 
