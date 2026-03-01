@@ -32,6 +32,7 @@ const App: React.FC = () => {
   
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [isLoadingReports, setIsLoadingReports] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedReport, setSelectedReport] = useState<Submission | null>(null);
   const [editingReport, setEditingReport] = useState<Submission | null>(null);
 
@@ -67,11 +68,18 @@ const App: React.FC = () => {
 
   const fetchSubmissions = useCallback(async () => {
     setIsLoadingReports(true);
+    setFetchError(null);
     try {
-      const response = await fetch(`${APPS_SCRIPT_URL}?action=getData&t=${new Date().getTime()}`);
-      if (!response.ok) throw new Error('Gagal mengambil data');
+      console.log("Fetching monitoring data from:", `${APPS_SCRIPT_URL}?action=getData`);
+      const response = await fetch(`${APPS_SCRIPT_URL}?action=getData&t=${new Date().getTime()}`, {
+        method: "GET",
+      });
+      
+      console.log("Response status:", response.status);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       
       const text = await response.text();
+      console.log("Response text (first 100 chars):", text.substring(0, 100));
       
       // Check if the response is the old plain text response
       if (text.startsWith('SI-PANDANG')) {
@@ -125,8 +133,9 @@ const App: React.FC = () => {
         };
       }).reverse();
       setSubmissions(data);
-    } catch (error) {
-      console.error("Fetch error:", error);
+    } catch (error: any) {
+      console.error("Fetch error detail:", error);
+      setFetchError(error.message || "Gagal mengambil data dari server");
     } finally {
       setIsLoadingReports(false);
     }
@@ -546,6 +555,23 @@ const App: React.FC = () => {
              </div>
 
              <ReportsTable submissions={paginatedSubmissions} onViewDetail={setSelectedReport} onEdit={setEditingReport} />
+
+             {isLoadingReports && submissions.length === 0 && (
+               <div className="py-10 text-center text-slate-500 font-medium">
+                 <div className="flex justify-center items-center space-x-2 mb-3">
+                   <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                   <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></div>
+                   <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></div>
+                 </div>
+                 Loading data...
+               </div>
+             )}
+             
+             {fetchError && (
+               <div className="py-6 text-center text-red-500 font-medium bg-red-50 rounded-xl border border-red-100 mt-4">
+                 Error: {fetchError}
+               </div>
+             )}
 
              {/* Pagination Controls */}
              {filteredSubmissions.length > 0 && (

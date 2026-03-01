@@ -13,6 +13,7 @@ export const PantauKGB: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pegawaiList, setPegawaiList] = useState<PegawaiKGB[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedPegawai, setSelectedPegawai] = useState<PegawaiKGB | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(50);
@@ -21,9 +22,26 @@ export const PantauKGB: React.FC = () => {
   // Fetch Data
   const fetchPegawai = async () => {
     setIsLoading(true);
+    setFetchError(null);
     try {
-      const response = await fetch(`${APPS_SCRIPT_URL}?action=getKGB&t=${new Date().getTime()}`);
-      const json = await response.json();
+      console.log("Fetching KGB data from:", `${APPS_SCRIPT_URL}?action=getKGB`);
+      const response = await fetch(`${APPS_SCRIPT_URL}?action=getKGB&t=${new Date().getTime()}`, {
+        method: "GET",
+      });
+      
+      console.log("Response status:", response.status);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
+      const text = await response.text();
+      console.log("Response text (first 100 chars):", text.substring(0, 100));
+      
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch (e) {
+        console.error("Failed to parse JSON:", text);
+        throw new Error("Format data tidak valid. Pastikan Apps Script telah di-deploy ulang.");
+      }
       
       if (json.data && json.data.length > 1) { // Skip header row
         const rows = json.data.slice(1);
@@ -50,8 +68,9 @@ export const PantauKGB: React.FC = () => {
       } else {
         setPegawaiList([]);
       }
-    } catch (error) {
-      console.error("Failed to fetch KGB data:", error);
+    } catch (error: any) {
+      console.error("Failed to fetch KGB data detail:", error);
+      setFetchError(error.message || "Gagal mengambil data dari server");
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +159,6 @@ export const PantauKGB: React.FC = () => {
     try {
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: 'addPegawai',
@@ -190,7 +208,6 @@ export const PantauKGB: React.FC = () => {
     try {
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: 'deletePegawai',
@@ -211,7 +228,6 @@ export const PantauKGB: React.FC = () => {
     try {
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: 'updatePegawai',
@@ -392,6 +408,14 @@ export const PantauKGB: React.FC = () => {
                         <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></div>
                       </div>
                       <p className="mt-2 text-xs font-medium">Memuat data...</p>
+                    </td>
+                  </tr>
+                ) : fetchError ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center">
+                      <div className="text-red-500 font-medium bg-red-50 p-4 rounded-xl inline-block border border-red-100">
+                        Error: {fetchError}
+                      </div>
                     </td>
                   </tr>
                 ) : filteredPegawai.length === 0 ? (
