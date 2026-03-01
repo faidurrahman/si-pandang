@@ -637,51 +637,51 @@ const App: React.FC = () => {
 
       {activeTab === 'layanan' && (
       <section className="contact-section max-w-4xl mx-auto px-4 md:px-6 mb-20 md:mb-32">
-        <div className="bg-white rounded-[32px] md:rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-50 p-6 md:p-14">
-          <div className="flex items-center space-x-3 md:space-x-4 mb-6 md:mb-10">
+        <div className="bg-white rounded-2xl md:rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-50 p-4 md:p-10">
+          <div className="flex items-center space-x-2 md:space-x-4 mb-4 md:mb-8">
             <div className="text-amber-500">
-              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 md:w-8 md:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             </div>
-            <h2 className="text-xl md:text-3xl font-black text-[#0a1e3b] tracking-tight">Kontak Admin</h2>
+            <h2 className="text-lg md:text-3xl font-black text-[#0a1e3b] tracking-tight">Kontak Admin</h2>
           </div>
 
-          <div className="space-y-3 md:space-y-5 contact-container">
-            <a href={MAPS_LINK} target="_blank" className="contact-item flex items-center p-4 md:p-6 bg-[#f5f9ff] rounded-[20px] md:rounded-[24px] group hover:bg-[#ebf4ff] transition-all">
-              <div className="contact-icon w-10 h-10 md:w-14 md:h-14 bg-blue-100 flex items-center justify-center rounded-xl md:rounded-2xl text-blue-600 flex-shrink-0 group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5 md:w-7 md:h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <div className="space-y-2 md:space-y-4 contact-container">
+            <a href={MAPS_LINK} target="_blank" className="contact-item flex items-center p-3 md:p-5 bg-[#f5f9ff] rounded-xl md:rounded-2xl group hover:bg-[#ebf4ff] transition-all">
+              <div className="contact-icon w-8 h-8 md:w-12 md:h-12 bg-blue-100 flex items-center justify-center rounded-lg md:rounded-xl text-blue-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+                <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <div className="contact-text ml-4 md:ml-6 overflow-hidden">
-                <h4 className="text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">ALAMAT</h4>
-                <p className="text-[#0a1e3b] font-bold text-sm md:text-base truncate">Jl. Samiun No. 15, Kota Makassar</p>
+              <div className="contact-text ml-3 md:ml-5 overflow-hidden">
+                <h4 className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">ALAMAT</h4>
+                <p className="text-[#0a1e3b] font-semibold text-xs md:text-sm truncate">Jl. Samiun No. 15, Kota Makassar</p>
               </div>
             </a>
 
-            <a href={WA_LINK} target="_blank" className="contact-item flex items-center p-4 md:p-6 bg-[#f0fff4] rounded-[20px] md:rounded-[24px] group hover:bg-[#e6ffed] transition-all">
-              <div className="contact-icon w-10 h-10 md:w-14 md:h-14 bg-emerald-100 flex items-center justify-center rounded-xl md:rounded-2xl text-emerald-600 flex-shrink-0 group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5 md:w-7 md:h-7" fill="currentColor" viewBox="0 0 24 24">
+            <a href={WA_LINK} target="_blank" className="contact-item flex items-center p-3 md:p-5 bg-[#f0fff4] rounded-xl md:rounded-2xl group hover:bg-[#e6ffed] transition-all">
+              <div className="contact-icon w-8 h-8 md:w-12 md:h-12 bg-emerald-100 flex items-center justify-center rounded-lg md:rounded-xl text-emerald-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+                <svg className="w-4 h-4 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.912-.001-3.793-.46-5.467-1.331l-6.53 1.714zm5.868-3.363l.42.249c1.662.984 3.566 1.503 5.507 1.504 5.814 0 10.546-4.731 10.549-10.548 0-2.817-1.097-5.465-3.091-7.458s-4.64-3.091-7.46-3.091c-5.815 0-10.547 4.732-10.55 10.548-.001 1.902.501 3.754 1.455 5.356l.271.456-1.011 3.694 3.8-.996z" />
                 </svg>
               </div>
-              <div className="contact-text ml-4 md:ml-6 overflow-hidden">
-                <h4 className="text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">WHATSAPP</h4>
-                <p className="text-[#0a1e3b] font-bold text-sm md:text-base truncate">{WA_NUMBER}</p>
+              <div className="contact-text ml-3 md:ml-5 overflow-hidden">
+                <h4 className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">WHATSAPP</h4>
+                <p className="text-[#0a1e3b] font-semibold text-xs md:text-sm truncate">{WA_NUMBER}</p>
               </div>
             </a>
 
-            <a href={`mailto:${EMAIL_ADDRESS}`} className="contact-item flex items-center p-4 md:p-6 bg-[#fff5f8] rounded-[20px] md:rounded-[24px] group hover:bg-[#fff0f4] transition-all">
-              <div className="contact-icon w-10 h-10 md:w-14 md:h-14 bg-pink-100 flex items-center justify-center rounded-xl md:rounded-2xl text-pink-600 flex-shrink-0 group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href={`mailto:${EMAIL_ADDRESS}`} className="contact-item flex items-center p-3 md:p-5 bg-[#fff5f8] rounded-xl md:rounded-2xl group hover:bg-[#fff0f4] transition-all">
+              <div className="contact-icon w-8 h-8 md:w-12 md:h-12 bg-pink-100 flex items-center justify-center rounded-lg md:rounded-xl text-pink-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+                <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
-              <div className="contact-text ml-4 md:ml-6 overflow-hidden">
-                <h4 className="text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">EMAIL</h4>
-                <p className="text-[#0a1e3b] font-bold text-sm md:text-base truncate">{EMAIL_ADDRESS}</p>
+              <div className="contact-text ml-3 md:ml-5 overflow-hidden w-full">
+                <h4 className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">EMAIL</h4>
+                <p className="text-[#0a1e3b] font-semibold text-xs md:text-sm break-all line-clamp-2">{EMAIL_ADDRESS}</p>
               </div>
             </a>
           </div>
