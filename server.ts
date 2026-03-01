@@ -26,11 +26,13 @@ async function startServer() {
         method: req.method,
         headers: {
           'Content-Type': req.headers['content-type'] || 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         },
+        redirect: 'follow',
       };
 
       if (req.method !== 'GET' && req.method !== 'HEAD') {
-        options.body = JSON.stringify(req.body);
+        options.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
       }
 
       console.log(`Proxying ${req.method} request to Google Apps Script...`);

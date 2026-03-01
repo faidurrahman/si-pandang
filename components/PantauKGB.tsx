@@ -22,7 +22,7 @@ export const PantauKGB: React.FC = () => {
   const fetchPegawai = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${APPS_SCRIPT_URL}?action=getKGB`);
+      const response = await fetch(`${APPS_SCRIPT_URL}?action=getKGB&t=${new Date().getTime()}`);
       const json = await response.json();
       
       if (json.data && json.data.length > 1) { // Skip header row
