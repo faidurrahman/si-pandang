@@ -1,17 +1,148 @@
 /**
- * BACKEND SI-PANDANG - Digitalisasi Kepegawaian (VERSI STABIL)
+ * BACKEND SI-PANDANG - Digitalisasi Kepegawaian (VERSI STABIL + NOTIFIKASI)
  * Struktur Sheet "Pengajuan":
- * A: Tanggal | B: Nama | C: NIP | D: Layanan | E: Nama File | F: Status | G: URL File | H: ID Pengajuan | I: Pengumuman
+ * A: Tanggal | B: Nama | C: NIP | D: Layanan | E: Nama File | F: Status | G: URL File | H: ID Pengajuan | I: Pengumuman | J: Is Read
  */
 
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
 const SHEET_NAME = "Pengajuan";
 const FOLDER_ID = "1wzYoeJmy95Tm8yAsAyyEx9RwWbDrClp-";
 
+// Fungsi doOptions diperlukan untuk menangani preflight request (CORS) dari browser
+function doOptions(e) {
+  return ContentService.createTextOutput("")
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.openById(SHEET_ID);
+
+    // =====================================================================
+    // 1. LOGIKA BARU: Menangani action 'addPegawai', 'deletePegawai', 'updatePegawai'
+    // =====================================================================
+    if (data.action === 'addPegawai') {
+      var sheetKgb = ss.getSheetByName('KGB') || ss.getSheetByName('kgb') || ss.getSheetByName('Kgb');
+      
+      if (!sheetKgb) {
+        // Jika sheet tidak ada, buat sheet baru dengan header
+        sheetKgb = ss.insertSheet('KGB');
+        sheetKgb.appendRow(['ID', 'Timestamp', 'Nama', 'NIP', 'Pangkat', 'Jabatan', 'TMT KGB', 'Gaji Pokok', 'URL SK', 'URL KGB']);
+      }
+
+      // ID Folder Google Drive untuk menyimpan file SK dan KGB (Sesuai permintaan)
+      var folderId = '1DA_hIwJl-4kcB96DGJV1PA-xVA_xwXV8'; 
+      var folder = DriveApp.getFolderById(folderId);
+
+      var skUrl = '';
+      var kgbUrl = '';
+
+      // Proses upload file jika ada (mengubah base64 kembali menjadi file)
+      if (data.files && data.files.length > 0) {
+        data.files.forEach(function(file) {
+          var blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimetype, file.filename);
+          var uploadedFile = folder.createFile(blob);
+          
+          // Set permission agar file bisa dilihat oleh siapa saja yang memiliki link
+          uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          
+          // Pisahkan URL berdasarkan tipe file yang dikirim dari frontend
+          if (file.type === 'sk') {
+            skUrl = uploadedFile.getUrl();
+          } else if (file.type === 'kgb') {
+            kgbUrl = uploadedFile.getUrl();
+          }
+        });
+      }
+
+      // Masukkan data ke baris baru (appendRow) di sheet KGB
+      // Urutan kolom: ID, Timestamp, Nama, NIP, Pangkat, Jabatan, TMT KGB, Gaji Pokok, URL SK, URL KGB
+      sheetKgb.appendRow([
+        data.id || '',
+        data.timestamp || new Date().toISOString(),
+        data.nama || '',
+        "'" + (data.nip || ''), // Tambahkan petik agar NIP tidak jadi angka scientific
+        data.pangkat || '',
+        data.jabatan || '',
+        data.tmtKgb || '',
+        data.gajiPokok || '',
+        skUrl,
+        kgbUrl
+      ]);
+
+      SpreadsheetApp.flush();
+
+      // Kembalikan respons sukses ke frontend
+      return ContentService.createTextOutput("Success Insert KGB").setMimeType(ContentService.MimeType.TEXT);
+    }
+
+    if (data.action === 'deletePegawai') {
+      var sheetKgb = ss.getSheetByName('KGB') || ss.getSheetByName('kgb') || ss.getSheetByName('Kgb');
+      if (!sheetKgb) return ContentService.createTextOutput("Sheet KGB not found").setMimeType(ContentService.MimeType.TEXT);
+      
+      var rows = sheetKgb.getDataRange().getValues();
+      var idToDelete = data.id;
+      var rowIndex = -1;
+
+      // Cari baris berdasarkan ID (Kolom A / index 0)
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][0]) === String(idToDelete)) {
+          rowIndex = i + 1; // 1-based index
+          break;
+        }
+      }
+
+      if (rowIndex !== -1) {
+        sheetKgb.deleteRow(rowIndex);
+        SpreadsheetApp.flush();
+        return ContentService.createTextOutput("Success Delete KGB").setMimeType(ContentService.MimeType.TEXT);
+      } else {
+        return ContentService.createTextOutput("ID Not Found").setMimeType(ContentService.MimeType.TEXT);
+      }
+    }
+
+    if (data.action === 'updatePegawai') {
+      var sheetKgb = ss.getSheetByName('KGB') || ss.getSheetByName('kgb') || ss.getSheetByName('Kgb');
+      if (!sheetKgb) return ContentService.createTextOutput("Sheet KGB not found").setMimeType(ContentService.MimeType.TEXT);
+      
+      var rows = sheetKgb.getDataRange().getValues();
+      var idToUpdate = data.id;
+      var rowIndex = -1;
+
+      // Cari baris berdasarkan ID (Kolom A / index 0)
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][0]) === String(idToUpdate)) {
+          rowIndex = i + 1; // 1-based index
+          break;
+        }
+      }
+
+      if (rowIndex !== -1) {
+        // Update kolom yang dikirim
+        // Urutan kolom: ID(0), Timestamp(1), Nama(2), NIP(3), Pangkat(4), Jabatan(5), TMT KGB(6), Gaji Pokok(7), URL SK(8), URL KGB(9)
+        
+        if (data.nama) sheetKgb.getRange(rowIndex, 3).setValue(data.nama);
+        if (data.nip) sheetKgb.getRange(rowIndex, 4).setValue("'" + data.nip);
+        if (data.pangkat) sheetKgb.getRange(rowIndex, 5).setValue(data.pangkat);
+        if (data.jabatan) sheetKgb.getRange(rowIndex, 6).setValue(data.jabatan);
+        if (data.tmtKgb) sheetKgb.getRange(rowIndex, 7).setValue(data.tmtKgb);
+        if (data.gajiPokok) sheetKgb.getRange(rowIndex, 8).setValue(data.gajiPokok);
+        
+        // Handle file updates if needed (optional, logic similar to addPegawai but updating cells)
+        // For simplicity, assuming file updates are handled separately or re-upload creates new entry
+        
+        SpreadsheetApp.flush();
+        return ContentService.createTextOutput("Success Update KGB").setMimeType(ContentService.MimeType.TEXT);
+      } else {
+        return ContentService.createTextOutput("ID Not Found").setMimeType(ContentService.MimeType.TEXT);
+      }
+    }
+
+    // =====================================================================
+    // 2. LOGIKA UTAMA: Pengajuan & Notifikasi
+    // =====================================================================
+
     const sheet = ss.getSheetByName(SHEET_NAME);
 
     if (!sheet) {
@@ -25,6 +156,15 @@ function doPost(e) {
     if (data.action === 'updateStatus') {
       return handleUpdateStatusOnly(sheet, data);
     }
+    
+    // --- FITUR NOTIFIKASI (BARU) ---
+    if (data.action === 'markAsRead') {
+      return handleMarkAsRead(sheet, data);
+    }
+    if (data.action === 'markAllAsRead') {
+      return handleMarkAllAsRead(sheet);
+    }
+    // -------------------------------
     
     // Default: Simpan Pengajuan Baru
     return handleInsertNewSubmission(sheet, data);
@@ -95,7 +235,8 @@ function handleInsertNewSubmission(sheet, data) {
       "Dalam Proses",      // F (5)
       finalFileUrl,        // G (6)
       uniqueId,            // H (7)
-      ""                   // I (8) - Kolom Pengumuman (kosong saat awal)
+      "",                  // I (8) - Kolom Pengumuman
+      0                    // J (9) - Is Read (0 = Belum Dibaca)
     ]);
 
     SpreadsheetApp.flush();
@@ -139,9 +280,50 @@ function handleUpdateStatusOnly(sheet, data) {
   return ContentService.createTextOutput("ID Not Found").setMimeType(ContentService.MimeType.TEXT);
 }
 
+/**
+ * Menandai satu notifikasi sebagai sudah dibaca (Kolom J = 1)
+ */
+function handleMarkAsRead(sheet, data) {
+  const rowIndex = findRowById(sheet, data.id);
+  if (rowIndex !== -1) {
+    // Kolom J adalah kolom ke-10
+    sheet.getRange(rowIndex, 10).setValue(1); 
+    return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput(JSON.stringify({status: "not found"})).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Menandai SEMUA notifikasi sebagai sudah dibaca (Kolom J = 1)
+ */
+function handleMarkAllAsRead(sheet) {
+  var rows = sheet.getDataRange().getValues();
+  if (rows.length <= 1) return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
+  
+  // Update Kolom J (10) untuk semua baris data (mulai baris 2)
+  var range = sheet.getRange(2, 10, rows.length - 1, 1);
+  range.setValue(1);
+  
+  return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
+}
+
 function doGet(e) {
   try {
     const ss = SpreadsheetApp.openById(SHEET_ID);
+    
+    // Cek parameter action
+    if (e.parameter && e.parameter.action === 'getKGB') {
+      const sheetKgb = ss.getSheetByName('KGB') || ss.getSheetByName('kgb') || ss.getSheetByName('Kgb');
+      if (!sheetKgb) {
+        return ContentService.createTextOutput(JSON.stringify({ data: [] }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      const data = sheetKgb.getDataRange().getValues();
+      return ContentService.createTextOutput(JSON.stringify({ data: data }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Default: Ambil data Pengajuan
     const sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) {
       return ContentService.createTextOutput(JSON.stringify({ error: "Sheet not found" }))

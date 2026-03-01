@@ -26,5 +26,22 @@ export interface Submission {
   filename: string;
   fileUrl: string;
   pengumuman?: string; // Kolom baru I
+  isRead: boolean; // Kolom baru J (0=Unread, 1=Read)
   additionalFiles?: { filename: string; url: string }[];
+}
+
+export interface PegawaiKGB {
+  id: string;
+  timestamp: string;
+  nama: string;
+  nip: string;
+  pangkat: string;
+  jabatan: string;
+  tmtKgb: string;
+  gajiPokok: string;
+  skUrl: string;
+  kgbUrl: string;
+  // Calculated fields for frontend
+  jadwalBerikutnya?: string;
+  status?: 'Aman' | 'Mendekati' | 'Lewat Jadwal';
 }

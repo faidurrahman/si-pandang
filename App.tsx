@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { SERVICES } from './constants';
+import { SERVICES, APPS_SCRIPT_URL } from './constants';
 import { Service, Submission, SubmissionStatus } from './types';
 import { ServiceCard } from './components/ServiceCard';
 import { ServiceModal } from './components/ServiceModal';
@@ -12,8 +12,6 @@ import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
 import { PantauKGB } from './components/PantauKGB';
 
-
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEehw7MuRO_leCLt_B1JfNHkzaxC6VgGX9HtlBmz2uAPsgua4alCOt5-VodnKp_cuz/exec";
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
 
 const WA_NUMBER = "085242728901";
@@ -33,7 +31,6 @@ const App: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [readNotifIds, setReadNotifIds] = useState<Set<string>>(new Set());
   const [isLoadingReports, setIsLoadingReports] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Submission | null>(null);
   const [editingReport, setEditingReport] = useState<Submission | null>(null);
@@ -118,6 +115,7 @@ const App: React.FC = () => {
           fileUrl: urls[0],
           id: subId,
           pengumuman: cleanStr(columns[8]) || '',
+          isRead: cleanStr(columns[9]) === '1',
           additionalFiles: additionalFiles
         };
       }).reverse();
@@ -136,22 +134,46 @@ const App: React.FC = () => {
   }, [fetchSubmissions]);
 
   const unreadSubmissions = useMemo(() => {
-    return submissions.filter(s => s.status === 'Dalam Proses' && !readNotifIds.has(s.id));
-  }, [submissions, readNotifIds]);
+    return submissions.filter(s => s.status === 'Dalam Proses' && !s.isRead);
+  }, [submissions]);
 
   const pendingSubmissionsCount = unreadSubmissions.length;
 
-  const markAsRead = (id: string) => {
-    setReadNotifIds(prev => {
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
+  const markAsRead = async (id: string) => {
+    // Optimistic update
+    setSubmissions(prev => prev.map(s => s.id === id ? { ...s, isRead: true } : s));
+
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: 'markAsRead',
+          id: id
+        })
+      });
+    } catch (error) {
+      console.error("Failed to mark as read:", error);
+    }
   };
 
-  const markAllAsRead = () => {
-    const allIds = submissions.map(s => s.id);
-    setReadNotifIds(new Set([...readNotifIds, ...allIds]));
+  const markAllAsRead = async () => {
+    // Optimistic update
+    setSubmissions(prev => prev.map(s => ({ ...s, isRead: true })));
+
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: 'markAllAsRead'
+        })
+      });
+    } catch (error) {
+      console.error("Failed to mark all as read:", error);
+    }
   };
 
   const handleUpdateData = async (updatedData: any) => {
@@ -307,7 +329,7 @@ const App: React.FC = () => {
                         <div 
                           key={sub.id} 
                           onClick={() => markAsRead(sub.id)}
-                          className={`p-4 md:p-5 hover:bg-slate-50 border-b border-slate-50 transition-colors cursor-pointer group flex space-x-4 ${readNotifIds.has(sub.id) ? 'opacity-60' : 'opacity-100'}`}
+                          className={`p-4 md:p-5 hover:bg-slate-50 border-b border-slate-50 transition-colors cursor-pointer group flex space-x-4 ${sub.isRead ? 'opacity-60' : 'opacity-100'}`}
                         >
                           <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0 font-black text-xs md:text-sm">
                             {sub.nama.charAt(0)}
