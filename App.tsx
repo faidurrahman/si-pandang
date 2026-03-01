@@ -38,6 +38,11 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  // Pagination & Monitoring State
+  const [itemsPerPage, setItemsPerPage] = useState(50);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [monitoringSearchTerm, setMonitoringSearchTerm] = useState('');
+
   const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -146,7 +151,6 @@ const App: React.FC = () => {
     try {
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: 'markAsRead',
@@ -165,7 +169,6 @@ const App: React.FC = () => {
     try {
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: 'markAllAsRead'
@@ -192,7 +195,6 @@ const App: React.FC = () => {
     try {
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: 'updateData',
@@ -225,7 +227,6 @@ const App: React.FC = () => {
     try {
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           ...data,
@@ -282,43 +283,63 @@ const App: React.FC = () => {
     );
   }, [searchTerm]);
 
+  // Monitoring Pagination Logic
+  const filteredSubmissions = useMemo(() => {
+    return submissions.filter(sub => 
+      sub.nama.toLowerCase().includes(monitoringSearchTerm.toLowerCase()) ||
+      sub.nip.toLowerCase().includes(monitoringSearchTerm.toLowerCase()) ||
+      sub.layanan.toLowerCase().includes(monitoringSearchTerm.toLowerCase())
+    );
+  }, [submissions, monitoringSearchTerm]);
+
+  const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
+  
+  const paginatedSubmissions = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredSubmissions.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredSubmissions, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [monitoringSearchTerm, itemsPerPage]);
+
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
       <header className="relative w-full z-[140] bg-[#0F172A] border-b border-white/5 shadow-sm transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+        <div className="max-w-7xl mx-auto px-3 md:px-6 lg:px-8">
+          <div className="w-full flex justify-between items-center h-20">
             {/* Left Side: Logo & Text */}
-            <div className="flex items-center gap-3 md:gap-4">
+            <div className="flex items-center gap-2">
               <img 
                 src="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9" 
                 alt="Logo SI-PANDANG" 
-                className="h-9 md:h-10 w-auto object-contain drop-shadow-md"
+                className="h-8 md:h-10 w-auto object-contain drop-shadow-md"
                 referrerPolicy="no-referrer"
               />
               <div className="flex flex-col justify-center">
-                <h1 className="text-white text-[12px] sm:text-sm md:text-base font-semibold tracking-wide leading-tight">
+                <h1 className="text-white text-[10px] sm:text-sm md:text-base font-semibold tracking-wide leading-tight whitespace-nowrap">
                   PEMERINTAH KOTA MAKASSAR
                 </h1>
-                <p className="text-[#F59E0B] text-[10px] sm:text-xs md:text-sm font-normal tracking-wider mt-0.5">
+                <p className="text-[#F59E0B] text-[8px] sm:text-xs md:text-sm font-normal tracking-wider mt-0.5 whitespace-nowrap">
                   KECAMATAN UJUNG PANDANG
                 </p>
               </div>
             </div>
 
             {/* Right Side: Icons */}
-            <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-0.5">
               {isLoggedIn && (
-                <div className="relative" ref={notifRef}>
+                <div className="md:relative" ref={notifRef}>
                   <button 
                     onClick={() => setIsNotifOpen(!isNotifOpen)}
-                    className="group relative p-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
+                    className="group relative p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
                   >
-                    <svg className="w-6 h-6 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                     </svg>
                     
                     {pendingSubmissionsCount > 0 && (
-                      <span className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full ring-2 ring-[#0F172A]">
+                      <span className="absolute top-1 right-1 flex items-center justify-center w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full ring-2 ring-[#0F172A]">
                         {pendingSubmissionsCount > 9 ? '9+' : pendingSubmissionsCount}
                       </span>
                     )}
@@ -326,7 +347,7 @@ const App: React.FC = () => {
 
                   {/* Notification Dropdown */}
                   {isNotifOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top-right ring-1 ring-black/5">
+                    <div className="absolute top-20 left-4 right-4 md:top-full md:right-0 md:left-auto md:w-80 mt-2 z-50 bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top-right ring-1 ring-black/5">
                       <div className="px-5 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
                         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Notifikasi</h3>
                         {pendingSubmissionsCount > 0 && (
@@ -378,9 +399,9 @@ const App: React.FC = () => {
 
               <button 
                 onClick={() => setIsSidebarOpen(true)} 
-                className="p-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
+                className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
               >
-                <svg className="w-6 h-6 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
               </button>
@@ -474,28 +495,121 @@ const App: React.FC = () => {
           </div>
         ) : activeTab === 'monitoring' ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 space-y-4 md:space-y-0">
+             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4">
                 <div>
                   <h2 className="text-xl md:text-2xl font-bold text-[#0a1e3b]">Monitoring Layanan</h2>
                   <p className="text-slate-400 text-[10px] md:text-xs font-medium mt-1">Pantau status pengajuan berkas kepegawaian Anda.</p>
                 </div>
-                <button 
-                  onClick={fetchSubmissions}
-                  className="px-4 py-2.5 md:px-6 md:py-3 bg-white border border-slate-200 rounded-xl text-slate-600 font-bold text-[10px] md:text-xs flex items-center hover:bg-slate-50 transition-colors w-max"
-                >
-                  <svg className={`w-3.5 h-3.5 md:w-4 md:h-4 mr-2 ${isLoadingReports ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Segarkan Data
-                </button>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Search Box */}
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      placeholder="Cari data..." 
+                      value={monitoringSearchTerm}
+                      onChange={(e) => setMonitoringSearchTerm(e.target.value)}
+                      className="w-full sm:w-48 pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-sm"
+                    />
+                    <svg className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+
+                  {/* Refresh Button */}
+                  <button 
+                    onClick={fetchSubmissions}
+                    className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 font-bold text-[10px] md:text-xs flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm"
+                  >
+                    <svg className={`w-3.5 h-3.5 md:w-4 md:h-4 mr-2 ${isLoadingReports ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Segarkan
+                  </button>
+                </div>
              </div>
-             <ReportsTable submissions={submissions} onViewDetail={setSelectedReport} onEdit={setEditingReport} />
+
+             {/* Show Entries Dropdown */}
+             <div className="flex justify-end w-full mb-3">
+               <div className="flex items-center gap-2">
+                 <span className="text-sm text-slate-600 font-medium">Show</span>
+                 <select 
+                   value={itemsPerPage} 
+                   onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                   className="w-auto px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                 >
+                   {[5, 10, 20, 30, 50, 100].map(num => (
+                     <option key={num} value={num}>{num}</option>
+                   ))}
+                 </select>
+               </div>
+             </div>
+
+             <ReportsTable submissions={paginatedSubmissions} onViewDetail={setSelectedReport} onEdit={setEditingReport} />
+
+             {/* Pagination Controls */}
+             {filteredSubmissions.length > 0 && (
+               <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+                 <p className="text-slate-500 font-medium text-center md:text-left">
+                   Menampilkan <span className="font-bold text-[#0a1e3b]">{(currentPage - 1) * itemsPerPage + 1}</span> sampai <span className="font-bold text-[#0a1e3b]">{Math.min(currentPage * itemsPerPage, filteredSubmissions.length)}</span> dari <span className="font-bold text-[#0a1e3b]">{filteredSubmissions.length}</span> data
+                 </p>
+                 
+                 <div className="flex items-center space-x-1">
+                   <button 
+                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                     disabled={currentPage === 1}
+                     className="px-3 py-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
+                   >
+                     Previous
+                   </button>
+                   
+                   <div className="flex space-x-1">
+                    {(() => {
+                        const pages = [];
+                        const maxVisibleButtons = 5;
+                        let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
+                        let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+                        
+                        if (endPage - startPage + 1 < maxVisibleButtons) {
+                          startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+                        }
+
+                        for (let i = startPage; i <= endPage; i++) {
+                          pages.push(
+                            <button
+                              key={i}
+                              onClick={() => setCurrentPage(i)}
+                              className={`w-8 h-8 rounded-lg font-bold transition-colors flex items-center justify-center ${
+                                currentPage === i 
+                                  ? 'bg-[#0a1e3b] text-white border border-[#0a1e3b]' 
+                                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                              }`}
+                            >
+                              {i}
+                            </button>
+                          );
+                        }
+                        return pages;
+                    })()}
+                   </div>
+
+                   <button 
+                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                     disabled={currentPage === totalPages}
+                     className="px-3 py-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
+                   >
+                     Next
+                   </button>
+                 </div>
+               </div>
+             )}
           </div>
         ) : (
           <PantauKGB />
         )}
       </main>
 
+      {activeTab === 'layanan' && (
       <section className="contact-section max-w-4xl mx-auto px-4 md:px-6 mb-20 md:mb-32">
         <div className="bg-white rounded-[32px] md:rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-50 p-6 md:p-14">
           <div className="flex items-center space-x-3 md:space-x-4 mb-6 md:mb-10">
@@ -547,6 +661,7 @@ const App: React.FC = () => {
           </div>
         </div>
       </section>
+      )}
 
       <footer className="bg-[#050b18] pt-20 pb-12 px-6 relative overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent"></div>
