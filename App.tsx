@@ -284,89 +284,107 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
-      <header className="absolute top-0 left-0 w-full z-[140] px-4 py-4 md:px-12 md:py-10">
-        <div className="header-container w-full flex justify-between items-center">
-          <div className="header-logo flex items-center space-x-2 md:space-x-3 justify-start">
-            <img 
-              src="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9" 
-              alt="Logo SI-PANDANG" 
-              className="h-10 md:h-16 w-auto drop-shadow-2xl object-contain"
-              referrerPolicy="no-referrer"
-            />
-            <div className="border-l border-white/20 pl-2 md:pl-3 flex flex-col justify-center text-left">
-              <p className="text-white text-[8px] md:text-[11px] font-black uppercase tracking-widest leading-tight">Pemerintah Kota Makassar</p>
-              <p className="text-amber-500 text-[7px] md:text-[9px] font-bold uppercase tracking-tighter">Kecamatan Ujung Pandang</p>
-            </div>
-          </div>
-          
-          <div className="nav-icons-wrapper flex items-center space-x-3 md:space-x-5 justify-end">
-            {isLoggedIn && (
-              <div className="relative" ref={notifRef}>
-                <button 
-                  onClick={() => setIsNotifOpen(!isNotifOpen)}
-                  className="w-8 h-8 md:w-11 md:h-11 bg-white/10 backdrop-blur-md rounded-lg md:rounded-xl flex items-center justify-center text-amber-500 hover:text-amber-400 transition-all border border-white/10 relative shadow-xl active:scale-90"
-                >
-                  <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                  {pendingSubmissionsCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-[#0a1e3b] shadow-lg animate-bounce">
-                      {pendingSubmissionsCount}
-                    </span>
-                  )}
-                </button>
-
-                {isNotifOpen && (
-                  <div className="absolute top-12 md:top-14 right-0 w-72 sm:w-80 bg-white rounded-[24px] md:rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="p-4 md:p-6 border-b border-slate-50 bg-white flex justify-between items-center">
-                      <h3 className="text-[10px] font-black text-[#0a1e3b] uppercase tracking-widest">Notifikasi</h3>
-                      {pendingSubmissionsCount > 0 && (
-                        <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-[8px] font-black rounded-full uppercase tracking-widest">{pendingSubmissionsCount} BARU</span>
-                      )}
-                    </div>
-                    <div className="max-h-[300px] md:max-h-[400px] overflow-y-auto">
-                      {submissions.slice(0, 10).map((sub) => (
-                        <div 
-                          key={sub.id} 
-                          onClick={() => markAsRead(sub.id)}
-                          className={`p-4 md:p-5 hover:bg-slate-50 border-b border-slate-50 transition-colors cursor-pointer group flex space-x-4 ${sub.isRead ? 'opacity-60' : 'opacity-100'}`}
-                        >
-                          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0 font-black text-xs md:text-sm">
-                            {sub.nama.charAt(0)}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-[11px] md:text-[12px] font-bold text-[#0a1e3b] leading-snug">
-                              {sub.nama} – {sub.layanan}
-                            </p>
-                            <p className="text-[9px] md:text-[10px] text-amber-600 font-bold uppercase mt-1 tracking-wider">
-                              {sub.tanggal}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                      {submissions.length === 0 && (
-                        <div className="p-10 md:p-12 text-center">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tidak ada notifikasi baru</p>
-                        </div>
-                      )}
-                    </div>
-                    <button 
-                      onClick={markAllAsRead} 
-                      className="w-full py-4 md:py-5 text-center text-[10px] font-black text-slate-400 hover:text-amber-600 hover:bg-slate-50 transition-all uppercase tracking-[0.2em]"
-                    >
-                      Tandai Semua Telah Dibaca
-                    </button>
-                  </div>
-                )}
+      <header className="relative w-full z-[140] bg-[#0F172A] border-b border-white/5 shadow-sm transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Left Side: Logo & Text */}
+            <div className="flex items-center gap-3 md:gap-4">
+              <img 
+                src="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9" 
+                alt="Logo SI-PANDANG" 
+                className="h-9 md:h-10 w-auto object-contain drop-shadow-md"
+                referrerPolicy="no-referrer"
+              />
+              <div className="flex flex-col justify-center">
+                <h1 className="text-white text-[12px] sm:text-sm md:text-base font-semibold tracking-wide leading-tight">
+                  PEMERINTAH KOTA MAKASSAR
+                </h1>
+                <p className="text-[#F59E0B] text-[10px] sm:text-xs md:text-sm font-normal tracking-wider mt-0.5">
+                  KECAMATAN UJUNG PANDANG
+                </p>
               </div>
-            )}
-            <button onClick={() => setIsSidebarOpen(true)} className="text-white hover:opacity-70 transition-opacity relative group p-1.5">
-              <svg className="w-6 h-6 md:w-9 md:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="4" y1="6" x2="20" y2="6"></line>
-                <line x1="10" y1="12" x2="20" y2="12"></line>
-                <line x1="4" y1="18" x2="20" y2="18"></line>
-              </svg>
-            </button>
+            </div>
+
+            {/* Right Side: Icons */}
+            <div className="flex items-center gap-2 md:gap-4">
+              {isLoggedIn && (
+                <div className="relative" ref={notifRef}>
+                  <button 
+                    onClick={() => setIsNotifOpen(!isNotifOpen)}
+                    className="group relative p-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
+                  >
+                    <svg className="w-6 h-6 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                    </svg>
+                    
+                    {pendingSubmissionsCount > 0 && (
+                      <span className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full ring-2 ring-[#0F172A]">
+                        {pendingSubmissionsCount > 9 ? '9+' : pendingSubmissionsCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Notification Dropdown */}
+                  {isNotifOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top-right ring-1 ring-black/5">
+                      <div className="px-5 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Notifikasi</h3>
+                        {pendingSubmissionsCount > 0 && (
+                          <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full">{pendingSubmissionsCount} BARU</span>
+                        )}
+                      </div>
+                      <div className="max-h-[320px] overflow-y-auto">
+                        {submissions.slice(0, 10).map((sub) => (
+                          <div 
+                            key={sub.id} 
+                            onClick={() => markAsRead(sub.id)}
+                            className={`px-5 py-4 hover:bg-slate-50 border-b border-slate-50 transition-colors cursor-pointer flex gap-3 ${sub.isRead ? 'opacity-60' : 'opacity-100 bg-blue-50/30'}`}
+                          >
+                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0 font-bold text-xs">
+                              {sub.nama.charAt(0)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-slate-800 truncate">
+                                {sub.nama}
+                              </p>
+                              <p className="text-[10px] text-slate-500 mt-0.5 truncate">
+                                {sub.layanan}
+                              </p>
+                              <p className="text-[9px] text-amber-600 font-medium mt-1.5">
+                                {sub.tanggal}
+                              </p>
+                            </div>
+                            {!sub.isRead && (
+                              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0"></div>
+                            )}
+                          </div>
+                        ))}
+                        {submissions.length === 0 && (
+                          <div className="py-12 text-center">
+                            <p className="text-xs text-slate-400 font-medium">Tidak ada notifikasi baru</p>
+                          </div>
+                        )}
+                      </div>
+                      <button 
+                        onClick={markAllAsRead} 
+                        className="w-full py-3 text-center text-[10px] font-bold text-slate-500 hover:text-amber-600 hover:bg-slate-50 transition-colors border-t border-slate-50 uppercase tracking-wider"
+                      >
+                        Tandai Semua Dibaca
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button 
+                onClick={() => setIsSidebarOpen(true)} 
+                className="p-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
+              >
+                <svg className="w-6 h-6 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -384,38 +402,46 @@ const App: React.FC = () => {
         onLogout={handleLogout} 
       />
 
-      <section className="hero-bg relative min-h-[80vh] md:min-h-[85vh] flex flex-col items-center justify-center pt-24 pb-16 md:pt-40 md:pb-24 overflow-hidden px-4">
-        <div className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10">
-          <div className="w-12 h-12 md:w-24 md:h-24 bg-amber-500 rounded-2xl md:rounded-[2rem] flex items-center justify-center shadow-2xl shadow-amber-900/40 mb-6 md:mb-12 hover:scale-110 transition-transform duration-500 cursor-pointer">
-             <svg className="w-6 h-6 md:w-12 md:h-12 text-[#0a1e3b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <section className="relative bg-[#0F172A] pt-12 pb-20 md:pt-24 md:pb-28 overflow-hidden shadow-2xl z-10">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent opacity-50"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent opacity-30"></div>
+        
+        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
+          {/* Icon - Minimalist */}
+          <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white/5 rounded-2xl mb-8 border border-white/10 shadow-lg backdrop-blur-sm ring-1 ring-white/5">
+             <svg className="w-6 h-6 md:w-8 md:h-8 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M2 17l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
              </svg>
           </div>
-          <div className="mb-4 md:mb-10">
-            <span className="text-amber-500/60 text-[10px] md:text-xs font-light uppercase tracking-[0.3em]">PORTAL RESMI KEPEGAWAIAN</span>
+
+          {/* Typography - Refined */}
+          <div className="space-y-4 mb-10">
+            <h2 className="text-slate-400 text-[10px] md:text-xs font-medium tracking-[0.3em] uppercase">
+              Selamat Datang di
+            </h2>
+            
+            <h1 className="text-white text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
+              SI-PANDANG
+            </h1>
+            
+            <p className="text-slate-400 text-xs md:text-base font-light max-w-xl mx-auto leading-relaxed tracking-wide">
+              Sistem Informasi Pelayanan Administrasi Kepegawaian<br className="hidden md:block"/> Kecamatan Ujung Pandang
+            </p>
           </div>
-          <div className="mb-6 md:mb-10">
-            <h2 className="text-white text-[10px] md:text-3xl font-black tracking-[0.3em] uppercase opacity-80 mb-2">SELAMAT DATANG DI</h2>
-            <h1 className="text-amber-500 text-5xl md:text-9xl font-black tracking-tight uppercase leading-none drop-shadow-2xl">SI-PANDANG</h1>
-          </div>
-          <p className="text-white/80 text-[11px] md:text-xl max-w-[280px] md:max-w-3xl mx-auto mb-10 md:mb-16 font-bold leading-relaxed px-4 uppercase tracking-wider">
-            Sistem Informasi Pelayanan Administrasi Kepegawaian Kecamatan Ujung Pandang
-          </p>
-          <div className="flex flex-col items-center">
-            <button 
-              onClick={() => { setActiveTab('layanan'); setTimeout(() => document.getElementById('layanan-menu')?.scrollIntoView({ behavior: 'smooth' }), 50); }} 
-              className="btn-mulai-layanan tracking-widest !px-8 !py-3 md:!px-12 md:!py-5 text-xs md:text-lg md:scale-110 hover:scale-105 transition-transform"
-            >
-              MULAI LAYANAN
-            </button>
-          </div>
-        </div>
-        <div className="wave-bottom overflow-hidden">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-16 md:h-32">
-            <path d="M0,0 C300,120 900,120 1200,0 L1200,120 L0,120 Z" className="shape-fill"></path>
-          </svg>
+
+          {/* Button - Sleek */}
+          <button 
+            onClick={() => { setActiveTab('layanan'); setTimeout(() => document.getElementById('layanan-menu')?.scrollIntoView({ behavior: 'smooth' }), 50); }} 
+            className="group relative inline-flex items-center justify-center px-8 py-3 text-xs md:text-sm font-bold text-[#0F172A] transition-all duration-300 bg-[#F59E0B] rounded-full hover:bg-[#fbbf24] hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(245,158,11,0.5)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ring-offset-[#0F172A]"
+          >
+            <span>MULAI LAYANAN</span>
+            <svg className="w-4 h-4 ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
         </div>
       </section>
 
