@@ -16,6 +16,7 @@ export const PantauKGB: React.FC = () => {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedPegawai, setSelectedPegawai] = useState<PegawaiKGB | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'All' | 'Aman' | 'Mendekati' | 'Lewat Jadwal'>('All');
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -126,16 +127,18 @@ export const PantauKGB: React.FC = () => {
 
   // Filtered List
   const filteredPegawai = useMemo(() => {
-    return pegawaiList.filter(p => 
-      p.nama.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      p.nip.includes(searchTerm)
-    );
-  }, [pegawaiList, searchTerm]);
+    return pegawaiList.filter(p => {
+      const matchesSearch = p.nama.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            p.nip.includes(searchTerm);
+      const matchesFilter = filterStatus === 'All' || p.status === filterStatus;
+      return matchesSearch && matchesFilter;
+    });
+  }, [pegawaiList, searchTerm, filterStatus]);
 
   // Pagination Logic
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, itemsPerPage]);
+  }, [searchTerm, itemsPerPage, filterStatus]);
 
   const totalPages = Math.ceil(filteredPegawai.length / itemsPerPage);
   const paginatedData = useMemo(() => {
@@ -270,7 +273,10 @@ export const PantauKGB: React.FC = () => {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           {/* Total Pegawai */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-center space-x-4">
+          <div 
+            onClick={() => setFilterStatus('All')}
+            className={`bg-white rounded-xl shadow-sm border p-6 flex items-center space-x-4 cursor-pointer transition-all duration-200 hover:shadow-md ${filterStatus === 'All' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-slate-100 hover:border-blue-200'}`}
+          >
             <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -283,7 +289,10 @@ export const PantauKGB: React.FC = () => {
           </div>
 
           {/* Aman */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-center space-x-4">
+          <div 
+            onClick={() => setFilterStatus('Aman')}
+            className={`bg-white rounded-xl shadow-sm border p-6 flex items-center space-x-4 cursor-pointer transition-all duration-200 hover:shadow-md ${filterStatus === 'Aman' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-100 hover:border-emerald-200'}`}
+          >
             <div className="w-12 h-12 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -296,7 +305,10 @@ export const PantauKGB: React.FC = () => {
           </div>
 
           {/* Mendekati */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-center space-x-4 relative overflow-hidden">
+          <div 
+            onClick={() => setFilterStatus('Mendekati')}
+            className={`bg-white rounded-xl shadow-sm border p-6 flex items-center space-x-4 relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md ${filterStatus === 'Mendekati' ? 'border-amber-500 ring-2 ring-amber-500/20' : 'border-slate-100 hover:border-amber-200'}`}
+          >
             {stats.mendekati > 0 && <div className="absolute top-0 right-0 w-3 h-3 bg-amber-500 rounded-full animate-ping m-2"></div>}
             <div className="w-12 h-12 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,7 +322,10 @@ export const PantauKGB: React.FC = () => {
           </div>
 
           {/* Lewat Jadwal */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-center space-x-4 relative overflow-hidden">
+          <div 
+            onClick={() => setFilterStatus('Lewat Jadwal')}
+            className={`bg-white rounded-xl shadow-sm border p-6 flex items-center space-x-4 relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md ${filterStatus === 'Lewat Jadwal' ? 'border-red-500 ring-2 ring-red-500/20' : 'border-slate-100 hover:border-red-200'}`}
+          >
              {stats.lewat > 0 && <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping m-2"></div>}
             <div className="w-12 h-12 rounded-lg bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
