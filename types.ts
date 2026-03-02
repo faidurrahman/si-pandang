@@ -12,6 +12,8 @@ export interface Service {
   requirements: Requirement[];
   category: 'Kepegawaian' | 'Kesejahteraan' | 'Mutasi' | 'Pensiun';
   estimatedTime: string;
+  downloadUrl?: string;
+  downloadLabel?: string;
 }
 
 export type SubmissionStatus = 'Dalam Proses' | 'Selesai' | 'Ditolak' | 'Direvisi';

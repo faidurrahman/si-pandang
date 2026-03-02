@@ -12,10 +12,12 @@ export const SERVICES: Service[] = [
     category: 'Kepegawaian',
     estimatedTime: '14 Hari Kerja',
     requirements: [
-      { id: 'kp1', label: 'Fotokopi SK Pangkat Terakhir', isMandatory: true },
-      { id: 'kp2', label: 'Fotokopi SK Kenaikan Gaji Berkala (KGB) terakhir', isMandatory: true },
-      { id: 'kp3', label: 'SKP bernilai "Baik" dalam 2 tahun terakhir', isMandatory: true },
-      { id: 'kp4_old', label: 'Surat Pengantar dari Camat', isMandatory: true }
+      { id: 'kp1', label: 'SK CPNS', isMandatory: true },
+      { id: 'kp2', label: 'SK PNS', isMandatory: true },
+      { id: 'kp3', label: 'SK Pangkat Terakhir', isMandatory: true },
+      { id: 'kp4', label: 'Ijazah & Transkrip Nilai', isMandatory: true },
+      { id: 'kp5', label: 'SKP 2 Tahun Terakhir', isMandatory: true },
+      { id: 'kp6', label: 'Dokumen Mutasi (jika memiliki riwayat mutasi)', isMandatory: false }
     ]
   },
   {
@@ -26,23 +28,8 @@ export const SERVICES: Service[] = [
     category: 'Kesejahteraan',
     estimatedTime: '3 Hari Kerja',
     requirements: [
-      { id: 'kgb1', label: 'Fotokopi SK Pangkat Terakhir', isMandatory: true },
-      { id: 'kgb2', label: 'Fotokopi SK KGB Terakhir', isMandatory: true },
-      { id: 'kgb3', label: 'SKP 2 tahun terakhir (Minimal Baik)', isMandatory: true },
-      { id: 'kgb4', label: 'Surat Pengantar', isMandatory: true }
-    ]
-  },
-  {
-    id: 'suket',
-    title: 'Surat Keterangan (SUKET)',
-    description: 'Untuk Bank, KPR, Paspor, Sekolah Anak, dll.',
-    icon: '📄',
-    category: 'Kepegawaian',
-    estimatedTime: '2 Hari Kerja',
-    requirements: [
-      { id: 'suket1', label: 'File Scan SK Pangkat Terakhir', isMandatory: true },
-      { id: 'suket2', label: 'File Scan KTP', isMandatory: true },
-      { id: 'suket3', label: 'Bukti Pendukung (Misal: Formulir dari Bank atau Sekolah yang perlu ditandatangani)', isMandatory: true }
+      { id: 'kgb1', label: 'Fotocopy SK pangkat terakhir', isMandatory: true },
+      { id: 'kgb2', label: 'Fotocopy SK KGB terakhir', isMandatory: true }
     ]
   },
   {
@@ -53,9 +40,9 @@ export const SERVICES: Service[] = [
     category: 'Kesejahteraan',
     estimatedTime: '3 Hari Kerja',
     requirements: [
-      { id: 'kp4_1', label: 'Penambahan Istri/Suami: Fotokopi Surat Nikah, KTP & KK Suami Istri, SK Pangkat.', isMandatory: true },
-      { id: 'kp4_2', label: 'Penambahan Anak (Baru Lahir): Fotokopi Akta Kelahiran & KK Terbaru.', isMandatory: true },
-      { id: 'kp4_3', label: 'Anak Kuliah (21-25 Tahun): Surat Keterangan Kuliah Aktif (Asli) & Surat Pernyataan Belum Bekerja/Menikah.', isMandatory: true }
+      { id: 'kp4_1', label: 'Fotocopy Kartu Keluarga', isMandatory: true },
+      { id: 'kp4_2', label: 'Fotocopy Buku Nikah (Legalisir)', isMandatory: true },
+      { id: 'kp4_3', label: 'Fotocopy Akta Kelahiran anak', isMandatory: true }
     ]
   },
   {
@@ -66,60 +53,33 @@ export const SERVICES: Service[] = [
     category: 'Kepegawaian',
     estimatedTime: '14 Hari Kerja',
     requirements: [
-      { id: 'gelar1', label: 'File Scan Ijazah & Transkrip Nilai (Legalisir)', isMandatory: true },
-      { id: 'gelar2', label: 'File Scan SK Izin Belajar/Tugas Belajar (Dokumen dasar saat mulai kuliah)', isMandatory: true },
-      { id: 'gelar3', label: 'File Scan SK Pangkat Terakhir', isMandatory: true },
-      { id: 'gelar4', label: 'Uraian Tugas (Relevansi antara gelar baru dengan tugas jabatan)', isMandatory: true }
+      { id: 'gelar1', label: 'SK CPNS', isMandatory: true },
+      { id: 'gelar2', label: 'SK PNS', isMandatory: true },
+      { id: 'gelar3', label: 'SK Pangkat Terakhir', isMandatory: true },
+      { id: 'gelar4', label: 'Ijazah & Transkrip Nilai', isMandatory: true },
+      { id: 'gelar5', label: 'SKP 2 Tahun Terakhir', isMandatory: true },
+      { id: 'gelar6', label: 'Dokumen Mutasi (jika memiliki riwayat mutasi)', isMandatory: false },
+      { id: 'gelar7', label: 'Surat izin belajar/tugas belajar', isMandatory: true },
+      { id: 'gelar8', label: 'Keterangan PDPT/PD DIKTI', isMandatory: true },
+      { id: 'gelar9', label: 'Ijazah & transkrip nilai terbaru', isMandatory: true },
+      { id: 'gelar10', label: 'Keterangan akreditasi prodi', isMandatory: true },
+      { id: 'gelar11', label: 'Sertifikat lulus ujian penyesuaian ijazah (bagi PI)', isMandatory: false },
+      { id: 'gelar12', label: 'Uraian tugas yang ditetapkan pejabat setingkat eselon II (bagi PI)', isMandatory: false }
     ]
   },
   {
-    id: 'ct',
-    title: 'Cuti Tahunan',
-    description: 'Layanan permohonan ketidakhadiran tahunan.',
+    id: 'cuti',
+    title: 'Cuti',
+    description: 'Layanan permohonan segala jenis cuti (Tahunan, Sakit, Melahirkan, Alasan Penting).',
     icon: '📅',
     category: 'Kesejahteraan',
-    estimatedTime: '1 Hari Kerja',
+    estimatedTime: '1-3 Hari Kerja',
+    downloadUrl: 'https://docs.google.com/document/d/1B-e7pimbYtR3SsB9qIhQPM6oTKrsIHY0/export?format=doc',
+    downloadLabel: 'Download Format Form Pengajuan Cuti',
     requirements: [
-      { id: 'ct1', label: 'Mengisi Formulir Permintaan Cuti', isMandatory: true },
-      { id: 'ct2', label: 'Masa kerja minimal 1 tahun terus menerus', isMandatory: true },
-      { id: 'ct3', label: 'Sisa kuota cuti masih tersedia (Maksimal 12 hari/tahun)', isMandatory: true }
-    ]
-  },
-  {
-    id: 'cs',
-    title: 'Cuti Sakit',
-    description: 'Permohonan cuti karena alasan kesehatan.',
-    icon: '➕',
-    category: 'Kesejahteraan',
-    estimatedTime: '1 Hari Kerja',
-    requirements: [
-      { id: 'cs1', label: 'Sakit 1-14 hari: Formulir Cuti & Surat Ket. Dokter/Puskesmas', isMandatory: true },
-      { id: 'cs2', label: 'Sakit >14 hari: Formulir Cuti & Surat Ket. Dokter Pemerintah (RSUD)', isMandatory: true }
-    ]
-  },
-  {
-    id: 'cm',
-    title: 'Cuti Melahirkan',
-    description: 'Khusus pegawai wanita untuk persalinan.',
-    icon: '🔘',
-    category: 'Kesejahteraan',
-    estimatedTime: '2 Hari Kerja',
-    requirements: [
-      { id: 'cm1', label: 'Berlaku untuk anak ke-1 s.d. ke-3', isMandatory: true },
-      { id: 'cm2', label: 'Lampiran: Surat Keterangan Dokter/Bidan (HPL)', isMandatory: true }
-    ]
-  },
-  {
-    id: 'cap',
-    title: 'Cuti Alasan Penting',
-    description: 'Keluarga sakit/meninggal, nikah, atau istri melahirkan.',
-    icon: '📍',
-    category: 'Kesejahteraan',
-    estimatedTime: '2 Hari Kerja',
-    requirements: [
-      { id: 'cap1', label: 'Surat Keterangan Dokter (Rawat Inap)', isMandatory: false },
-      { id: 'cap2', label: 'Surat Keterangan Kematian/Nikah', isMandatory: false },
-      { id: 'cap3', label: 'Formulir Permintaan Cuti', isMandatory: true }
+      { id: 'cuti1', label: 'Fotocopy SK Pangkat Terakhir', isMandatory: true },
+      { id: 'cuti2', label: 'Form Pengajuan Cuti', isMandatory: true },
+      { id: 'cuti3', label: 'Rekapitulasi Absen (di siapkan oleh sub bag. umum dan kepegawaian kecamatan ujung pandang)', isMandatory: true }
     ]
   },
   {
@@ -137,16 +97,25 @@ export const SERVICES: Service[] = [
   },
   {
     id: 'pensiun',
-    title: 'Pengajuan Pensiun',
+    title: 'Pengajuan Berkas Usia Pensiun (BUP)',
     description: 'Layanan pemberhentian BUP atau Janda/Duda.',
     icon: '🏛️',
     category: 'Pensiun',
     estimatedTime: '30 Hari Kerja',
     requirements: [
-      { id: 'p1', label: 'Data Perorangan Calon Penerima Pensiun (DPCP)', isMandatory: true },
-      { id: 'p2', label: 'Fotokopi SK CPNS, PNS, dan Pangkat Terakhir', isMandatory: true },
-      { id: 'p3', label: 'Fotokopi KK, KTP, Karpeg, Taspen', isMandatory: true },
-      { id: 'p4', label: 'Pas Foto terbaru', isMandatory: true }
+      { id: 'p1', label: 'Surat pengantar', isMandatory: true },
+      { id: 'p2', label: 'Surat permohonan yang diketahui atasan langsung', isMandatory: true },
+      { id: 'p3', label: 'SK CPNS', isMandatory: true },
+      { id: 'p4', label: 'SK PNS', isMandatory: true },
+      { id: 'p5', label: 'SK pangkat terakhir', isMandatory: true },
+      { id: 'p6', label: 'Surat tidak pernah dijatuhi hukuman disiplin', isMandatory: true },
+      { id: 'p7', label: 'SKP tahun 1 (satu) tahun terakhir', isMandatory: true },
+      { id: 'p8', label: 'Daftar susunan keluarga', isMandatory: true },
+      { id: 'p9', label: 'FC akta nikah / akta cerai / akta kematian (dilegalisir)', isMandatory: true },
+      { id: 'p10', label: 'FC akta lahir anak (disahkan)', isMandatory: true },
+      { id: 'p11', label: 'FC nomor rekening', isMandatory: true },
+      { id: 'p12', label: 'FC NPWP & KTP', isMandatory: true },
+      { id: 'p13', label: 'SK PNS suami/istri (jika PNS)', isMandatory: false }
     ]
   },
   {
@@ -157,22 +126,12 @@ export const SERVICES: Service[] = [
     category: 'Kepegawaian',
     estimatedTime: '30 Hari Kerja',
     requirements: [
-      { id: 'sl1', label: 'Daftar Riwayat Hidup', isMandatory: true },
-      { id: 'sl2', label: 'SK CPNS dan SK Pangkat Terakhir', isMandatory: true },
-      { id: 'sl3', label: 'Surat Pernyataan Bebas Hukuman Disiplin', isMandatory: true }
+      { id: 'sl1', label: 'SK CPNS', isMandatory: true },
+      { id: 'sl2', label: 'SK PNS', isMandatory: true },
+      { id: 'sl3', label: 'SK Pangkat terakhir', isMandatory: true },
+      { id: 'sl4', label: 'SK Jabatan terakhir', isMandatory: true },
+      { id: 'sl5', label: 'Daftar Riwayat Hidup / Biodata pegawai', isMandatory: true }
     ]
   },
-  {
-    id: 'mutasi',
-    title: 'Mutasi Pegawai',
-    description: 'Layanan pindah masuk/keluar instansi.',
-    icon: '↔️',
-    category: 'Mutasi',
-    estimatedTime: '60 Hari Kerja',
-    requirements: [
-      { id: 'm1', label: 'Surat Permohonan Pindah', isMandatory: true },
-      { id: 'm2', label: 'Analisis Jabatan & Beban Kerja (Anjab ABK)', isMandatory: true },
-      { id: 'm3', label: 'Rekomendasi Instansi Asal & Tujuan', isMandatory: true }
-    ]
-  }
+
 ];

@@ -184,6 +184,31 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ initialService
             </select>
           </div>
 
+          {/* Download Format Button if available */}
+          {SERVICES.find(s => s.id === formData.layanan)?.downloadUrl && formData.layanan !== 'cuti' && (
+            <div className="mb-4 p-3 md:p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+              <div>
+                <p className="text-[10px] md:text-[11px] font-bold text-blue-800">
+                  Dokumen Persyaratan
+                </p>
+                <p className="text-[9px] md:text-[10px] text-blue-600 mt-0.5">
+                  Unduh format dokumen yang diperlukan di sini.
+                </p>
+              </div>
+              <a 
+                href={SERVICES.find(s => s.id === formData.layanan)?.downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] md:text-xs font-bold rounded-lg transition-colors flex items-center shadow-sm"
+              >
+                <svg className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                {SERVICES.find(s => s.id === formData.layanan)?.downloadLabel || 'Download Format'}
+              </a>
+            </div>
+          )}
+
           {/* Upload Berkas */}
           <div>
             <label className="block text-[10px] md:text-[11px] font-bold text-[#0a192f] mb-1.5 md:mb-2">
