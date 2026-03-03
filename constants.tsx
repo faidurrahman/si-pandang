@@ -90,9 +90,12 @@ export const SERVICES: Service[] = [
     category: 'Kepegawaian',
     estimatedTime: '7 Hari Kerja',
     requirements: [
-      { id: 'ib1', label: 'Fotokopi SK Pangkat Terakhir', isMandatory: true },
-      { id: 'ib2', label: 'Surat Keterangan Diterima/Aktif Kuliah (Akreditasi B)', isMandatory: true },
-      { id: 'ib3', label: 'Jadwal Kuliah & Uraian Tugas Jabatan', isMandatory: true }
+      { id: 'ib1', label: 'Surat Keterangan Lulus (SKL) atau Bukti Kelulusan Seleksi Akademik', isMandatory: true },
+      { id: 'ib2', label: 'Kartu Rencana Studi (KRS) semester berjalan', isMandatory: true },
+      { id: 'ib3', label: 'Ijazah Pendidikan Terakhir (yang telah dilegalisir)', isMandatory: true },
+      { id: 'ib4', label: 'Sertifikat Akreditasi Program Studi dan Perguruan Tinggi tujuan (minimal Akreditasi B atau sesuai regulasi yang berlaku)', isMandatory: true },
+      { id: 'ib5', label: 'Fotokopi SK CPNS', isMandatory: true },
+      { id: 'ib6', label: 'Fotokopi SK Pangkat/Golongan Terakhir', isMandatory: true }
     ]
   },
   {
