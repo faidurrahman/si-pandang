@@ -99,6 +99,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
           </div>
 
           <a 
+            href="https://drive.google.com/file/d/1CgfFOfX7Bmo2jM8nfVSTjW-78WlwbgB4/view" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center p-4 rounded-2xl text-white/60 hover:bg-white/5 hover:text-white font-bold transition-all group"
+          >
+            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-4 group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-all">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+              </svg>
+            </div>
+            <span className="text-xs uppercase tracking-widest">Panduan Penggunaan</span>
+          </a>
+
+          <a 
             href={WA_LINK} 
             target="_blank"
             className="w-full flex items-center p-4 rounded-2xl text-white/60 hover:bg-white/5 hover:text-white font-bold transition-all group"

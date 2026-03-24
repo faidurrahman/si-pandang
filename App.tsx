@@ -38,6 +38,7 @@ const App: React.FC = () => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showGuidePopup, setShowGuidePopup] = useState(false);
 
   // Pagination & Monitoring State
   const [itemsPerPage, setItemsPerPage] = useState(50);
@@ -45,6 +46,19 @@ const App: React.FC = () => {
   const [monitoringSearchTerm, setMonitoringSearchTerm] = useState('');
 
   const notifRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('hasSeenGuidePopup');
+    if (!hasSeenGuide) {
+      const timer = setTimeout(() => setShowGuidePopup(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleCloseGuide = () => {
+    localStorage.setItem('hasSeenGuidePopup', 'true');
+    setShowGuidePopup(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -337,6 +351,18 @@ const App: React.FC = () => {
 
             {/* Right Side: Icons */}
             <div className="flex items-center gap-0.5">
+              <a
+                href="https://drive.google.com/file/d/1CgfFOfX7Bmo2jM8nfVSTjW-78WlwbgB4/view"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
+                title="Panduan Penggunaan"
+              >
+                <svg className="w-5 h-5 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
+              </a>
+
               {isLoggedIn && (
                 <div className="md:relative" ref={notifRef}>
                   <button 
@@ -732,6 +758,45 @@ const App: React.FC = () => {
             <span className="text-xs font-bold uppercase tracking-widest">
               {submitStatus === 'success' ? 'Berhasil Terkirim' : 'Gagal Mengirim'}
             </span>
+          </div>
+        </div>
+      )}
+
+      {/* Guide Popup */}
+      {showGuidePopup && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white rounded-[32px] w-full max-w-[400px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="p-8 text-center flex flex-col items-center">
+              <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-6 shadow-inner">
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-extrabold text-[#0a1e3b] mb-2">Buku Panduan SI-PANDANG</h3>
+              <p className="text-sm text-slate-500 mb-8 leading-relaxed">
+                Selamat datang! Untuk memudahkan Anda dalam menggunakan layanan administrasi kepegawaian, kami telah menyediakan buku panduan lengkap.
+              </p>
+              <div className="flex flex-col w-full space-y-3">
+                <a
+                  href="https://drive.google.com/file/d/1CgfFOfX7Bmo2jM8nfVSTjW-78WlwbgB4/view"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleCloseGuide}
+                  className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200 transition-all flex items-center justify-center"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  Buka Buku Panduan
+                </a>
+                <button
+                  onClick={handleCloseGuide}
+                  className="w-full py-3.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-sm transition-colors"
+                >
+                  Lain Kali
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
