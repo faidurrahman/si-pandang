@@ -197,12 +197,19 @@ export const PantauKGB: React.FC = () => {
         fetchPegawai();
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Submission error:", error);
       setIsSubmitting(false);
+      
+      // Extract the error message, limiting length if it's an HTML error page
+      let errorMessage = error.message || 'Terjadi kesalahan saat menyimpan data.';
+      if (errorMessage.length > 200) {
+        errorMessage = errorMessage.substring(0, 200) + '...';
+      }
+
       Swal.fire({
         title: 'Gagal!',
-        text: 'Terjadi kesalahan saat menyimpan data.',
+        text: errorMessage,
         icon: 'error',
         confirmButtonColor: '#ef4444'
       });
@@ -232,9 +239,21 @@ export const PantauKGB: React.FC = () => {
       
       // Refresh to sync
       setTimeout(fetchPegawai, 2000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Delete error:", error);
       fetchPegawai(); // Revert on error
+      
+      let errorMessage = error.message || 'Terjadi kesalahan saat menghapus data.';
+      if (errorMessage.length > 200) {
+        errorMessage = errorMessage.substring(0, 200) + '...';
+      }
+
+      Swal.fire({
+        title: 'Gagal!',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
     }
   };
 
@@ -260,9 +279,21 @@ export const PantauKGB: React.FC = () => {
       setIsEditModalOpen(false);
       setSelectedPegawai(null);
       setTimeout(fetchPegawai, 2000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Update error:", error);
       setIsSubmitting(false);
+      
+      let errorMessage = error.message || 'Terjadi kesalahan saat mengupdate data.';
+      if (errorMessage.length > 200) {
+        errorMessage = errorMessage.substring(0, 200) + '...';
+      }
+
+      Swal.fire({
+        title: 'Gagal!',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
     }
   };
 

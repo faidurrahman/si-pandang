@@ -30,6 +30,11 @@ function doPost(e) {
         sheetKgb = ss.insertSheet('KGB');
         sheetKgb.appendRow(['ID', 'Timestamp', 'Nama', 'NIP', 'Pangkat', 'Jabatan', 'TMT KGB', 'Gaji Pokok', 'URL SK', 'URL KGB']);
       }
+      
+      // Pastikan sheet memiliki setidaknya 1 baris untuk menghindari error getRange
+      if (sheetKgb.getMaxRows() === 0) {
+        sheetKgb.insertRows(1, 1);
+      }
 
       // ID Folder Google Drive untuk menyimpan file SK dan KGB (Sesuai permintaan)
       var folderId = '1DA_hIwJl-4kcB96DGJV1PA-xVA_xwXV8'; 
@@ -70,6 +75,11 @@ function doPost(e) {
       // Jika tidak ada baris kosong di tengah, gunakan getLastRow() + 1
       if (emptyRow === 1 && columnA[0][0] !== "") {
          emptyRow = sheetKgb.getLastRow() + 1;
+      }
+
+      // Pastikan emptyRow tidak melebihi jumlah baris maksimum sheet
+      if (emptyRow > sheetKgb.getMaxRows()) {
+        sheetKgb.insertRowAfter(sheetKgb.getMaxRows());
       }
 
       // Urutan kolom: ID, Timestamp, Nama, NIP, Pangkat, Jabatan, TMT KGB, Gaji Pokok, URL SK, URL KGB
