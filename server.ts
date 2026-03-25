@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 
 // Hardcoded for now to avoid import issues with .tsx files in Node
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_qce-_O5ELCBZhI9mJ0ZzcYY-jypZitUpM_Ph-w8R3bcp3pJ8aiazncFUubG-OlxE/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVVBp0iPfhIg6mGHdzolUquFHSG5bd6Ir3IeFzFvDyFt2zGZXgoTsIbJBs0K1b8slY/exec";
 
 async function startServer() {
   const app = express();

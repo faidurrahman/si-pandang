@@ -23,7 +23,16 @@ function doPost(e) {
     // 1. LOGIKA BARU: Menangani action 'addPegawai', 'deletePegawai', 'updatePegawai'
     // =====================================================================
     if (data.action === 'addPegawai') {
-      var sheetKgb = ss.getSheetByName('KGB') || ss.getSheetByName('kgb') || ss.getSheetByName('Kgb');
+      // Cari sheet KGB (mengatasi kemungkinan ada spasi di nama sheet)
+      var sheets = ss.getSheets();
+      var sheetKgb = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
+        if (sName === 'KGB') {
+          sheetKgb = sheets[s];
+          break;
+        }
+      }
       
       if (!sheetKgb) {
         // Jika sheet tidak ada, buat sheet baru dengan header
@@ -37,7 +46,7 @@ function doPost(e) {
       }
 
       // ID Folder Google Drive untuk menyimpan file SK dan KGB (Sesuai permintaan)
-      var folderId = '1DA_hIwJl-4kcB96DGJV1PA-xVA_xwXV8'; 
+      var folderId = '1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs'; 
       var folder = DriveApp.getFolderById(folderId);
 
       var skUrl = '';
@@ -61,29 +70,24 @@ function doPost(e) {
         });
       }
 
-      // Masukkan data ke baris baru di sheet KGB
-      // Cari baris kosong pertama berdasarkan kolom A (ID)
+      // Cari baris terakhir yang memiliki data di kolom A (ID)
       var columnA = sheetKgb.getRange('A:A').getValues();
-      var emptyRow = 1;
-      for (var i = 0; i < columnA.length; i++) {
-        if (columnA[i][0] === "") {
-          emptyRow = i + 1;
+      var lastRow = 0;
+      for (var i = columnA.length - 1; i >= 0; i--) {
+        if (columnA[i][0] !== "") {
+          lastRow = i + 1;
           break;
         }
       }
-      
-      // Jika tidak ada baris kosong di tengah, gunakan getLastRow() + 1
-      if (emptyRow === 1 && columnA[0][0] !== "") {
-         emptyRow = sheetKgb.getLastRow() + 1;
-      }
+      var targetRow = lastRow + 1;
 
-      // Pastikan emptyRow tidak melebihi jumlah baris maksimum sheet
-      if (emptyRow > sheetKgb.getMaxRows()) {
+      // Pastikan targetRow tidak melebihi jumlah baris maksimum sheet
+      if (targetRow > sheetKgb.getMaxRows()) {
         sheetKgb.insertRowAfter(sheetKgb.getMaxRows());
       }
 
       // Urutan kolom: ID, Timestamp, Nama, NIP, Pangkat, Jabatan, TMT KGB, Gaji Pokok, URL SK, URL KGB
-      sheetKgb.getRange(emptyRow, 1, 1, 10).setValues([[
+      sheetKgb.getRange(targetRow, 1, 1, 10).setValues([[
         data.id || '',
         data.timestamp || new Date().toISOString(),
         data.nama || '',
@@ -103,7 +107,15 @@ function doPost(e) {
     }
 
     if (data.action === 'deletePegawai') {
-      var sheetKgb = ss.getSheetByName('KGB') || ss.getSheetByName('kgb') || ss.getSheetByName('Kgb');
+      var sheets = ss.getSheets();
+      var sheetKgb = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
+        if (sName === 'KGB') {
+          sheetKgb = sheets[s];
+          break;
+        }
+      }
       if (!sheetKgb) return ContentService.createTextOutput("Sheet KGB not found").setMimeType(ContentService.MimeType.TEXT);
       
       var rows = sheetKgb.getDataRange().getValues();
@@ -128,7 +140,15 @@ function doPost(e) {
     }
 
     if (data.action === 'updatePegawai') {
-      var sheetKgb = ss.getSheetByName('KGB') || ss.getSheetByName('kgb') || ss.getSheetByName('Kgb');
+      var sheets = ss.getSheets();
+      var sheetKgb = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
+        if (sName === 'KGB') {
+          sheetKgb = sheets[s];
+          break;
+        }
+      }
       if (!sheetKgb) return ContentService.createTextOutput("Sheet KGB not found").setMimeType(ContentService.MimeType.TEXT);
       
       var rows = sheetKgb.getDataRange().getValues();
@@ -338,7 +358,15 @@ function doGet(e) {
     
     // Cek parameter action
     if (e.parameter && e.parameter.action === 'getKGB') {
-      const sheetKgb = ss.getSheetByName('KGB') || ss.getSheetByName('kgb') || ss.getSheetByName('Kgb');
+      var sheets = ss.getSheets();
+      var sheetKgb = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
+        if (sName === 'KGB') {
+          sheetKgb = sheets[s];
+          break;
+        }
+      }
       if (!sheetKgb) {
         return ContentService.createTextOutput(JSON.stringify({ data: [] }))
           .setMimeType(ContentService.MimeType.JSON);
