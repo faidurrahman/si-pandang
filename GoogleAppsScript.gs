@@ -56,9 +56,24 @@ function doPost(e) {
         });
       }
 
-      // Masukkan data ke baris baru (appendRow) di sheet KGB
+      // Masukkan data ke baris baru di sheet KGB
+      // Cari baris kosong pertama berdasarkan kolom A (ID)
+      var columnA = sheetKgb.getRange('A:A').getValues();
+      var emptyRow = 1;
+      for (var i = 0; i < columnA.length; i++) {
+        if (columnA[i][0] === "") {
+          emptyRow = i + 1;
+          break;
+        }
+      }
+      
+      // Jika tidak ada baris kosong di tengah, gunakan getLastRow() + 1
+      if (emptyRow === 1 && columnA[0][0] !== "") {
+         emptyRow = sheetKgb.getLastRow() + 1;
+      }
+
       // Urutan kolom: ID, Timestamp, Nama, NIP, Pangkat, Jabatan, TMT KGB, Gaji Pokok, URL SK, URL KGB
-      sheetKgb.appendRow([
+      sheetKgb.getRange(emptyRow, 1, 1, 10).setValues([[
         data.id || '',
         data.timestamp || new Date().toISOString(),
         data.nama || '',
@@ -69,7 +84,7 @@ function doPost(e) {
         data.gajiPokok || '',
         skUrl,
         kgbUrl
-      ]);
+      ]]);
 
       SpreadsheetApp.flush();
 

@@ -160,7 +160,7 @@ export const PantauKGB: React.FC = () => {
     const formattedDate = now.toISOString();
 
     try {
-      await fetch(APPS_SCRIPT_URL, {
+      const response = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
@@ -170,6 +170,13 @@ export const PantauKGB: React.FC = () => {
           ...data
         })
       });
+      
+      const resultText = await response.text();
+      console.log("Add Pegawai Response:", resultText);
+      
+      if (!resultText.includes("Success Insert KGB")) {
+        throw new Error(resultText || "Gagal menyimpan ke sheet KGB. Pastikan Apps Script sudah di-deploy ulang.");
+      }
       
       setIsSubmitting(false);
       setIsAddModalOpen(false);
@@ -209,7 +216,7 @@ export const PantauKGB: React.FC = () => {
     setPegawaiList(prev => prev.filter(p => p.id !== id));
 
     try {
-      await fetch(APPS_SCRIPT_URL, {
+      const response = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
@@ -217,6 +224,12 @@ export const PantauKGB: React.FC = () => {
           id: id
         })
       });
+      
+      const resultText = await response.text();
+      if (!resultText.includes("Success Delete KGB")) {
+        throw new Error(resultText || "Gagal menghapus data di sheet KGB.");
+      }
+      
       // Refresh to sync
       setTimeout(fetchPegawai, 2000);
     } catch (error) {
@@ -229,7 +242,7 @@ export const PantauKGB: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      await fetch(APPS_SCRIPT_URL, {
+      const response = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
@@ -237,6 +250,11 @@ export const PantauKGB: React.FC = () => {
           ...data
         })
       });
+      
+      const resultText = await response.text();
+      if (!resultText.includes("Success Update KGB")) {
+        throw new Error(resultText || "Gagal mengupdate data di sheet KGB.");
+      }
       
       setIsSubmitting(false);
       setIsEditModalOpen(false);
