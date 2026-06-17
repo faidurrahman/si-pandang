@@ -1,3 +1,5 @@
+/// <reference types="vite-plugin-pwa/client" />
+
 export interface Requirement {
   id: string;
   label: string;
