@@ -17,6 +17,8 @@ export const SERVICES: Service[] = [
       { id: 'kp3', label: 'SK Pangkat Terakhir', isMandatory: true },
       { id: 'kp4', label: 'Ijazah & Transkrip Nilai', isMandatory: true },
       { id: 'kp5', label: 'SKP 2 Tahun Terakhir', isMandatory: true },
+      { id: 'kp7', label: 'Surat Pernyataan Pelantikan', isMandatory: true },
+      { id: 'kp8', label: 'SK Jabatan Terakhir', isMandatory: true },
       { id: 'kp6', label: 'Dokumen Mutasi (jika memiliki riwayat mutasi)', isMandatory: false }
     ]
   },
