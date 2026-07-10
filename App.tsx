@@ -11,6 +11,7 @@ import { Sidebar } from './components/Sidebar';
 import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
 import { PantauKGB } from './components/PantauKGB';
+import { LpjKegiatan } from './components/LpjKegiatan';
 
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
 
@@ -21,7 +22,7 @@ const MAPS_LINK = "https://maps.app.goo.gl/SX1s5Pf62GeDYKaG9";
 const EMAIL_ADDRESS = "data.kecujungpandang@gmail.com";
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb'>('layanan');
+  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan'>('layanan');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -328,7 +329,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
-      <header className="relative w-full z-[140] bg-[#0F172A] border-b border-white/5 shadow-sm transition-all duration-300">
+      <header className="relative w-full z-[140] bg-[#0F172A] border-b border-white/5 shadow-sm transition-all duration-300 print:hidden">
         <div className="max-w-7xl mx-auto px-3 md:px-6 lg:px-8">
           <div className="w-full flex justify-between items-center h-20">
             {/* Left Side: Logo & Text */}
@@ -458,7 +459,7 @@ const App: React.FC = () => {
         onLogout={handleLogout} 
       />
 
-      <section className="relative bg-[#0F172A] pt-12 pb-20 md:pt-24 md:pb-28 overflow-hidden shadow-2xl z-10">
+      <section className={`relative bg-[#0F172A] pt-12 pb-20 md:pt-24 md:pb-28 overflow-hidden shadow-2xl z-10 ${activeTab === 'lpj-kegiatan' ? 'print:hidden' : ''}`}>
         {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent opacity-50"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent opacity-30"></div>
@@ -501,7 +502,7 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      <main id="layanan-menu" className="relative z-20 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 -mt-6 md:-mt-4 w-full flex-grow">
+      <main id="layanan-menu" className="relative z-20 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 -mt-6 md:-mt-4 w-full flex-grow print:p-0 print:m-0 print:max-w-none">
         {activeTab === 'layanan' ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="mb-8 md:mb-12 text-center">
@@ -656,9 +657,11 @@ const App: React.FC = () => {
                </div>
              )}
           </div>
-        ) : (
+         ) : activeTab === 'pantau-kgb' ? (
           <PantauKGB />
-        )}
+        ) : activeTab === 'lpj-kegiatan' ? (
+          <LpjKegiatan />
+        ) : null}
       </main>
 
       {activeTab === 'layanan' && (
