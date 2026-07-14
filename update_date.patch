@@ -1,0 +1,36 @@
+--- components/DataPegawaiPage.tsx
++++ components/DataPegawaiPage.tsx
+@@ -19,6 +19,16 @@
+   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+   const [isSubmitting, setIsSubmitting] = useState(false);
+ 
++  const safeDateToISO = (val: any) => {
++    if (!val) return '';
++    try {
++      const d = new Date(val);
++      if (isNaN(d.getTime())) return '';
++      return d.toISOString().split('T')[0];
++    } catch {
++      return '';
++    }
++  };
++
+   const fetchData = async () => {
+     setIsLoading(true);
+     setError(null);
+@@ -32,11 +42,11 @@
+           unitKerja: row[4] || '',
+           golongan: row[5] || '',
+           golonganPangkat: row[6] || '',
+-          tmtGolongan: row[7] ? new Date(row[7]).toISOString().split('T')[0] : '',
++          tmtGolongan: safeDateToISO(row[7]),
+           eselon: row[8] || '',
+           namaJabatan: row[9] || '',
+-          tmtJabatan: row[10] ? new Date(row[10]).toISOString().split('T')[0] : '',
++          tmtJabatan: safeDateToISO(row[10]),
+           statusPegawai: row[11] || '',
+-          tmtPegawai: row[12] ? new Date(row[12]).toISOString().split('T')[0] : '',
++          tmtPegawai: safeDateToISO(row[12]),
+           masaKerjaTahun: Number(row[13]) || 0,
+           masaKerjaBulan: Number(row[14]) || 0,
+           jenisKelamin: row[15] || '',

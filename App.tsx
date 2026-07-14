@@ -12,6 +12,7 @@ import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
 import { PantauKGB } from './components/PantauKGB';
 import { LpjKegiatan } from './components/LpjKegiatan';
+import { DataPegawaiPage } from './components/DataPegawaiPage';
 
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
 
@@ -22,7 +23,7 @@ const MAPS_LINK = "https://maps.app.goo.gl/SX1s5Pf62GeDYKaG9";
 const EMAIL_ADDRESS = "data.kecujungpandang@gmail.com";
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan'>('layanan');
+  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'data-pegawai'>('layanan');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -661,6 +662,8 @@ const App: React.FC = () => {
           <PantauKGB />
         ) : activeTab === 'lpj-kegiatan' ? (
           <LpjKegiatan />
+        ) : activeTab === 'data-pegawai' ? (
+          <DataPegawaiPage />
         ) : null}
       </main>
 
