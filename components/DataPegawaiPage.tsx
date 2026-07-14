@@ -197,7 +197,7 @@ export const DataPegawaiPage: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
         
         <div className="text-center mb-8">
           <h1 className="text-2xl font-normal text-gray-800">DAFTAR PEGAWAI</h1>
@@ -289,7 +289,7 @@ export const DataPegawaiPage: React.FC = () => {
                         <div className="uppercase">{splitTempatTanggal(item.tempatTanggalLahir).tempat},{splitTempatTanggal(item.tempatTanggalLahir).tanggal}</div>
                       </td>
                       <td className="p-3 border-r border-gray-200 text-center whitespace-nowrap">{item.nip}</td>
-                      <td className="p-3 border-r border-gray-200 text-center">{item.golongan}</td>
+                      <td className="p-3 border-r border-gray-200 text-center">{item.golonganPangkat} {item.golongan}</td>
                       <td className="p-3 border-r border-gray-200 text-center whitespace-nowrap">{formatDateStr(item.tmtGolongan)}</td>
                       <td className="p-3 border-r border-gray-200">{item.namaJabatan}</td>
                       <td className="p-3 border-r border-gray-200 text-center whitespace-nowrap">{formatDateStr(item.tmtJabatan)}</td>
