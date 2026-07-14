@@ -35,6 +35,38 @@ export const DataPegawaiPage: React.FC = () => {
     }
   };
 
+  const calculateMasaKerjaFromNip = (nip: string) => {
+    if (!nip || nip.length < 18) return null;
+    const yearStr = nip.substring(8, 12);
+    const monthStr = nip.substring(12, 14);
+    
+    const startYear = parseInt(yearStr, 10);
+    const startMonth = parseInt(monthStr, 10);
+    
+    if (isNaN(startYear) || isNaN(startMonth) || startMonth < 1 || startMonth > 12) {
+      return null;
+    }
+    
+    const now = new Date();
+    let currentYear = now.getFullYear();
+    let currentMonth = now.getMonth() + 1; // 1-12
+    
+    let diffYear = currentYear - startYear;
+    let diffMonth = currentMonth - startMonth;
+    
+    if (diffMonth < 0) {
+      diffYear -= 1;
+      diffMonth += 12;
+    }
+    
+    if (diffYear < 0) {
+      diffYear = 0;
+      diffMonth = 0;
+    }
+    
+    return { tahun: diffYear, bulan: diffMonth };
+  };
+
   const fetchData = async () => {
     setIsLoading(true);
     setError(null);
@@ -44,36 +76,49 @@ export const DataPegawaiPage: React.FC = () => {
       const result = await response.json();
       if (result.data && result.data.length > 1) {
         const rows = result.data.slice(1);
-        const mapped: DataPegawai[] = rows.map((row: any[], index: number) => ({
-          id: String(row[3]).replace(/'/g, '').trim() || String(index),
-          nama: row[1] || '',
-          tempatTanggalLahir: row[2] || '',
-          nip: String(row[3]).replace(/'/g, '').trim() || '',
-          unitKerja: row[4] || '',
-          golongan: row[5] || '',
-          golonganPangkat: row[6] || '',
-          tmtGolongan: safeDateToISO(row[7]),
-          eselon: row[8] || '',
-          namaJabatan: row[9] || '',
-          tmtJabatan: safeDateToISO(row[10]),
-          statusPegawai: row[11] || '',
-          tmtPegawai: safeDateToISO(row[12]),
-          masaKerjaTahun: Number(row[13]) || 0,
-          masaKerjaBulan: Number(row[14]) || 0,
-          jenisKelamin: row[15] || '',
-          agama: row[16] || '',
-          statusPerkawinan: row[17] || '',
-          pendidikanAwal: row[18] || '',
-          pendidikanAkhir: row[19] || '',
-          noAskes: String(row[20]).replace(/'/g, '').trim() || '',
-          noNpwp: String(row[21]).replace(/'/g, '').trim() || '',
-          noKtp: String(row[22]).replace(/'/g, '').trim() || '',
-          alamatRumah: row[23] || '',
-          kelurahan: row[24] || '',
-          kecamatan: row[25] || '',
-          telp: String(row[26]).replace(/'/g, '').trim() || '',
-          email: row[27] || ''
-        })).filter(p => p.nip); // Hanya masukkan jika ada NIP
+        const mapped: DataPegawai[] = rows.map((row: any[], index: number) => {
+          const nipStr = String(row[3]).replace(/'/g, '').trim() || '';
+          
+          let masaTahun = Number(row[13]) || 0;
+          let masaBulan = Number(row[14]) || 0;
+          
+          const masaNip = calculateMasaKerjaFromNip(nipStr);
+          if (masaNip) {
+            masaTahun = masaNip.tahun;
+            masaBulan = masaNip.bulan;
+          }
+          
+          return {
+            id: nipStr || String(index),
+            nama: row[1] || '',
+            tempatTanggalLahir: row[2] || '',
+            nip: nipStr,
+            unitKerja: row[4] || '',
+            golongan: row[5] || '',
+            golonganPangkat: row[6] || '',
+            tmtGolongan: safeDateToISO(row[7]),
+            eselon: row[8] || '',
+            namaJabatan: row[9] || '',
+            tmtJabatan: safeDateToISO(row[10]),
+            statusPegawai: row[11] || '',
+            tmtPegawai: safeDateToISO(row[12]),
+            masaKerjaTahun: masaTahun,
+            masaKerjaBulan: masaBulan,
+            jenisKelamin: row[15] || '',
+            agama: row[16] || '',
+            statusPerkawinan: row[17] || '',
+            pendidikanAwal: row[18] || '',
+            pendidikanAkhir: row[19] || '',
+            noAskes: String(row[20]).replace(/'/g, '').trim() || '',
+            noNpwp: String(row[21]).replace(/'/g, '').trim() || '',
+            noKtp: String(row[22]).replace(/'/g, '').trim() || '',
+            alamatRumah: row[23] || '',
+            kelurahan: row[24] || '',
+            kecamatan: row[25] || '',
+            telp: String(row[26]).replace(/'/g, '').trim() || '',
+            email: row[27] || ''
+          };
+        }).filter(p => p.nip); // Hanya masukkan jika ada NIP
         setData(mapped);
       } else {
         setData([]);
