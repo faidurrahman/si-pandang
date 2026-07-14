@@ -503,7 +503,7 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      <main id="layanan-menu" className="relative z-20 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 -mt-6 md:-mt-4 w-full flex-grow print:p-0 print:m-0 print:max-w-none">
+      <main id="layanan-menu" className={`relative z-20 ${activeTab === 'data-pegawai' ? 'w-full' : 'max-w-7xl'} mx-auto px-4 md:px-6 py-8 md:py-12 -mt-6 md:-mt-4 w-full flex-grow print:p-0 print:m-0 print:max-w-none`}>
         {activeTab === 'layanan' ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="mb-8 md:mb-12 text-center">

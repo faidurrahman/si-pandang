@@ -119,7 +119,39 @@ export const DataPegawaiPage: React.FC = () => {
             email: row[27] || ''
           };
         }).filter(p => p.nip); // Hanya masukkan jika ada NIP
-        setData(mapped);
+        const getGolonganWeight = (item: DataPegawai) => {
+          const gol = item.golongan || '';
+          const golPangkat = item.golonganPangkat || '';
+          const golStr = (gol + ' ' + golPangkat).toUpperCase().trim();
+          
+          if (golStr.includes('IV/E')) return 17;
+          if (golStr.includes('IV/D')) return 16;
+          if (golStr.includes('IV/C')) return 15;
+          if (golStr.includes('IV/B')) return 14;
+          if (golStr.includes('IV/A')) return 13;
+          
+          if (golStr.includes('III/D')) return 12;
+          if (golStr.includes('III/C')) return 11;
+          if (golStr.includes('III/B')) return 10;
+          if (golStr.includes('III/A')) return 9;
+          
+          if (golStr.includes('II/D')) return 8;
+          if (golStr.includes('II/C')) return 7;
+          if (golStr.includes('II/B')) return 6;
+          if (golStr.includes('II/A')) return 5;
+          
+          if (golStr.includes('I/D')) return 4;
+          if (golStr.includes('I/C')) return 3;
+          if (golStr.includes('I/B')) return 2;
+          if (golStr.includes('I/A')) return 1;
+          
+          return 0;
+        };
+
+        const sortedMapped = mapped.sort((a, b) => {
+          return getGolonganWeight(b) - getGolonganWeight(a);
+        });
+        setData(sortedMapped);
       } else {
         setData([]);
       }
@@ -255,16 +287,16 @@ export const DataPegawaiPage: React.FC = () => {
                 {error}
               </div>
             ) : (
-              <table className="w-full text-sm text-left border-collapse min-w-[1200px]">
+              <table className="w-full text-sm text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-100 text-gray-600 border-b border-gray-200 text-[11px] uppercase">
-                    <th className="p-3 border-r border-gray-200 font-bold" rowSpan={2}>NAMA/TEMPAT TGL LAHIR</th>
-                    <th className="p-3 border-r border-gray-200 font-bold text-center" rowSpan={2}>NIP</th>
+                    <th className="p-2 border-r border-gray-200 font-bold" rowSpan={2}>NAMA/TEMPAT TGL LAHIR</th>
+                    <th className="p-2 border-r border-gray-200 font-bold text-center" rowSpan={2}>NIP</th>
                     <th className="p-2 border-r border-gray-200 font-bold text-center border-b" colSpan={2}>PANGKAT</th>
                     <th className="p-2 border-r border-gray-200 font-bold text-center border-b" colSpan={2}>JABATAN</th>
                     <th className="p-2 border-r border-gray-200 font-bold text-center border-b" colSpan={2}>PEGAWAI</th>
                     <th className="p-2 border-r border-gray-200 font-bold text-center border-b" colSpan={2}>MASA KERJA</th>
-                    <th className="p-3 font-bold text-center" rowSpan={2}>PILIHAN</th>
+                    <th className="p-2 font-bold text-center whitespace-nowrap w-20" rowSpan={2}>PILIHAN</th>
                   </tr>
                   <tr className="bg-gray-100 text-gray-600 border-b border-gray-200 text-[11px] uppercase">
                     <th className="p-2 border-r border-gray-200 font-bold text-center">GOL</th>
@@ -284,20 +316,23 @@ export const DataPegawaiPage: React.FC = () => {
                     </tr>
                   ) : displayedData.map((item) => (
                     <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50 text-gray-700 text-xs">
-                      <td className="p-3 border-r border-gray-200 leading-tight">
+                      <td className="p-2 border-r border-gray-200 leading-tight">
                         <div className="text-blue-600 font-medium uppercase mb-1">{item.nama}</div>
                         <div className="uppercase">{splitTempatTanggal(item.tempatTanggalLahir).tempat},{splitTempatTanggal(item.tempatTanggalLahir).tanggal}</div>
                       </td>
-                      <td className="p-3 border-r border-gray-200 text-center whitespace-nowrap">{item.nip}</td>
-                      <td className="p-3 border-r border-gray-200 text-center">{item.golonganPangkat} {item.golongan}</td>
-                      <td className="p-3 border-r border-gray-200 text-center whitespace-nowrap">{formatDateStr(item.tmtGolongan)}</td>
-                      <td className="p-3 border-r border-gray-200">{item.namaJabatan}</td>
-                      <td className="p-3 border-r border-gray-200 text-center whitespace-nowrap">{formatDateStr(item.tmtJabatan)}</td>
-                      <td className="p-3 border-r border-gray-200 text-center">{item.statusPegawai}</td>
-                      <td className="p-3 border-r border-gray-200 text-center whitespace-nowrap">{formatDateStr(item.tmtPegawai)}</td>
-                      <td className="p-3 border-r border-gray-200 text-center">{item.masaKerjaTahun}</td>
-                      <td className="p-3 border-r border-gray-200 text-center">{item.masaKerjaBulan}</td>
-                      <td className="p-3 text-center align-middle">
+                      <td className="p-2 border-r border-gray-200 text-center whitespace-nowrap">{item.nip}</td>
+                      <td className="p-2 border-r border-gray-200 text-center leading-tight">
+                        <div className="font-medium whitespace-nowrap">{item.golongan}</div>
+                        <div className="text-[10px] text-gray-500 whitespace-nowrap">{item.golonganPangkat}</div>
+                      </td>
+                      <td className="p-2 border-r border-gray-200 text-center whitespace-nowrap">{formatDateStr(item.tmtGolongan)}</td>
+                      <td className="p-2 border-r border-gray-200">{item.namaJabatan}</td>
+                      <td className="p-2 border-r border-gray-200 text-center whitespace-nowrap">{formatDateStr(item.tmtJabatan)}</td>
+                      <td className="p-2 border-r border-gray-200 text-center">{item.statusPegawai}</td>
+                      <td className="p-2 border-r border-gray-200 text-center whitespace-nowrap">{formatDateStr(item.tmtPegawai)}</td>
+                      <td className="p-2 border-r border-gray-200 text-center">{item.masaKerjaTahun}</td>
+                      <td className="p-2 border-r border-gray-200 text-center">{item.masaKerjaBulan}</td>
+                      <td className="p-2 text-center align-middle whitespace-nowrap w-20">
                         <div className="flex flex-col items-center justify-center gap-2">
                           <button 
                             onClick={() => { setSelectedPegawai(item); setIsViewModalOpen(true); }}
