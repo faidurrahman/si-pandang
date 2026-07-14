@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -12,6 +12,44 @@ export const LpjKegiatan: React.FC = () => {
   
   const coverRef = useRef<HTMLDivElement>(null);
 
+  const [previewScale, setPreviewScale] = useState(1);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (previewContainerRef.current) {
+        const parentWidth = previewContainerRef.current.clientWidth;
+        // 816px paper width + 48px padding (24px each side)
+        const targetWidth = 864; 
+        if (parentWidth > 0 && parentWidth < targetWidth) {
+          setPreviewScale(parentWidth / targetWidth);
+        } else {
+          setPreviewScale(1);
+        }
+      }
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
+  const currentScale = isGenerating ? 1 : previewScale;
+  
+  const chunkArray = <T,>(arr: T[], size: number): T[][] => {
+    const chunked = [];
+    for (let i = 0; i < arr.length; i += size) {
+      chunked.push(arr.slice(i, i + size));
+    }
+    return chunked;
+  };
+
+  const photoPages = chunkArray(photos, 6);
+
+  const pagesCount = 1 + photoPages.length;
+  const unscaledHeight = (pagesCount * 1344) + ((pagesCount - 1) * 32);
+  const scaledHeight = unscaledHeight * currentScale;
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -24,18 +62,12 @@ export const LpjKegiatan: React.FC = () => {
     setPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
-  const chunkArray = <T,>(arr: T[], size: number): T[][] => {
-    const chunked = [];
-    for (let i = 0; i < arr.length; i += size) {
-      chunked.push(arr.slice(i, i + size));
-    }
-    return chunked;
-  };
-
-  const photoPages = chunkArray(photos, 6);
-
   const handlePrint = async () => {
     setIsGenerating(true);
+
+    // Tunggu DOM update agar scale kembali ke 1 untuk html2canvas
+    await new Promise(resolve => setTimeout(resolve, 300));
+
     try {
       const pdf = new jsPDF('p', 'mm', 'legal');
       const legalWidth = 215.9;
@@ -189,67 +221,69 @@ export const LpjKegiatan: React.FC = () => {
       </div>
 
       {/* Document Preview Section */}
-      <div className="w-full lg:w-2/3 flex justify-center print:w-full print:block">
-        {/* Paper Container */}
-        <div className="bg-white shadow-xl print:shadow-none print:m-0 mx-auto" 
-             style={{ 
-               width: '215.9mm', 
-               minHeight: '355.6mm', 
-               backgroundColor: 'white' 
-             }}>
+      <div ref={previewContainerRef} className="w-full lg:w-2/3 bg-gray-200 py-8 flex flex-col items-center overflow-y-auto overflow-x-hidden">
+        
+        {/* Scaled Wrapper to fix layout height */}
+        <div className="w-full flex justify-center transition-all duration-300" style={{ height: `${scaledHeight}px` }}>
           
-          {/* Page 1: Cover */}
-          <div ref={coverRef} className="w-full min-h-[355.6mm] box-border p-10 flex flex-col items-center text-center relative print:h-screen print:page-break-after bg-white">
-            <div className="pt-8 w-full">
-              <h1 className="text-2xl font-black text-black uppercase leading-relaxed">
-                LAPORAN PERTANGGUNG JAWABAN
-              </h1>
-              {judul && (
-                <h2 className="text-xl font-bold text-black uppercase mt-2">
-                  KEGIATAN {judul}
-                </h2>
-              )}
-              {tanggal && (
-                <h3 className="text-lg font-bold text-black uppercase mt-4">
-                  {tanggal}
-                </h3>
-              )}
-            </div>
-
-            <div className="flex-1 flex flex-col justify-center items-center w-full">
-              {/* Logo Placeholder */}
-              <img 
-                src="https://lh3.googleusercontent.com/d/1dxwhUWW20e4w8BdOcrwaojHbz0GxGOwQ" 
-                alt="Logo Makassar" 
-                className="w-96 h-auto mx-auto mt-8 object-contain"
-                crossOrigin="anonymous"
-              />
-            </div>
-
-            <div className="mt-auto text-center pb-8 w-full">
-              <p className="text-xl font-bold text-black uppercase">TAHUN ANGGARAN {tahunAnggaran}</p>
-              <p className="text-xl font-bold text-black uppercase mt-1">KECAMATAN UJUNG PANDANG</p>
-            </div>
+          <div className="flex flex-col items-center gap-8 origin-top transition-transform duration-300"
+               style={{ transform: `scale(${currentScale})`, width: '816px' }}>
+            
+            {/* Page 1: Cover */}
+            <div ref={coverRef} className="bg-white shadow-lg box-border overflow-hidden w-[816px] h-[1344px] p-10 flex flex-col items-center text-center relative shrink-0"
+                 style={{ backgroundColor: 'white' }}>
+          <div className="pt-8 w-full">
+            <h1 className="text-2xl font-black text-black uppercase leading-relaxed">
+              LAPORAN PERTANGGUNG JAWABAN
+            </h1>
+            {judul && (
+              <h2 className="text-xl font-bold text-black uppercase mt-2">
+                KEGIATAN {judul}
+              </h2>
+            )}
+            {tanggal && (
+              <h3 className="text-lg font-bold text-black uppercase mt-4">
+                {tanggal}
+              </h3>
+            )}
           </div>
 
-          {/* Page 2 and beyond: Dokumentasi Lapangan */}
-          {photoPages.length > 0 && photoPages.map((pagePhotos, pageIndex) => (
-            <div key={pageIndex} className="pdf-page-doc w-full min-h-[355.6mm] box-border p-10 flex flex-col print:mt-0 bg-white" style={{ pageBreakBefore: 'always', breakBefore: 'page' }}>
-              <h2 className="text-xl font-bold text-black uppercase text-center underline">
-                DOKUMENTASI {judul}
-              </h2>
-              <div className="flex-1 mt-6 w-full">
-                <div className="grid grid-cols-2 grid-rows-3 gap-y-4 gap-x-2 h-full max-h-[280mm]">
-                  {pagePhotos.map((src, index) => (
-                    <div key={index} className="flex justify-center items-center overflow-hidden h-full">
-                      <img src={src} alt={`Dokumentasi ${pageIndex * 6 + index + 1}`} className="aspect-[3/4] h-full max-h-[90mm] w-auto object-cover shadow-sm" crossOrigin="anonymous" />
-                    </div>
-                  ))}
-                </div>
+          <div className="flex-1 flex flex-col justify-center items-center w-full">
+            {/* Logo Placeholder */}
+            <img 
+              src="https://lh3.googleusercontent.com/d/1dxwhUWW20e4w8BdOcrwaojHbz0GxGOwQ" 
+              alt="Logo Makassar" 
+              className="w-96 h-auto mx-auto mt-8 object-contain"
+              crossOrigin="anonymous"
+            />
+          </div>
+
+          <div className="mt-auto text-center pb-8 w-full">
+            <p className="text-xl font-bold text-black uppercase">TAHUN ANGGARAN {tahunAnggaran}</p>
+            <p className="text-xl font-bold text-black uppercase mt-1">KECAMATAN UJUNG PANDANG</p>
+          </div>
+        </div>
+
+        {/* Page 2 and beyond: Dokumentasi Lapangan */}
+        {photoPages.length > 0 && photoPages.map((pagePhotos, pageIndex) => (
+          <div key={pageIndex} className="pdf-page-doc bg-white shadow-lg box-border overflow-hidden w-[816px] h-[1344px] p-10 flex flex-col shrink-0"
+               style={{ backgroundColor: 'white' }}>
+            <h2 className="text-xl font-bold text-black uppercase text-center underline">
+              DOKUMENTASI {judul}
+            </h2>
+            <div className="flex-1 min-h-0 mt-6 w-full">
+              <div className="grid grid-cols-2 grid-rows-3 gap-6 h-full">
+                {pagePhotos.map((src, index) => (
+                  <div key={index} className="relative w-full h-full overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50">
+                    <img src={src} alt={`Dokumentasi ${pageIndex * 6 + index + 1}`} className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+          </div>
+        ))}
 
+          </div>
         </div>
       </div>
       

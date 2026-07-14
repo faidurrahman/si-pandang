@@ -164,6 +164,29 @@ function doPost(e) {
       }
 
       if (rowIndex !== -1) {
+        // ID Folder Google Drive untuk menyimpan file SK dan KGB
+        var folderId = '1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs'; 
+        var folder = DriveApp.getFolderById(folderId);
+
+        var skUrl = '';
+        var kgbUrl = '';
+
+        // Proses upload file jika ada
+        if (data.files && data.files.length > 0) {
+          data.files.forEach(function(file) {
+            var blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimetype, file.filename);
+            var uploadedFile = folder.createFile(blob);
+            
+            uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+            
+            if (file.type === 'sk') {
+              skUrl = uploadedFile.getUrl();
+            } else if (file.type === 'kgb') {
+              kgbUrl = uploadedFile.getUrl();
+            }
+          });
+        }
+
         // Update kolom yang dikirim
         // Urutan kolom: ID(0), Timestamp(1), Nama(2), NIP(3), Pangkat(4), Jabatan(5), TMT KGB(6), Gaji Pokok(7), URL SK(8), URL KGB(9)
         
@@ -173,9 +196,8 @@ function doPost(e) {
         if (data.jabatan) sheetKgb.getRange(rowIndex, 6).setValue(data.jabatan);
         if (data.tmtKgb) sheetKgb.getRange(rowIndex, 7).setValue(data.tmtKgb);
         if (data.gajiPokok) sheetKgb.getRange(rowIndex, 8).setValue(data.gajiPokok);
-        
-        // Handle file updates if needed (optional, logic similar to addPegawai but updating cells)
-        // For simplicity, assuming file updates are handled separately or re-upload creates new entry
+        if (skUrl) sheetKgb.getRange(rowIndex, 9).setValue(skUrl);
+        if (kgbUrl) sheetKgb.getRange(rowIndex, 10).setValue(kgbUrl);
         
         SpreadsheetApp.flush();
         return ContentService.createTextOutput("Success Update KGB").setMimeType(ContentService.MimeType.TEXT);
