@@ -36,7 +36,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) =>
         {service.icon}
       </div>
       <h3 className="text-sm font-bold text-slate-900 mb-1 leading-tight px-1 group-hover:text-blue-600 transition-colors">
-        {service.title}
+        {service.title || service.name}
       </h3>
       <p className="text-[10px] text-slate-400 font-medium leading-tight relative z-10">
         {service.description}

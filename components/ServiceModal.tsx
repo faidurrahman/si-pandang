@@ -25,13 +25,13 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ service, onClose, on
             </div>
             <div>
               <h2 className="text-lg md:text-xl font-extrabold text-[#0a192f] leading-tight">
-                {service.title}
+                {service.title || service.name}
               </h2>
               <p className="text-slate-500 text-[10px] md:text-[11px] font-medium mt-1">
                 {service.description}
               </p>
               <p className="text-slate-400 text-[10px] md:text-[11px] font-medium opacity-80 mt-0.5">
-                Pengajuan {service.title.toLowerCase()} dengan persyaratan lengkap
+                Pengajuan {(service.title || service.name || '').toLowerCase()} dengan persyaratan lengkap
               </p>
             </div>
           </div>
@@ -54,7 +54,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ service, onClose, on
           </div>
 
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {service.requirements.map((req) => (
+            {service.requirements?.map((req) => (
               <li key={req.id} className="group relative flex items-start p-3 md:p-4 bg-white border border-slate-200 rounded-xl transition-all duration-200 shadow-sm hover:border-blue-300 hover:shadow-md">
                 <div className="mt-0.5 h-5 w-5 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
                   <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
