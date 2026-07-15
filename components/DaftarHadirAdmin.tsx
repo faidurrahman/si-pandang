@@ -31,14 +31,15 @@ export const DaftarHadirAdmin: React.FC = () => {
 
   const getDriveImageUrl = (url: string) => {
     if (!url) return '';
-    if (url.startsWith('data:image') || url.includes('drive.google.com/uc')) {
+    if (url.startsWith('data:image')) {
       return url;
     }
     const match = url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (match && match[1]) {
-      return `https://drive.google.com/uc?id=${match[1]}`;
+      const driveUrl = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`;
+      return `/api/image-proxy?url=${encodeURIComponent(driveUrl)}`;
     }
-    return url;
+    return `/api/image-proxy?url=${encodeURIComponent(url)}`;
   };
 
   const formatTanggal = (dateString: string) => {
@@ -157,7 +158,7 @@ export const DaftarHadirAdmin: React.FC = () => {
     return k ? k.nama : id;
   };
 
-  const loadImageToBase64 = (url: string): Promise<string | null> => {
+  const getBase64ImageFromUrl = (url: string): Promise<string | null> => {
     return new Promise((resolve) => {
       if (!url) return resolve(null);
       const img = new Image();
@@ -194,26 +195,49 @@ export const DaftarHadirAdmin: React.FC = () => {
     });
 
     const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
     
+    // Load kop logos dynamically using getBase64ImageFromUrl
+    const leftLogoUrl = `/api/image-proxy?url=${encodeURIComponent('https://drive.google.com/uc?export=view&id=1dxwhUWW20e4w8BdOcrwaojHbz0GxGOwQ')}`;
+    const rightLogoUrl = `/api/image-proxy?url=${encodeURIComponent('https://drive.google.com/uc?export=view&id=1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9')}`;
+    
+    const [leftLogoBase64, rightLogoBase64] = await Promise.all([
+      getBase64ImageFromUrl(leftLogoUrl),
+      getBase64ImageFromUrl(rightLogoUrl)
+    ]);
+    
+    // Draw logos
+    const logoY = 12;
+    const logoWidth = 16;
+    const logoHeight = 20;
+    
+    if (leftLogoBase64) {
+      doc.addImage(leftLogoBase64, 'PNG', 14, logoY, logoWidth, logoHeight);
+    }
+    if (rightLogoBase64) {
+      doc.addImage(rightLogoBase64, 'PNG', pageWidth - 14 - logoWidth, logoY, logoWidth, logoHeight);
+    }
+    
+    // Draw centered title
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     
-    const titleLines = doc.splitTextToSize(selectedRekapKegiatan.nama.toUpperCase(), 180);
-    let y = 20;
+    const titleLines = doc.splitTextToSize(selectedRekapKegiatan.nama.toUpperCase(), 130); // Leave room for logos
+    let y = 16;
     
     titleLines.forEach((line: string) => {
-      doc.text(line, 105, y, { align: 'center' });
+      doc.text(line, pageWidth / 2, y, { align: 'center' });
       y += 6;
     });
     
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text(selectedRekapKegiatan.hariTanggal, 105, y, { align: 'center' });
+    doc.text(selectedRekapKegiatan.hariTanggal, pageWidth / 2, y, { align: 'center' });
     y += 6;
-    doc.text(selectedRekapKegiatan.tempat, 105, y, { align: 'center' });
+    doc.text(selectedRekapKegiatan.tempat, pageWidth / 2, y, { align: 'center' });
     y += 6;
-    doc.text(selectedRekapKegiatan.waktu, 105, y, { align: 'center' });
-    y += 10;
+    doc.text(selectedRekapKegiatan.waktu, pageWidth / 2, y, { align: 'center' });
+    y += 15;
     
     const tableData = filteredKehadirans.map((k, index) => [
       index + 1,
@@ -230,23 +254,27 @@ export const DaftarHadirAdmin: React.FC = () => {
     for (let i = 0; i < filteredKehadirans.length; i++) {
       const ttdUrl = filteredKehadirans[i].ttd;
       if (ttdUrl) {
-        base64Images[i] = await loadImageToBase64(getDriveImageUrl(ttdUrl));
+        base64Images[i] = await getBase64ImageFromUrl(getDriveImageUrl(ttdUrl));
       }
     }
 
     autoTable(doc, {
-      startY: y,
+      startY: 42,
+      margin: { top: 42, right: 10, bottom: 15, left: 10 },
       head: [['No', 'Nama', 'Instansi', 'Gender', 'No. HP', 'Email', 'TTD']],
       body: tableData,
       theme: 'grid',
       styles: { 
-        fontSize: 9, 
-        cellPadding: 3,
+        fontSize: 8, 
+        cellPadding: 2,
         valign: 'middle',
-        minCellHeight: 15
+        minCellHeight: 14,
+        lineColor: [0, 0, 0],
+        lineWidth: 0.2,
+        textColor: [0, 0, 0]
       },
       headStyles: {
-        fillColor: [240, 240, 240],
+        fillColor: [255, 255, 255],
         textColor: [0, 0, 0],
         fontStyle: 'bold',
         halign: 'center'
@@ -270,9 +298,9 @@ export const DaftarHadirAdmin: React.FC = () => {
                 imgBase64,
                 'PNG',
                 data.cell.x + 2,
-                data.cell.y + 2,
+                data.cell.y + 1,
                 20,
-                11
+                10
               );
             } catch(e) {}
           }
@@ -435,35 +463,42 @@ export const DaftarHadirAdmin: React.FC = () => {
             </div>
 
             {selectedRekapKegiatan ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-50 text-gray-600 border-b">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 overflow-x-auto">
+                <div className="mb-6 text-center text-black">
+                  <h3 className="text-xl font-bold uppercase mb-2">{selectedRekapKegiatan.nama}</h3>
+                  <p>{selectedRekapKegiatan.hariTanggal}</p>
+                  <p>{selectedRekapKegiatan.tempat}</p>
+                  <p>{selectedRekapKegiatan.waktu}</p>
+                </div>
+                
+                <table className="w-full text-sm border-collapse border border-black bg-white">
+                  <thead>
                     <tr>
-                      <th className="px-6 py-4 font-semibold w-12">No</th>
-                      <th className="px-6 py-4 font-semibold">Waktu Submit</th>
-                      <th className="px-6 py-4 font-semibold">Nama Lengkap</th>
-                      <th className="px-6 py-4 font-semibold">Instansi</th>
-                      <th className="px-6 py-4 font-semibold">Gender</th>
-                      <th className="px-6 py-4 font-semibold">No. HP / Email</th>
-                      <th className="px-6 py-4 font-semibold text-center">TTD</th>
+                      <th className="border border-black px-4 py-2 text-center font-bold text-black w-12">No</th>
+                      <th className="border border-black px-4 py-2 text-center font-bold text-black">Nama</th>
+                      <th className="border border-black px-4 py-2 text-center font-bold text-black">Instansi</th>
+                      <th className="border border-black px-4 py-2 text-center font-bold text-black">Gender</th>
+                      <th className="border border-black px-4 py-2 text-center font-bold text-black">No. HP</th>
+                      <th className="border border-black px-4 py-2 text-center font-bold text-black">Email</th>
+                      <th className="border border-black px-4 py-2 text-center font-bold text-black">TTD</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody>
                     {isLoadingRekap ? (
-                      <tr><td colSpan={7} className="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>
+                      <tr><td colSpan={7} className="border border-black px-4 py-8 text-center text-gray-500">Memuat data...</td></tr>
                     ) : filteredKehadirans.length === 0 ? (
-                      <tr><td colSpan={7} className="px-6 py-8 text-center text-gray-500">Tidak ada data kehadiran untuk kegiatan ini.</td></tr>
+                      <tr><td colSpan={7} className="border border-black px-4 py-8 text-center text-gray-500">Tidak ada data kehadiran untuk kegiatan ini.</td></tr>
                     ) : filteredKehadirans.map((k, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-gray-500">{idx + 1}</td>
-                        <td className="px-6 py-4 text-gray-600">{new Date(k.timestamp).toLocaleString('id-ID')}</td>
-                        <td className="px-6 py-4 font-medium text-gray-900">{k.nama_lengkap}</td>
-                        <td className="px-6 py-4 text-gray-600">{k.instansi}</td>
-                        <td className="px-6 py-4 text-gray-600 text-center">{k.gender}</td>
-                        <td className="px-6 py-4 text-gray-600">{k.no_hp}<br/><span className="text-xs text-gray-400">{k.email}</span></td>
-                        <td className="px-6 py-4 text-center">
+                      <tr key={idx}>
+                        <td className="border border-black px-4 py-2 text-black text-center">{idx + 1}</td>
+                        <td className="border border-black px-4 py-2 text-black text-left">{k.nama_lengkap}</td>
+                        <td className="border border-black px-4 py-2 text-black text-left">{k.instansi}</td>
+                        <td className="border border-black px-4 py-2 text-black text-center">{k.gender}</td>
+                        <td className="border border-black px-4 py-2 text-black text-left">{k.no_hp}</td>
+                        <td className="border border-black px-4 py-2 text-black text-left">{k.email}</td>
+                        <td className="border border-black px-4 py-2 text-black text-center">
                           {k.ttd ? (
-                            <img src={getDriveImageUrl(k.ttd)} alt="ttd" className="h-12 object-contain mx-auto" />
+                            <img src={getDriveImageUrl(k.ttd)} alt="ttd" className="h-12 object-contain mx-auto" referrerPolicy="no-referrer" />
                           ) : '-'}
                         </td>
                       </tr>

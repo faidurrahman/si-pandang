@@ -12,6 +12,36 @@ async function startServer() {
   app.use(express.json());
   app.use(express.text());
 
+  // Proxy endpoint for images (to bypass CORS)
+  app.get('/api/image-proxy', async (req, res) => {
+    try {
+      const imageUrl = req.query.url as string;
+      if (!imageUrl) {
+        return res.status(400).json({ error: 'Missing url parameter' });
+      }
+      
+      const response = await fetch(imageUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        }
+      });
+      
+      if (!response.ok) {
+        return res.status(response.status).send('Failed to fetch image');
+      }
+      
+      res.set('Content-Type', response.headers.get('content-type') || 'image/jpeg');
+      res.set('Access-Control-Allow-Origin', '*');
+      res.set('Cache-Control', 'public, max-age=31536000');
+      
+      const buffer = await response.arrayBuffer();
+      res.send(Buffer.from(buffer));
+    } catch (error) {
+      console.error('Image proxy error:', error);
+      res.status(500).json({ error: 'Failed to proxy image' });
+    }
+  });
+
   // Proxy endpoint for Google Apps Script
   app.all('/api/proxy', async (req, res) => {
     try {

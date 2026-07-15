@@ -30,17 +30,23 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) =>
   return (
     <div 
       onClick={() => onClick(service)}
-      className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300 cursor-pointer text-center flex flex-col items-center group h-full"
+      className="relative bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 hover:border-black/20 group cursor-pointer transition-all duration-300 ease-in-out text-center flex flex-col items-center h-full"
     >
-      <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl mb-4 shadow-sm group-hover:scale-110 transition-transform ${getIconStyles(service.id)}`}>
+      <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl mb-4 shadow-sm transition-transform duration-300 group-hover:scale-110 ${getIconStyles(service.id)}`}>
         {service.icon}
       </div>
-      <h3 className="text-sm font-bold text-slate-900 mb-1 leading-tight px-1">
+      <h3 className="text-sm font-bold text-slate-900 mb-1 leading-tight px-1 group-hover:text-blue-600 transition-colors">
         {service.title}
       </h3>
-      <p className="text-[10px] text-slate-400 font-medium leading-tight">
+      <p className="text-[10px] text-slate-400 font-medium leading-tight relative z-10">
         {service.description}
       </p>
+      
+      <div className="absolute bottom-4 right-4 opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 text-blue-600">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </div>
     </div>
   );
 };
