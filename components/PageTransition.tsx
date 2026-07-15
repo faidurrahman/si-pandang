@@ -44,9 +44,10 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, active
               className="flex items-center justify-center"
             >
               <img 
-                src="/logo-kecamatan.png" 
+                src="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9" 
                 alt="Logo Kecamatan Ujung Pandang" 
                 className="w-24 md:w-28 h-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
+                referrerPolicy="no-referrer"
               />
             </motion.div>
             
