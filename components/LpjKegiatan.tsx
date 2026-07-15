@@ -4,6 +4,7 @@ import jsPDF from 'jspdf';
 
 export const LpjKegiatan: React.FC = () => {
   const [judul, setJudul] = useState('');
+  const [judulDokumentasi, setJudulDokumentasi] = useState('');
   const [tanggal, setTanggal] = useState('');
   const [tahunAnggaran, setTahunAnggaran] = useState(new Date().getFullYear().toString());
   const [photos, setPhotos] = useState<string[]>([]);
@@ -124,6 +125,17 @@ export const LpjKegiatan: React.FC = () => {
                 onChange={(e) => setJudul(e.target.value)}
                 placeholder="Contoh: Rapat Koordinasi..."
                 rows={3}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Judul Dokumentasi (Halaman 2)</label>
+              <textarea
+                value={judulDokumentasi}
+                onChange={(e) => setJudulDokumentasi(e.target.value)}
+                placeholder="Contoh: DOKUMENTASI RAPAT..."
+                rows={2}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm resize-none"
               />
             </div>
@@ -269,7 +281,7 @@ export const LpjKegiatan: React.FC = () => {
           <div key={pageIndex} className="pdf-page-doc bg-white shadow-lg box-border overflow-hidden w-[816px] h-[1344px] p-10 flex flex-col shrink-0"
                style={{ backgroundColor: 'white' }}>
             <h2 className="text-xl font-bold text-black uppercase text-center underline whitespace-pre-wrap">
-              DOKUMENTASI {pageIndex === 0 ? judul : ''}
+              {pageIndex === 0 ? judulDokumentasi : ''}
             </h2>
             <div className="flex-1 min-h-0 mt-6 w-full">
               <div className="grid grid-cols-2 grid-rows-3 gap-6 h-full">
