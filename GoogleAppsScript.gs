@@ -22,6 +22,68 @@ function doPost(e) {
     // =====================================================================
     // 1. LOGIKA BARU: Menangani action 'addPegawai', 'deletePegawai', 'updatePegawai'
     // =====================================================================
+    
+    // -------------------------------------------------------------
+    // LOGIKA DAFTAR HADIR & KEGIATAN
+    // -------------------------------------------------------------
+    if (data.action === 'addDataKegiatan') {
+      var sheetDataKegiatan = ss.getSheetByName('Data_Kegiatan');
+      if (!sheetDataKegiatan) {
+        sheetDataKegiatan = ss.insertSheet('Data_Kegiatan');
+        sheetDataKegiatan.appendRow(['id_kegiatan', 'nama_kegiatan', 'hari_tanggal', 'waktu', 'tempat']);
+      }
+      
+      var idKegiatan = data.id_kegiatan || Utilities.getUuid();
+      
+      sheetDataKegiatan.appendRow([
+        idKegiatan,
+        data.nama_kegiatan || '',
+        data.hari_tanggal || '',
+        data.waktu || '',
+        data.tempat || ''
+      ]);
+      
+      return ContentService.createTextOutput(JSON.stringify({ status: "Success", id_kegiatan: idKegiatan }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (data.action === 'addDaftarHadir') {
+      var sheetDaftarHadir = ss.getSheetByName('Daftar_Hadir');
+      if (!sheetDaftarHadir) {
+        sheetDaftarHadir = ss.insertSheet('Daftar_Hadir');
+        sheetDaftarHadir.appendRow(['timestamp', 'id_kegiatan', 'nama_lengkap', 'instansi', 'gender', 'no_hp', 'email', 'ttd_digital']);
+      }
+      
+      // Upload TTD ke Google Drive
+      var ttdUrl = '';
+      if (data.ttd_digital) {
+        try {
+          var folder = DriveApp.getFolderById(FOLDER_ID);
+          var namaFile = 'TTD_' + (data.nama_lengkap || 'Unknown') + '_' + new Date().getTime() + '.png';
+          var blob = Utilities.newBlob(Utilities.base64Decode(data.ttd_digital), 'image/png', namaFile);
+          var uploadedFile = folder.createFile(blob);
+          uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          ttdUrl = uploadedFile.getUrl();
+        } catch (e) {
+          ttdUrl = 'Gagal upload TTD: ' + e.toString();
+        }
+      }
+      
+      sheetDaftarHadir.appendRow([
+        new Date().toISOString(),
+        data.id_kegiatan || '',
+        data.nama_lengkap || '',
+        data.instansi || '',
+        data.gender || '',
+        "'" + (data.no_hp || ''),
+        data.email || '',
+        ttdUrl || '' // URL file dari Google Drive
+      ]);
+      
+      return ContentService.createTextOutput(JSON.stringify({ status: "Success" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     if (data.action === 'updateDaftarPegawai') {
       var sheets = ss.getSheets();
       var sheetDaftar = null;
@@ -435,6 +497,30 @@ function doGet(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
     
+    
+    // Cek parameter action untuk Daftar Hadir
+    if (e.parameter && e.parameter.action === 'getDataKegiatan') {
+      var sheetDataKegiatan = ss.getSheetByName('Data_Kegiatan');
+      if (!sheetDataKegiatan) {
+        return ContentService.createTextOutput(JSON.stringify({ data: [] }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      const data = sheetDataKegiatan.getDataRange().getValues();
+      return ContentService.createTextOutput(JSON.stringify({ data: data }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (e.parameter && e.parameter.action === 'getDaftarHadir') {
+      var sheetDaftarHadir = ss.getSheetByName('Daftar_Hadir');
+      if (!sheetDaftarHadir) {
+        return ContentService.createTextOutput(JSON.stringify({ data: [] }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      const data = sheetDaftarHadir.getDataRange().getValues();
+      return ContentService.createTextOutput(JSON.stringify({ data: data }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     // Default: Ambil data Pengajuan
     const sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) {

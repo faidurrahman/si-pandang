@@ -13,7 +13,8 @@ import { LoginModal } from './components/LoginModal';
 import { PantauKGB } from './components/PantauKGB';
 import { LpjKegiatan } from './components/LpjKegiatan';
 import { DataPegawaiPage } from './components/DataPegawaiPage';
-import { DaftarHadirPage } from './components/DaftarHadirPage';
+import { DaftarHadirAdmin } from './components/DaftarHadirAdmin';
+import { FormKehadiran } from './components/FormKehadiran';
 
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
 
@@ -328,6 +329,14 @@ const App: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [monitoringSearchTerm, itemsPerPage]);
+
+  // Check URL for kegiatan_id to show Form Kehadiran directly
+  const queryParams = new URLSearchParams(window.location.search);
+  const kegiatanIdFromUrl = queryParams.get('kegiatan_id');
+
+  if (kegiatanIdFromUrl) {
+    return <FormKehadiran kegiatanId={kegiatanIdFromUrl} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
@@ -666,7 +675,7 @@ const App: React.FC = () => {
         ) : activeTab === 'data-pegawai' ? (
           <DataPegawaiPage />
         ) : activeTab === 'daftar-hadir' ? (
-          <DaftarHadirPage />
+          <DaftarHadirAdmin />
         ) : null}
       </main>
 
