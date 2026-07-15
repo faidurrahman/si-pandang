@@ -8,6 +8,7 @@ export const DataPegawaiPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [entries, setEntries] = useState(10);
   const [data, setData] = useState<DataPegawai[]>([]);
+  const [filterType, setFilterType] = useState<'all' | 'PNS' | 'PPPK Penuh Waktu' | 'PPPK Paruh Waktu'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -195,6 +196,15 @@ export const DataPegawaiPage: React.FC = () => {
 
   const filteredData = useMemo(() => {
     return data.filter(item => {
+      // Check filterType
+      if (filterType === 'PNS') {
+        if (!item.statusPegawai?.toUpperCase().includes('PNS')) return false;
+      } else if (filterType === 'PPPK Penuh Waktu') {
+        if (!item.statusPegawai?.toUpperCase().includes('PPPK PENUH WAKTU')) return false;
+      } else if (filterType === 'PPPK Paruh Waktu') {
+        if (!item.statusPegawai?.toUpperCase().includes('PPPK PARUH WAKTU')) return false;
+      }
+
       if (searchTerm) {
         const lowerSearch = searchTerm.toLowerCase();
         return item.nama.toLowerCase().includes(lowerSearch) || 
@@ -203,7 +213,7 @@ export const DataPegawaiPage: React.FC = () => {
       }
       return true;
     });
-  }, [data, searchTerm]);
+  }, [data, searchTerm, filterType]);
 
   const displayedData = filteredData.slice(0, entries);
 
@@ -234,6 +244,47 @@ export const DataPegawaiPage: React.FC = () => {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-normal text-gray-800">DAFTAR PEGAWAI</h1>
           <h2 className="text-2xl font-normal text-gray-800">SATUAN KERJA KECAMATAN UJUNG PANDANG</h2>
+        </div>
+
+        {/* Dashboard Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div 
+            onClick={() => setFilterType('all')}
+            className={`bg-white rounded-xl shadow-sm border p-6 cursor-pointer transition-all ${filterType === 'all' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200 hover:border-blue-300'}`}
+          >
+            <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Total Pegawai</div>
+            <div className="text-4xl font-bold text-gray-900">{data.length}</div>
+          </div>
+          
+          <div 
+            onClick={() => setFilterType('PNS')}
+            className={`bg-white rounded-xl shadow-sm border p-6 cursor-pointer transition-all ${filterType === 'PNS' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200 hover:border-blue-300'}`}
+          >
+            <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Jumlah PNS</div>
+            <div className="text-4xl font-bold text-gray-900">
+              {data.filter(item => item.statusPegawai?.toUpperCase().includes('PNS')).length}
+            </div>
+          </div>
+
+          <div 
+            onClick={() => setFilterType('PPPK Penuh Waktu')}
+            className={`bg-white rounded-xl shadow-sm border p-6 cursor-pointer transition-all ${filterType === 'PPPK Penuh Waktu' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200 hover:border-blue-300'}`}
+          >
+            <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Jumlah PPPK Penuh Waktu</div>
+            <div className="text-4xl font-bold text-gray-900">
+              {data.filter(item => item.statusPegawai?.toUpperCase().includes('PPPK PENUH WAKTU')).length}
+            </div>
+          </div>
+
+          <div 
+            onClick={() => setFilterType('PPPK Paruh Waktu')}
+            className={`bg-white rounded-xl shadow-sm border p-6 cursor-pointer transition-all ${filterType === 'PPPK Paruh Waktu' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200 hover:border-blue-300'}`}
+          >
+            <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Jumlah PPPK Paruh Waktu</div>
+            <div className="text-4xl font-bold text-gray-900">
+              {data.filter(item => item.statusPegawai?.toUpperCase().includes('PPPK PARUH WAKTU')).length}
+            </div>
+          </div>
         </div>
 
         <div className="bg-white shadow-sm border border-gray-200">
