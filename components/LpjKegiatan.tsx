@@ -119,12 +119,12 @@ export const LpjKegiatan: React.FC = () => {
           <div className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Judul Kegiatan</label>
-              <input
-                type="text"
+              <textarea
                 value={judul}
                 onChange={(e) => setJudul(e.target.value)}
                 placeholder="Contoh: Rapat Koordinasi..."
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
+                rows={3}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm resize-none"
               />
             </div>
 
@@ -237,8 +237,8 @@ export const LpjKegiatan: React.FC = () => {
               LAPORAN PERTANGGUNG JAWABAN
             </h1>
             {judul && (
-              <h2 className="text-xl font-bold text-black uppercase mt-2">
-                KEGIATAN {judul}
+              <h2 className="text-xl font-bold text-black uppercase mt-2 whitespace-pre-wrap">
+                {judul}
               </h2>
             )}
             {tanggal && (
@@ -268,8 +268,8 @@ export const LpjKegiatan: React.FC = () => {
         {photoPages.length > 0 && photoPages.map((pagePhotos, pageIndex) => (
           <div key={pageIndex} className="pdf-page-doc bg-white shadow-lg box-border overflow-hidden w-[816px] h-[1344px] p-10 flex flex-col shrink-0"
                style={{ backgroundColor: 'white' }}>
-            <h2 className="text-xl font-bold text-black uppercase text-center underline">
-              DOKUMENTASI {judul}
+            <h2 className="text-xl font-bold text-black uppercase text-center underline whitespace-pre-wrap">
+              DOKUMENTASI {pageIndex === 0 ? judul : ''}
             </h2>
             <div className="flex-1 min-h-0 mt-6 w-full">
               <div className="grid grid-cols-2 grid-rows-3 gap-6 h-full">

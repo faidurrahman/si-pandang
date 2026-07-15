@@ -1,3 +1,21 @@
+export type SubmissionStatus = 'Dalam Proses' | 'Selesai' | 'Ditolak' | 'Direvisi';
+
+export interface Submission {
+  id: string;
+  nama: string;
+  nip: string;
+  layanan: string;
+  status: SubmissionStatus;
+  berkasUrl: string;
+  timestamp: string;
+  tanggal?: string;
+  pengumuman?: string;
+  isRead?: boolean;
+  filename?: string;
+  fileUrl?: string;
+  additionalFiles?: Array<{filename: string, url: string}>;
+}
+
 export interface Pegawai {
   id: string;
   nama: string;
@@ -12,10 +30,16 @@ export interface Pegawai {
 
 export interface Service {
   id: string;
-  name: string;
+  name?: string;
+  title?: string;
+  category?: string;
+  estimatedTime?: string;
   icon: string;
   description: string;
-  color: string;
+  color?: string;
+  requirements?: Array<{id: string, label: string, isMandatory: boolean}>;
+  downloadUrl?: string;
+  downloadLabel?: string;
 }
 
 export interface PegawaiKGB {

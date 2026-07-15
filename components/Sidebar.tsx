@@ -3,8 +3,8 @@ import React from 'react';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  activeTab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'data-pegawai';
-  onNavigate: (tab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'data-pegawai') => void;
+  activeTab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'data-pegawai' | 'daftar-hadir';
+  onNavigate: (tab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'data-pegawai' | 'daftar-hadir') => void;
   isLoggedIn: boolean;
   onLoginClick: () => void;
   onLogout: () => void;
@@ -114,6 +114,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
                   </svg>
                 </div>
                 <span className="text-xs uppercase tracking-widest">Data Pegawai</span>
+              </button>
+              
+              <button 
+                onClick={() => { onNavigate('daftar-hadir'); onClose(); }}
+                className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'daftar-hadir' ? 'bg-amber-400 text-slate-900 font-black shadow-xl shadow-amber-900/20' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'daftar-hadir' ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </div>
+                <span className="text-xs uppercase tracking-widest">Daftar Hadir</span>
               </button>
             </>
           )}
