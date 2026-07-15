@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import { APPS_SCRIPT_URL } from '../constants';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import Swal from 'sweetalert2';
 
 export const DaftarHadirAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'master' | 'rekap'>('master');
@@ -26,6 +29,31 @@ export const DaftarHadirAdmin: React.FC = () => {
   // QR Modal
   const [qrModalData, setQrModalData] = useState<{id: string, nama: string} | null>(null);
 
+  const getDriveImageUrl = (url: string) => {
+    if (!url) return '';
+    if (url.startsWith('data:image') || url.includes('drive.google.com/uc')) {
+      return url;
+    }
+    const match = url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      return `https://drive.google.com/uc?id=${match[1]}`;
+    }
+    return url;
+  };
+
+  const formatTanggal = (dateString: string) => {
+    if (!dateString) return '';
+    if (typeof dateString === 'string' && dateString.includes('T') && dateString.endsWith('Z')) {
+      try {
+        const d = new Date(dateString);
+        return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      } catch (e) {
+        return dateString.split('T')[0];
+      }
+    }
+    return dateString;
+  };
+
   useEffect(() => {
     fetchKegiatans();
     fetchKehadirans();
@@ -42,7 +70,7 @@ export const DaftarHadirAdmin: React.FC = () => {
         setKegiatans(result.data.slice(1).map((r: any) => ({
           id: r[0],
           nama: r[1],
-          hariTanggal: r[2],
+          hariTanggal: formatTanggal(r[2]),
           waktu: r[3],
           tempat: r[4]
         })));
@@ -127,6 +155,133 @@ export const DaftarHadirAdmin: React.FC = () => {
   const getKegiatanName = (id: string) => {
     const k = kegiatans.find(k => k.id === id);
     return k ? k.nama : id;
+  };
+
+  const loadImageToBase64 = (url: string): Promise<string | null> => {
+    return new Promise((resolve) => {
+      if (!url) return resolve(null);
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(null);
+        ctx.drawImage(img, 0, 0);
+        try {
+          resolve(canvas.toDataURL('image/png'));
+        } catch (e) {
+          resolve(null);
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!selectedRekapKegiatan) return;
+    
+    // Add loading state visually if needed, but for now just process
+    Swal.fire({
+      title: 'Memproses PDF',
+      text: 'Mohon tunggu sebentar...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    
+    const titleLines = doc.splitTextToSize(selectedRekapKegiatan.nama.toUpperCase(), 180);
+    let y = 20;
+    
+    titleLines.forEach((line: string) => {
+      doc.text(line, 105, y, { align: 'center' });
+      y += 6;
+    });
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(selectedRekapKegiatan.hariTanggal, 105, y, { align: 'center' });
+    y += 6;
+    doc.text(selectedRekapKegiatan.tempat, 105, y, { align: 'center' });
+    y += 6;
+    doc.text(selectedRekapKegiatan.waktu, 105, y, { align: 'center' });
+    y += 10;
+    
+    const tableData = filteredKehadirans.map((k, index) => [
+      index + 1,
+      k.nama_lengkap,
+      k.instansi,
+      k.gender,
+      k.no_hp,
+      k.email,
+      ''
+    ]);
+
+    // Preload images
+    const base64Images: Record<number, string | null> = {};
+    for (let i = 0; i < filteredKehadirans.length; i++) {
+      const ttdUrl = filteredKehadirans[i].ttd;
+      if (ttdUrl) {
+        base64Images[i] = await loadImageToBase64(getDriveImageUrl(ttdUrl));
+      }
+    }
+
+    autoTable(doc, {
+      startY: y,
+      head: [['No', 'Nama', 'Instansi', 'Gender', 'No. HP', 'Email', 'TTD']],
+      body: tableData,
+      theme: 'grid',
+      styles: { 
+        fontSize: 9, 
+        cellPadding: 3,
+        valign: 'middle',
+        minCellHeight: 15
+      },
+      headStyles: {
+        fillColor: [240, 240, 240],
+        textColor: [0, 0, 0],
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      columnStyles: {
+        0: { halign: 'center', cellWidth: 10 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 35 },
+        3: { halign: 'center', cellWidth: 15 },
+        4: { cellWidth: 25 },
+        5: { cellWidth: 40 },
+        6: { halign: 'center', cellWidth: 25 }
+      },
+      didDrawCell: function(data) {
+        if (data.column.index === 6 && data.cell.section === 'body') {
+          const rowIndex = data.row.index;
+          const imgBase64 = base64Images[rowIndex];
+          if (imgBase64) {
+            try {
+              doc.addImage(
+                imgBase64,
+                'PNG',
+                data.cell.x + 2,
+                data.cell.y + 2,
+                20,
+                11
+              );
+            } catch(e) {}
+          }
+        }
+      }
+    });
+
+    Swal.close();
+    doc.save(`Daftar_Hadir_${selectedRekapKegiatan.nama.replace(/\s+/g, '_')}.pdf`);
   };
 
   const getAppUrl = () => {
@@ -261,13 +416,20 @@ export const DaftarHadirAdmin: React.FC = () => {
                   ))}
                 </select>
               </div>
-              <div className="flex items-end">
+              <div className="flex items-end gap-2">
                 <button 
                   onClick={fetchKehadirans}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors border border-gray-300 flex items-center gap-2 text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                   Refresh Data
+                </button>
+                <button 
+                  onClick={handleDownloadPDF}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  Save PDF
                 </button>
               </div>
             </div>
@@ -301,7 +463,7 @@ export const DaftarHadirAdmin: React.FC = () => {
                         <td className="px-6 py-4 text-gray-600">{k.no_hp}<br/><span className="text-xs text-gray-400">{k.email}</span></td>
                         <td className="px-6 py-4 text-center">
                           {k.ttd ? (
-                            <img src={k.ttd} alt="ttd" className="h-12 object-contain mx-auto" />
+                            <img src={getDriveImageUrl(k.ttd)} alt="ttd" className="h-12 object-contain mx-auto" />
                           ) : '-'}
                         </td>
                       </tr>

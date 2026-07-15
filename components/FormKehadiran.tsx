@@ -19,6 +19,19 @@ export const FormKehadiran: React.FC<FormKehadiranProps> = ({ kegiatanId }) => {
   const [kegiatanDetails, setKegiatanDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const formatTanggal = (dateString: string) => {
+    if (!dateString) return '';
+    if (typeof dateString === 'string' && dateString.includes('T') && dateString.endsWith('Z')) {
+      try {
+        const d = new Date(dateString);
+        return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      } catch (e) {
+        return dateString.split('T')[0];
+      }
+    }
+    return dateString;
+  };
+
   useEffect(() => {
     // Fetch data kegiatan
     const fetchKegiatan = async () => {
@@ -34,7 +47,7 @@ export const FormKehadiran: React.FC<FormKehadiranProps> = ({ kegiatanId }) => {
             setKegiatanDetails({
               id: kegiatan[0],
               nama: kegiatan[1],
-              hariTanggal: kegiatan[2],
+              hariTanggal: formatTanggal(kegiatan[2]),
               waktu: kegiatan[3],
               tempat: kegiatan[4]
             });
