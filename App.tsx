@@ -341,59 +341,59 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-slate-900/80 backdrop-blur-md border-b border-white/10 print:hidden">
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-slate-900/80 backdrop-blur-md border-b border-white/10 print:hidden">
         {/* Left Side: Logo & Text */}
         <div className="flex items-center gap-2">
-              <img 
-                src="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9" 
-                alt="Logo SI-PANDANG" 
-                className="h-8 md:h-10 w-auto object-contain drop-shadow-md"
-                referrerPolicy="no-referrer"
-              />
-              <div className="flex flex-col justify-center">
-                <h1 className="text-white text-[10px] sm:text-sm md:text-base font-semibold tracking-wide leading-tight whitespace-nowrap">
-                  PEMERINTAH KOTA MAKASSAR
-                </h1>
-                <p className="text-[#F59E0B] text-[8px] sm:text-xs md:text-sm font-normal tracking-wider mt-0.5 whitespace-nowrap">
-                  KECAMATAN UJUNG PANDANG
-                </p>
-              </div>
-            </div>
+          <img 
+            src="https://lh3.googleusercontent.com/d/1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9" 
+            alt="Logo SI-PANDANG" 
+            className="h-8 md:h-10 w-auto object-contain drop-shadow-md"
+            referrerPolicy="no-referrer"
+          />
+          <div className="flex flex-col justify-center">
+            <h1 className="text-white text-[10px] sm:text-sm md:text-base font-semibold tracking-wide leading-tight whitespace-nowrap">
+              PEMERINTAH KOTA MAKASSAR
+            </h1>
+            <p className="text-[#F59E0B] text-[8px] sm:text-xs md:text-sm font-normal tracking-wider mt-0.5 whitespace-nowrap">
+              KECAMATAN UJUNG PANDANG
+            </p>
+          </div>
+        </div>
 
-            {/* Right Side: Icons */}
-            <div className="flex items-center gap-0.5">
-              <a
-                href="https://drive.google.com/file/d/1CgfFOfX7Bmo2jM8nfVSTjW-78WlwbgB4/view"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
-                title="Panduan Penggunaan"
+        {/* Right Side: Icons */}
+        <div className="flex items-center gap-0.5 sm:gap-1">
+          <a
+            href="https://drive.google.com/file/d/1CgfFOfX7Bmo2jM8nfVSTjW-78WlwbgB4/view"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 sm:p-2 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
+            title="Panduan Penggunaan"
+          >
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+            </svg>
+          </a>
+
+          {isLoggedIn && (
+            <div className="md:relative" ref={notifRef}>
+              <button 
+                onClick={() => setIsNotifOpen(!isNotifOpen)}
+                className="group relative p-1.5 sm:p-2 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
               >
-                <svg className="w-5 h-5 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                 </svg>
-              </a>
+                
+                {pendingSubmissionsCount > 0 && (
+                  <span className="absolute top-1 right-1 flex items-center justify-center w-3.5 h-3.5 sm:w-4 sm:h-4 bg-red-500 text-white text-[8px] sm:text-[9px] font-bold rounded-full ring-2 ring-[#0F172A]">
+                    {pendingSubmissionsCount > 9 ? '9+' : pendingSubmissionsCount}
+                  </span>
+                )}
+              </button>
 
-              {isLoggedIn && (
-                <div className="md:relative" ref={notifRef}>
-                  <button 
-                    onClick={() => setIsNotifOpen(!isNotifOpen)}
-                    className="group relative p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
-                  >
-                    <svg className="w-5 h-5 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-                    </svg>
-                    
-                    {pendingSubmissionsCount > 0 && (
-                      <span className="absolute top-1 right-1 flex items-center justify-center w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full ring-2 ring-[#0F172A]">
-                        {pendingSubmissionsCount > 9 ? '9+' : pendingSubmissionsCount}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* Notification Dropdown */}
-                  {isNotifOpen && (
-                    <div className="absolute top-20 left-4 right-4 md:top-full md:right-0 md:left-auto md:w-80 mt-2 z-50 bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top-right ring-1 ring-black/5">
+              {/* Notification Dropdown */}
+              {isNotifOpen && (
+                <div className="absolute top-16 left-4 right-4 md:top-full md:right-0 md:left-auto md:w-80 md:mt-2 z-50 bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top-right ring-1 ring-black/5">
                       <div className="px-5 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
                         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Notifikasi</h3>
                         {pendingSubmissionsCount > 0 && (
@@ -443,15 +443,15 @@ const App: React.FC = () => {
                 </div>
               )}
 
-              <button 
-                onClick={() => setIsSidebarOpen(true)} 
-                className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
-              >
-                <svg className="w-5 h-5 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-              </button>
-            </div>
+          <button 
+            onClick={() => setIsSidebarOpen(true)} 
+            className="p-1.5 sm:p-2 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
+          >
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        </div>
       </header>
 
       <Sidebar 
@@ -468,14 +468,14 @@ const App: React.FC = () => {
       />
 
       <section className={`relative overflow-hidden bg-slate-900 pt-32 pb-20 md:pt-40 md:pb-28 shadow-2xl z-10 ${activeTab === 'lpj-kegiatan' ? 'print:hidden' : ''}`}>
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[30rem] h-[30rem] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[20rem] sm:w-[30rem] h-[20rem] sm:h-[30rem] bg-blue-500/10 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"></div>
         {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent opacity-50"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent opacity-30"></div>
         
         <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
           {/* Icon - Minimalist */}
-          <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white/5 rounded-2xl mb-8 border border-white/10 shadow-lg backdrop-blur-sm ring-1 ring-white/5">
+          <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-white/5 rounded-2xl mb-6 sm:mb-8 border border-white/10 shadow-lg backdrop-blur-sm ring-1 ring-white/5">
              <svg className="w-6 h-6 md:w-8 md:h-8 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M2 17l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
@@ -484,27 +484,27 @@ const App: React.FC = () => {
           </div>
 
           {/* Typography - Refined */}
-          <div className="space-y-4 mb-10">
+          <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
             <h2 className="text-slate-400 text-[10px] md:text-xs font-medium tracking-[0.3em] uppercase">
               Selamat Datang di
             </h2>
             
-            <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 tracking-tight mb-4">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 tracking-tight mb-3 sm:mb-4">
               SI-PANDANG
             </h1>
             
-            <p className="text-slate-400 font-medium max-w-2xl mx-auto">
-              Sistem Informasi Pelayanan Administrasi Kepegawaian<br className="hidden md:block"/> Kecamatan Ujung Pandang
+            <p className="text-slate-400 font-medium max-w-2xl mx-auto text-xs sm:text-sm md:text-base px-2">
+              Sistem Informasi Pelayanan Administrasi Kepegawaian<br className="hidden sm:block"/> Kecamatan Ujung Pandang
             </p>
           </div>
 
           {/* Button - Sleek */}
           <button 
             onClick={() => { setActiveTab('layanan'); setTimeout(() => document.getElementById('layanan-menu')?.scrollIntoView({ behavior: 'smooth' }), 50); }} 
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold py-3 px-8 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:-translate-y-1 transition-all duration-300 group"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold py-3 px-6 sm:px-8 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:-translate-y-1 transition-all duration-300 group text-xs sm:text-sm"
           >
             <span>MULAI LAYANAN</span>
-            <svg className="w-4 h-4 ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-1 sm:ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </button>
@@ -681,51 +681,51 @@ const App: React.FC = () => {
 
       {activeTab === 'layanan' && (
       <section className="contact-section max-w-4xl mx-auto px-4 md:px-6 mb-20 md:mb-32">
-        <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-8 sm:p-10 w-full max-w-lg mx-auto">
-          <div className="flex flex-col items-center justify-center text-center mb-8 space-y-3">
+        <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-6 sm:p-10 w-full max-w-lg mx-auto">
+          <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8 space-y-3">
             <div className="text-blue-500">
-              <svg className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Kontak Admin</h2>
+            <h2 className="text-xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Kontak Admin</h2>
           </div>
 
-          <div className="contact-container">
-            <a href={MAPS_LINK} target="_blank" className="flex items-center gap-5 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-lg hover:-translate-y-1 hover:border-blue-100 transition-all duration-300 group cursor-pointer w-full mb-4">
-              <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <div className="contact-container space-y-3 sm:space-y-4">
+            <a href={MAPS_LINK} target="_blank" className="flex items-center gap-4 sm:gap-5 p-3 sm:p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-lg hover:-translate-y-1 hover:border-blue-100 transition-all duration-300 group cursor-pointer w-full">
+              <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
               <div className="flex flex-col text-left">
                 <h4 className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">ALAMAT</h4>
-                <p className="text-sm sm:text-base font-semibold text-slate-700 group-hover:text-blue-700 transition-colors">Jl. Samiun No. 15, Kota Makassar</p>
+                <p className="text-xs sm:text-base font-semibold text-slate-700 group-hover:text-blue-700 transition-colors">Jl. Samiun No. 15, Kota Makassar</p>
               </div>
             </a>
 
-            <a href={WA_LINK} target="_blank" className="flex items-center gap-5 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-lg hover:-translate-y-1 hover:border-blue-100 transition-all duration-300 group cursor-pointer w-full mb-4">
-              <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a href={WA_LINK} target="_blank" className="flex items-center gap-4 sm:gap-5 p-3 sm:p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-lg hover:-translate-y-1 hover:border-blue-100 transition-all duration-300 group cursor-pointer w-full">
+              <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.912-.001-3.793-.46-5.467-1.331l-6.53 1.714zm5.868-3.363l.42.249c1.662.984 3.566 1.503 5.507 1.504 5.814 0 10.546-4.731 10.549-10.548 0-2.817-1.097-5.465-3.091-7.458s-4.64-3.091-7.46-3.091c-5.815 0-10.547 4.732-10.55 10.548-.001 1.902.501 3.754 1.455 5.356l.271.456-1.011 3.694 3.8-.996z" />
                 </svg>
               </div>
               <div className="flex flex-col text-left">
                 <h4 className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">WHATSAPP</h4>
-                <p className="text-sm sm:text-base font-semibold text-slate-700 group-hover:text-blue-700 transition-colors">{WA_NUMBER}</p>
+                <p className="text-xs sm:text-base font-semibold text-slate-700 group-hover:text-blue-700 transition-colors">{WA_NUMBER}</p>
               </div>
             </a>
 
-            <a href={`mailto:${EMAIL_ADDRESS}`} className="flex items-center gap-5 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-lg hover:-translate-y-1 hover:border-blue-100 transition-all duration-300 group cursor-pointer w-full mb-4">
-              <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href={`mailto:${EMAIL_ADDRESS}`} className="flex items-center gap-4 sm:gap-5 p-3 sm:p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-lg hover:-translate-y-1 hover:border-blue-100 transition-all duration-300 group cursor-pointer w-full">
+              <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
               <div className="flex flex-col text-left">
                 <h4 className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">EMAIL</h4>
-                <p className="text-sm sm:text-base font-semibold text-slate-700 group-hover:text-blue-700 transition-colors break-all line-clamp-2">{EMAIL_ADDRESS}</p>
+                <p className="text-xs sm:text-base font-semibold text-slate-700 group-hover:text-blue-700 transition-colors break-all line-clamp-2">{EMAIL_ADDRESS}</p>
               </div>
             </a>
           </div>
