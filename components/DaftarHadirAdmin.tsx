@@ -24,6 +24,7 @@ export const DaftarHadirAdmin: React.FC = () => {
   const [kehadirans, setKehadirans] = useState<any[]>([]);
   const [isLoadingRekap, setIsLoadingRekap] = useState(false);
   const [selectedRekapKegiatan, setSelectedRekapKegiatan] = useState<any>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [filterDate, setFilterDate] = useState('');
 
   // QR Modal
@@ -158,33 +159,32 @@ export const DaftarHadirAdmin: React.FC = () => {
     return k ? k.nama : id;
   };
 
-  const getBase64ImageFromUrl = (url: string): Promise<string | null> => {
-    return new Promise((resolve) => {
-      if (!url) return resolve(null);
-      const img = new Image();
-      img.crossOrigin = 'Anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return resolve(null);
-        ctx.drawImage(img, 0, 0);
-        try {
-          resolve(canvas.toDataURL('image/png'));
-        } catch (e) {
-          resolve(null);
-        }
-      };
-      img.onerror = () => resolve(null);
-      img.src = url;
-    });
+  const urlToBase64 = async (url: string): Promise<string | null> => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      if (!blob.type.startsWith('image/')) {
+        console.error("URL did not return an image:", url, "Type:", blob.type);
+        return null;
+      }
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error("Error fetching image:", url, error);
+      return null;
+    }
   };
 
+  
   const handleDownloadPDF = async () => {
     if (!selectedRekapKegiatan) return;
     
-    // Add loading state visually if needed, but for now just process
+    setIsGeneratingPdf(true);
+    // Add loading state visually
     Swal.fire({
       title: 'Memproses PDF',
       text: 'Mohon tunggu sebentar...',
@@ -194,124 +194,155 @@ export const DaftarHadirAdmin: React.FC = () => {
       }
     });
 
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    
-    // Load kop logos dynamically using getBase64ImageFromUrl
-    const leftLogoUrl = `/api/image-proxy?url=${encodeURIComponent('https://drive.google.com/uc?export=view&id=1dxwhUWW20e4w8BdOcrwaojHbz0GxGOwQ')}`;
-    const rightLogoUrl = `/api/image-proxy?url=${encodeURIComponent('https://drive.google.com/uc?export=view&id=1BU0DPMBjVe379MQ7Rczjn3_s4DAEa5L9')}`;
-    
-    const [leftLogoBase64, rightLogoBase64] = await Promise.all([
-      getBase64ImageFromUrl(leftLogoUrl),
-      getBase64ImageFromUrl(rightLogoUrl)
-    ]);
-    
-    // Draw logos
-    const logoY = 12;
-    const logoWidth = 16;
-    const logoHeight = 20;
-    
-    if (leftLogoBase64) {
-      doc.addImage(leftLogoBase64, 'PNG', 14, logoY, logoWidth, logoHeight);
-    }
-    if (rightLogoBase64) {
-      doc.addImage(rightLogoBase64, 'PNG', pageWidth - 14 - logoWidth, logoY, logoWidth, logoHeight);
-    }
-    
-    // Draw centered title
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    
-    const titleLines = doc.splitTextToSize(selectedRekapKegiatan.nama.toUpperCase(), 130); // Leave room for logos
-    let y = 16;
-    
-    titleLines.forEach((line: string) => {
-      doc.text(line, pageWidth / 2, y, { align: 'center' });
-      y += 6;
-    });
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text(selectedRekapKegiatan.hariTanggal, pageWidth / 2, y, { align: 'center' });
-    y += 6;
-    doc.text(selectedRekapKegiatan.tempat, pageWidth / 2, y, { align: 'center' });
-    y += 6;
-    doc.text(selectedRekapKegiatan.waktu, pageWidth / 2, y, { align: 'center' });
-    y += 15;
-    
-    const tableData = filteredKehadirans.map((k, index) => [
-      index + 1,
-      k.nama_lengkap,
-      k.instansi,
-      k.gender,
-      k.no_hp,
-      k.email,
-      ''
-    ]);
-
-    // Preload images
-    const base64Images: Record<number, string | null> = {};
-    for (let i = 0; i < filteredKehadirans.length; i++) {
-      const ttdUrl = filteredKehadirans[i].ttd;
-      if (ttdUrl) {
-        base64Images[i] = await getBase64ImageFromUrl(getDriveImageUrl(ttdUrl));
+    try {
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      // Load kop logos dynamically using urlToBase64
+      const [leftLogoBase64, rightLogoBase64] = await Promise.all([
+        urlToBase64('/logo-pemkot.png'),
+        urlToBase64('/logo-kecamatan.png')
+      ]);
+      
+      // Draw logos
+      const logoY = 12;
+      
+      if (leftLogoBase64) {
+        const leftProps = doc.getImageProperties(leftLogoBase64);
+        const leftWidth = 18;
+        const leftHeight = (leftProps.height * leftWidth) / leftProps.width;
+        doc.addImage(leftLogoBase64, 'PNG', 14, logoY, leftWidth, leftHeight);
       }
-    }
+      if (rightLogoBase64) {
+        const rightProps = doc.getImageProperties(rightLogoBase64);
+        const rightWidth = 18;
+        const rightHeight = (rightProps.height * rightWidth) / rightProps.width;
+        doc.addImage(rightLogoBase64, 'PNG', pageWidth - 14 - rightWidth, logoY, rightWidth, rightHeight);
+      }
+      
+      // Draw centered title
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      
+      const titleLines = doc.splitTextToSize(selectedRekapKegiatan.nama.toUpperCase(), 130); // Leave room for logos
+      let y = 16;
+      
+      titleLines.forEach((line: string) => {
+        doc.text(line, pageWidth / 2, y, { align: 'center' });
+        y += 6;
+      });
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(selectedRekapKegiatan.hariTanggal, pageWidth / 2, y, { align: 'center' });
+      y += 6;
+      doc.text(selectedRekapKegiatan.tempat, pageWidth / 2, y, { align: 'center' });
+      y += 6;
+      doc.text(selectedRekapKegiatan.waktu, pageWidth / 2, y, { align: 'center' });
+      y += 15;
+      
+      // Preload images for ttd
+      const enrichedKehadirans = await Promise.all(filteredKehadirans.map(async (k) => {
+        let ttdBase64 = null;
+        if (k.ttd) {
+           const processedUrl = getDriveImageUrl(k.ttd);
+           if (processedUrl.startsWith('data:image')) {
+             ttdBase64 = processedUrl;
+           } else {
+             ttdBase64 = await urlToBase64(processedUrl);
+           }
+        }
+        return {
+          ...k,
+          ttdBase64
+        };
+      }));
 
-    autoTable(doc, {
-      startY: 42,
-      margin: { top: 42, right: 10, bottom: 15, left: 10 },
-      head: [['No', 'Nama', 'Instansi', 'Gender', 'No. HP', 'Email', 'TTD']],
-      body: tableData,
-      theme: 'grid',
-      styles: { 
-        fontSize: 8, 
-        cellPadding: 2,
-        valign: 'middle',
-        minCellHeight: 14,
-        lineColor: [0, 0, 0],
-        lineWidth: 0.2,
-        textColor: [0, 0, 0]
-      },
-      headStyles: {
-        fillColor: [255, 255, 255],
-        textColor: [0, 0, 0],
-        fontStyle: 'bold',
-        halign: 'center'
-      },
-      columnStyles: {
-        0: { halign: 'center', cellWidth: 10 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 35 },
-        3: { halign: 'center', cellWidth: 15 },
-        4: { cellWidth: 25 },
-        5: { cellWidth: 40 },
-        6: { halign: 'center', cellWidth: 25 }
-      },
-      didDrawCell: function(data) {
-        if (data.column.index === 6 && data.cell.section === 'body') {
-          const rowIndex = data.row.index;
-          const imgBase64 = base64Images[rowIndex];
-          if (imgBase64) {
-            try {
-              doc.addImage(
-                imgBase64,
-                'PNG',
-                data.cell.x + 2,
-                data.cell.y + 1,
-                20,
-                10
-              );
-            } catch(e) {}
+      const tableData = enrichedKehadirans.map((k, index) => [
+        index + 1,
+        k.nama_lengkap,
+        k.instansi,
+        k.gender,
+        k.no_hp,
+        k.email,
+        ''
+      ]);
+
+      autoTable(doc, {
+        startY: 42,
+        margin: { top: 42, right: 10, bottom: 15, left: 10 },
+        head: [['No', 'Nama', 'Instansi', 'Gender', 'No. HP', 'Email', 'TTD']],
+        body: tableData,
+        theme: 'grid',
+        styles: { 
+          fontSize: 8, 
+          cellPadding: 2,
+          valign: 'middle',
+          minCellHeight: 14,
+          lineColor: [0, 0, 0],
+          lineWidth: 0.2,
+          textColor: [0, 0, 0]
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 10 },
+          1: { cellWidth: 40 },
+          2: { cellWidth: 35 },
+          3: { halign: 'center', cellWidth: 15 },
+          4: { cellWidth: 25 },
+          5: { cellWidth: 40 },
+          6: { halign: 'center', cellWidth: 25 }
+        },
+        didDrawCell: function(data) {
+          if (data.column.index === 6 && data.cell.section === 'body') {
+            const rowIndex = data.row.index;
+            const ttdBase64 = enrichedKehadirans[rowIndex]?.ttdBase64;
+            if (ttdBase64) {
+              try {
+                const imgProps = doc.getImageProperties(ttdBase64);
+                const maxWidth = 20;
+                const maxHeight = 10;
+                let imgWidth = maxWidth;
+                let imgHeight = (imgProps.height * maxWidth) / imgProps.width;
+                if (imgHeight > maxHeight) {
+                   imgHeight = maxHeight;
+                   imgWidth = (imgProps.width * maxHeight) / imgProps.height;
+                }
+                const xOffset = data.cell.x + (data.cell.width - imgWidth) / 2;
+                const yOffset = data.cell.y + (data.cell.height - imgHeight) / 2;
+                
+                doc.addImage(
+                  ttdBase64,
+                  'PNG',
+                  xOffset,
+                  yOffset,
+                  imgWidth,
+                  imgHeight
+                );
+              } catch(e) {}
+            }
           }
         }
-      }
-    });
-
-    Swal.close();
-    doc.save(`Daftar_Hadir_${selectedRekapKegiatan.nama.replace(/\s+/g, '_')}.pdf`);
+      });
+      
+      Swal.close();
+      doc.save(`Daftar_Hadir_${selectedRekapKegiatan.nama.replace(/\s+/g, '_')}.pdf`);
+    } catch(err) {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: 'Terjadi kesalahan saat membuat PDF'
+      });
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
-
   const getAppUrl = () => {
     const url = new URL(window.location.href);
     return `${url.origin}${url.pathname}`;
@@ -389,13 +420,14 @@ export const DaftarHadirAdmin: React.FC = () => {
             )}
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="w-full text-sm text-left">
+              <div className="w-full overflow-x-auto overflow-y-hidden custom-scrollbar">
+              <table className="w-full text-sm text-left min-w-[600px]">
                 <thead className="bg-gray-50 text-gray-600 border-b">
                   <tr>
-                    <th className="px-6 py-4 font-semibold">Nama Kegiatan</th>
-                    <th className="px-6 py-4 font-semibold">Waktu</th>
-                    <th className="px-6 py-4 font-semibold">Tempat</th>
-                    <th className="px-6 py-4 font-semibold text-right">Aksi</th>
+                    <th className="px-6 py-4 font-semibold min-w-[200px]">Nama Kegiatan</th>
+                    <th className="px-6 py-4 font-semibold whitespace-nowrap">Waktu</th>
+                    <th className="px-6 py-4 font-semibold min-w-[150px]">Tempat</th>
+                    <th className="px-6 py-4 font-semibold text-right whitespace-nowrap">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -405,10 +437,10 @@ export const DaftarHadirAdmin: React.FC = () => {
                     <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Belum ada kegiatan.</td></tr>
                   ) : kegiatans.map(k => (
                     <tr key={k.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">{k.nama}</td>
-                      <td className="px-6 py-4 text-gray-600">{k.hariTanggal}<br/>{k.waktu}</td>
-                      <td className="px-6 py-4 text-gray-600">{k.tempat}</td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 font-medium text-gray-900 min-w-[200px]">{k.nama}</td>
+                      <td className="px-6 py-4 text-gray-600 whitespace-nowrap">{k.hariTanggal}<br/>{k.waktu}</td>
+                      <td className="px-6 py-4 text-gray-600 min-w-[150px]">{k.tempat}</td>
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
                         <button 
                           onClick={() => setQrModalData({ id: k.id, nama: k.nama })}
                           className="text-blue-600 hover:text-blue-800 font-medium px-3 py-1 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors inline-flex items-center gap-1"
@@ -421,6 +453,7 @@ export const DaftarHadirAdmin: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         )}
@@ -454,16 +487,17 @@ export const DaftarHadirAdmin: React.FC = () => {
                 </button>
                 <button 
                   onClick={handleDownloadPDF}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
+                  disabled={isGeneratingPdf}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                  Save PDF
+                  {isGeneratingPdf ? "Membuat PDF..." : "Save PDF"}
                 </button>
               </div>
             </div>
 
             {selectedRekapKegiatan ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 overflow-x-auto">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8 overflow-x-auto custom-scrollbar">
                 <div className="mb-6 text-center text-black">
                   <h3 className="text-xl font-bold uppercase mb-2">{selectedRekapKegiatan.nama}</h3>
                   <p>{selectedRekapKegiatan.hariTanggal}</p>
@@ -471,7 +505,7 @@ export const DaftarHadirAdmin: React.FC = () => {
                   <p>{selectedRekapKegiatan.waktu}</p>
                 </div>
                 
-                <table className="w-full text-sm border-collapse border border-black bg-white">
+                <table className="w-full text-sm border-collapse border border-black bg-white min-w-[800px]">
                   <thead>
                     <tr>
                       <th className="border border-black px-4 py-2 text-center font-bold text-black w-12">No</th>
