@@ -23,14 +23,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
       />
 
       {/* Sidebar Drawer */}
-      <div className={`fixed top-0 right-0 h-full w-72 sm:w-80 bg-[#0a1e3b] z-[160] shadow-2xl transform transition-transform duration-500 ease-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed top-0 right-0 h-full w-72 sm:w-80 bg-slate-900/95 backdrop-blur-md border-l border-white/10 z-[160] shadow-2xl transform transition-transform duration-500 ease-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-3xl -mr-16 -mt-16" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -ml-16 -mb-16" />
 
         {/* Header */}
-        <div className="p-8 flex items-center justify-between relative">
+        <div className="p-8 flex items-center justify-between relative border-b border-white/10 pb-4 mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-900/20">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,12 +53,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
         </div>
 
         {/* Menu Items */}
-        <div className="px-4 py-6 flex-1 space-y-2 relative">
+        <div className="px-4 py-6 flex-1 flex flex-col space-y-2 relative">
           <button 
             onClick={() => { onNavigate('layanan'); onClose(); }}
-            className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'layanan' ? 'bg-white/10 text-white font-black' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+            className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'layanan' ? 'bg-blue-500/15 text-blue-400 font-semibold rounded-xl border border-blue-500/20' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl border border-transparent'}`}
           >
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'layanan' ? 'bg-amber-400 text-slate-900' : 'bg-white/5 group-hover:bg-white/10'}`}>
+            <div className={`flex items-center justify-center transition-all ${activeTab === 'layanan' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
@@ -70,9 +70,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
             <>
               <button 
                 onClick={() => { onNavigate('monitoring'); onClose(); }}
-                className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'monitoring' ? 'bg-amber-400 text-slate-900 font-black shadow-xl shadow-amber-900/20' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'monitoring' ? 'bg-blue-500/15 text-blue-400 font-semibold rounded-xl border border-blue-500/20' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl border border-transparent'}`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'monitoring' ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                <div className={`flex items-center justify-center transition-all ${activeTab === 'monitoring' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
@@ -82,9 +82,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
 
               <button 
                 onClick={() => { onNavigate('pantau-kgb'); onClose(); }}
-                className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'pantau-kgb' ? 'bg-amber-400 text-slate-900 font-black shadow-xl shadow-amber-900/20' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'pantau-kgb' ? 'bg-blue-500/15 text-blue-400 font-semibold rounded-xl border border-blue-500/20' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl border border-transparent'}`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'pantau-kgb' ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                <div className={`flex items-center justify-center transition-all ${activeTab === 'pantau-kgb' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
@@ -94,9 +94,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
 
               <button 
                 onClick={() => { onNavigate('lpj-kegiatan'); onClose(); }}
-                className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'lpj-kegiatan' ? 'bg-amber-400 text-slate-900 font-black shadow-xl shadow-amber-900/20' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'lpj-kegiatan' ? 'bg-blue-500/15 text-blue-400 font-semibold rounded-xl border border-blue-500/20' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl border border-transparent'}`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'lpj-kegiatan' ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                <div className={`flex items-center justify-center transition-all ${activeTab === 'lpj-kegiatan' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -106,9 +106,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
 
               <button 
                 onClick={() => { onNavigate('data-pegawai'); onClose(); }}
-                className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'data-pegawai' ? 'bg-amber-400 text-slate-900 font-black shadow-xl shadow-amber-900/20' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'data-pegawai' ? 'bg-blue-500/15 text-blue-400 font-semibold rounded-xl border border-blue-500/20' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl border border-transparent'}`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'data-pegawai' ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                <div className={`flex items-center justify-center transition-all ${activeTab === 'data-pegawai' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
@@ -118,9 +118,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
               
               <button 
                 onClick={() => { onNavigate('daftar-hadir'); onClose(); }}
-                className={`w-full flex items-center p-4 rounded-2xl transition-all group ${activeTab === 'daftar-hadir' ? 'bg-amber-400 text-slate-900 font-black shadow-xl shadow-amber-900/20' : 'text-white/60 hover:bg-white/5 hover:text-white font-bold'}`}
+                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'daftar-hadir' ? 'bg-blue-500/15 text-blue-400 font-semibold rounded-xl border border-blue-500/20' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl border border-transparent'}`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all ${activeTab === 'daftar-hadir' ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                <div className={`flex items-center justify-center transition-all ${activeTab === 'daftar-hadir' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
@@ -138,9 +138,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
             href="https://drive.google.com/file/d/1CgfFOfX7Bmo2jM8nfVSTjW-78WlwbgB4/view" 
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center p-4 rounded-2xl text-white/60 hover:bg-white/5 hover:text-white font-bold transition-all group"
+            className="w-full px-4 py-3 flex items-center gap-3 text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl transition-all duration-200 ease-in-out cursor-pointer group"
           >
-            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-4 group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-all">
+            <div className="flex items-center justify-center transition-all text-slate-400 group-hover:text-blue-400">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
               </svg>
@@ -151,9 +151,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
           <a 
             href={WA_LINK} 
             target="_blank"
-            className="w-full flex items-center p-4 rounded-2xl text-white/60 hover:bg-white/5 hover:text-white font-bold transition-all group"
+            className="w-full px-4 py-3 flex items-center gap-3 text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl transition-all duration-200 ease-in-out cursor-pointer group"
           >
-            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-4 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-all">
+            <div className="flex items-center justify-center transition-all text-slate-400 group-hover:text-emerald-400">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.912-.001-3.793-.46-5.467-1.331l-6.53 1.714zm5.868-3.363l.42.249c1.662.984 3.566 1.503 5.507 1.504 5.814 0 10.546-4.731 10.549-10.548 0-2.817-1.097-5.465-3.091-7.458s-4.64-3.091-7.46-3.091c-5.815 0-10.547 4.732-10.55 10.548-.001 1.902.501 3.754 1.455 5.356l.271.456-1.011 3.694 3.8-.996z" /></svg>
             </div>
             <span className="text-xs uppercase tracking-widest">Kontak Admin</span>
@@ -162,9 +162,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
           {!isLoggedIn ? (
             <button 
               onClick={() => { onLoginClick(); onClose(); }}
-              className="w-full flex items-center p-4 rounded-2xl text-white/40 hover:bg-white/5 hover:text-white/60 font-bold transition-all group mt-8 border border-white/5"
+              className="mt-auto w-full px-4 py-3 flex items-center gap-3 text-slate-400 font-medium hover:bg-white/5 hover:text-white rounded-xl transition-all duration-200 ease-in-out cursor-pointer group border border-white/5"
             >
-              <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-4 group-hover:bg-amber-500/10 group-hover:text-amber-400 transition-all">
+              <div className="flex items-center justify-center transition-all text-slate-500 group-hover:text-amber-400">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                 </svg>
@@ -174,9 +174,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
           ) : (
             <button 
               onClick={() => { onLogout(); onClose(); }}
-              className="w-full flex items-center p-4 rounded-2xl text-red-400 hover:bg-red-500/10 font-bold transition-all group mt-8 border border-red-500/10"
+              className="mt-auto border border-slate-700/50 text-slate-300 rounded-xl px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-400 cursor-pointer w-full group"
             >
-              <div className="w-10 h-10 bg-red-500/5 rounded-xl flex items-center justify-center mr-4 group-hover:bg-red-500/20 transition-all">
+              <div className="flex items-center justify-center transition-all text-slate-400 group-hover:text-rose-400">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>

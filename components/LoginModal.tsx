@@ -21,27 +21,27 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-[#0a1e3b]/80 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white rounded-[2.5rem] w-full max-w-[400px] overflow-hidden shadow-2xl animate-in zoom-in duration-300 border border-white/20">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-100 animate-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="p-8 pb-4 text-center">
-          <div className="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-amber-900/10">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        <div className="p-8 pb-2 text-center">
+          <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mx-auto mb-5">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-black text-[#0a1e3b] tracking-tight uppercase">Admin Login</h2>
-          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">SI-PANDANG Portal</p>
+          <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">Admin Login</h2>
+          <p className="text-slate-500 text-sm font-medium mt-1">SI-PANDANG Portal</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 pt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-8 pt-6 space-y-5">
           <div>
-            <label className="block text-[11px] font-bold text-[#0a1e3b] mb-2 uppercase tracking-widest">Username</label>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Username</label>
             <input 
               type="text"
               required
-              className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50 text-slate-700 placeholder-slate-300 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none transition-all text-sm font-medium"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
               placeholder="admin-username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -49,11 +49,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-[#0a1e3b] mb-2 uppercase tracking-widest">Password</label>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Password</label>
             <input 
               type="password"
               required
-              className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50 text-slate-700 placeholder-slate-300 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none transition-all text-sm font-medium"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -61,30 +61,30 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
           </div>
 
           {error && (
-            <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-center">
-              <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Username atau Password Salah!</p>
+            <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-center">
+              <p className="text-xs font-bold text-rose-600">Username atau Password Salah!</p>
             </div>
           )}
 
-          <div className="pt-4 flex space-x-3">
+          <div className="pt-2 flex space-x-3">
             <button 
               type="button"
               onClick={onClose}
-              className="flex-1 py-4 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
+              className="flex-1 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-xl font-semibold text-sm transition-all"
             >
               Batal
             </button>
             <button 
               type="submit"
-              className="flex-[2] py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-amber-900/10 transition-all active:scale-95"
+              className="flex-[2] py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-all shadow-sm active:scale-[0.98]"
             >
               Masuk Sekarang
             </button>
           </div>
         </form>
 
-        <div className="p-6 bg-slate-50 text-center border-t border-slate-100">
-           <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
+        <div className="p-5 bg-slate-50 text-center border-t border-slate-100">
+           <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider leading-relaxed">
              Sistem Informasi Pelayanan Kepegawaian<br/>Kecamatan Ujung Pandang
            </p>
         </div>
