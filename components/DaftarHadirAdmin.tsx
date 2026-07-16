@@ -80,7 +80,7 @@ export const DaftarHadirAdmin: React.FC = () => {
         setKegiatans([]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('PDF Error:', err);
     } finally {
       setIsLoadingKegiatan(false);
     }
@@ -207,18 +207,26 @@ export const DaftarHadirAdmin: React.FC = () => {
       // Draw logos
       const logoY = 12;
       
+      try {
       if (leftLogoBase64) {
         const leftProps = doc.getImageProperties(leftLogoBase64);
         const leftWidth = 18;
         const leftHeight = (leftProps.height * leftWidth) / leftProps.width;
-        doc.addImage(leftLogoBase64, 'PNG', 14, logoY, leftWidth, leftHeight);
+        let lFormat = 'PNG';
+        if (leftLogoBase64.startsWith('data:image/jpeg')) lFormat = 'JPEG';
+        doc.addImage(leftLogoBase64, lFormat, 14, logoY, leftWidth, leftHeight);
       }
       if (rightLogoBase64) {
         const rightProps = doc.getImageProperties(rightLogoBase64);
         const rightWidth = 18;
         const rightHeight = (rightProps.height * rightWidth) / rightProps.width;
-        doc.addImage(rightLogoBase64, 'PNG', pageWidth - 14 - rightWidth, logoY, rightWidth, rightHeight);
+        let rFormat = 'PNG';
+        if (rightLogoBase64.startsWith('data:image/jpeg')) rFormat = 'JPEG';
+        doc.addImage(rightLogoBase64, rFormat, pageWidth - 14 - rightWidth, logoY, rightWidth, rightHeight);
       }
+} catch(err) {
+  console.error("Error drawing logos", err);
+}
       
       // Draw centered title
       doc.setFontSize(12);
@@ -316,9 +324,14 @@ export const DaftarHadirAdmin: React.FC = () => {
                 const xOffset = data.cell.x + (data.cell.width - imgWidth) / 2;
                 const yOffset = data.cell.y + (data.cell.height - imgHeight) / 2;
                 
+                let format = 'PNG';
+                if (ttdBase64.startsWith('data:image/jpeg')) format = 'JPEG';
+                else if (ttdBase64.startsWith('data:image/png')) format = 'PNG';
+                else if (ttdBase64.startsWith('data:image/webp')) format = 'WEBP';
+                
                 doc.addImage(
                   ttdBase64,
-                  'PNG',
+                  format,
                   xOffset,
                   yOffset,
                   imgWidth,
@@ -337,7 +350,7 @@ export const DaftarHadirAdmin: React.FC = () => {
       Swal.fire({
         icon: 'error',
         title: 'Gagal',
-        text: 'Terjadi kesalahan saat membuat PDF'
+        text: 'Terjadi kesalahan saat membuat PDF: ' + (err instanceof Error ? err.message : String(err))
       });
     } finally {
       setIsGeneratingPdf(false);

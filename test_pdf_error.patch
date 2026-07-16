@@ -1,0 +1,44 @@
+--- components/DaftarHadirAdmin.tsx
++++ components/DaftarHadirAdmin.tsx
+@@ -204,15 +204,23 @@
+       const logoY = 12;
+       
+       if (leftLogoBase64) {
+-        const leftProps = doc.getImageProperties(leftLogoBase64);
+-        const leftWidth = 18;
+-        const leftHeight = (leftProps.height * leftWidth) / leftProps.width;
+-        doc.addImage(leftLogoBase64, 'PNG', 14, logoY, leftWidth, leftHeight);
++        try {
++          const leftProps = doc.getImageProperties(leftLogoBase64);
++          const leftWidth = 18;
++          const leftHeight = (leftProps.height * leftWidth) / leftProps.width;
++          doc.addImage(leftLogoBase64, 'PNG', 14, logoY, leftWidth, leftHeight);
++        } catch(e) {
++          console.error("Error drawing left logo:", e);
++        }
+       }
+       if (rightLogoBase64) {
+-        const rightProps = doc.getImageProperties(rightLogoBase64);
+-        const rightWidth = 18;
+-        const rightHeight = (rightProps.height * rightWidth) / rightProps.width;
+-        doc.addImage(rightLogoBase64, 'PNG', pageWidth - 14 - rightWidth, logoY, rightWidth, rightHeight);
++        try {
++          const rightProps = doc.getImageProperties(rightLogoBase64);
++          const rightWidth = 18;
++          const rightHeight = (rightProps.height * rightWidth) / rightProps.width;
++          doc.addImage(rightLogoBase64, 'PNG', pageWidth - 14 - rightWidth, logoY, rightWidth, rightHeight);
++        } catch (e) {
++          console.error("Error drawing right logo:", e);
++        }
+       }
+       
+       // Draw centered title
+@@ -324,7 +332,7 @@
+       Swal.close();
+       doc.save(`Daftar_Hadir_${selectedRekapKegiatan.nama.replace(/\s+/g, '_')}.pdf`);
+     } catch(err) {
+-      console.error(err);
++      console.error("Main PDF error:", err);
+       Swal.fire({
+         icon: 'error',
+         title: 'Gagal',
