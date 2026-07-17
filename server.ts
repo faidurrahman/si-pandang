@@ -3,7 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 
 // Hardcoded for now to avoid import issues with .tsx files in Node
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVVBp0iPfhIg6mGHdzolUquFHSG5bd6Ir3IeFzFvDyFt2zGZXgoTsIbJBs0K1b8slY/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMShTCk47Oufr89m1QljFAiFlEd6KA-0ZazcsGppHjv8ohEbtG5E52-zB3McOMhf6i/exec";
 
 async function startServer() {
   const app = express();
@@ -93,7 +93,7 @@ async function startServer() {
     // Serve static files in production
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('*all', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

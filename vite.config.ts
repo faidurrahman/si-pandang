@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
             name: 'SI-PANDANG Kecamatan Ujung Pandang',
             short_name: 'SI-PANDANG',
             description: 'Sistem Informasi Pelayanan Administrasi Kepegawaian',
-            theme_color: '#1e3a8a', // Biru pemerintahan elegan (Tailwind blue-900)
+            theme_color: '#0f172a', // Slate-900 senada dengan desain UI
             background_color: '#ffffff',
             display: 'standalone',
             icons: [

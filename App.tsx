@@ -1,3 +1,5 @@
+import { DaftarKendaraan } from './components/DaftarKendaraan';
+import { DashboardRekapBmd } from './components/DashboardRekapBmd';
 import { PageTransition } from "./components/PageTransition";
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { SERVICES, APPS_SCRIPT_URL } from './constants';
@@ -26,7 +28,7 @@ const MAPS_LINK = "https://maps.app.goo.gl/SX1s5Pf62GeDYKaG9";
 const EMAIL_ADDRESS = "data.kecujungpandang@gmail.com";
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'data-pegawai' | 'daftar-hadir'>('layanan');
+  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'rekap-bmd' | 'daftar-kendaraan' | 'lpj-kegiatan' | 'data-pegawai' | 'daftar-hadir'>('layanan');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -511,7 +513,7 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      <main id="layanan-menu" className={`relative z-20 ${['data-pegawai', 'daftar-hadir'].includes(activeTab) ? 'w-full' : 'max-w-7xl'} mx-auto px-4 md:px-6 py-8 md:py-12 -mt-6 md:-mt-4 w-full flex-grow print:p-0 print:m-0 print:max-w-none`}>
+      <main id="layanan-menu" className={`relative z-20 ${['data-pegawai', 'daftar-hadir', 'rekap-bmd', 'daftar-kendaraan'].includes(activeTab) ? 'w-full' : 'max-w-7xl'} mx-auto px-4 md:px-6 py-8 md:py-12 -mt-6 md:-mt-4 w-full flex-grow print:p-0 print:m-0 print:max-w-none`}>
         <PageTransition activeTab={activeTab}>
         {activeTab === 'layanan' ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -669,6 +671,10 @@ const App: React.FC = () => {
           </div>
          ) : activeTab === 'pantau-kgb' ? (
           <PantauKGB />
+        ) : activeTab === 'rekap-bmd' ? (
+          <DashboardRekapBmd />
+        ) : activeTab === 'daftar-kendaraan' ? (
+          <DaftarKendaraan />
         ) : activeTab === 'lpj-kegiatan' ? (
           <LpjKegiatan />
         ) : activeTab === 'data-pegawai' ? (
