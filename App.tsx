@@ -13,6 +13,7 @@ import { ReportDetailModal } from './components/ReportDetailModal';
 import { Sidebar } from './components/Sidebar';
 import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
+import { InstallPWA } from './components/InstallPWA';
 import { PantauKGB } from './components/PantauKGB';
 import { LpjKegiatan } from './components/LpjKegiatan';
 import { DataPegawaiPage } from './components/DataPegawaiPage';
@@ -364,6 +365,7 @@ const App: React.FC = () => {
 
         {/* Right Side: Icons */}
         <div className="flex items-center gap-0.5 sm:gap-1">
+          <InstallPWA />
           <a
             href="https://drive.google.com/file/d/1CgfFOfX7Bmo2jM8nfVSTjW-78WlwbgB4/view"
             target="_blank"
