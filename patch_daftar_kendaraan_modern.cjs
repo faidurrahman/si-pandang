@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const content = `import React, { useState, useEffect } from 'react';
 import { ModalDetailKendaraan } from './ModalDetailKendaraan';
 
 import { APPS_SCRIPT_URL } from '../constants';
 
-const API_URL = `${APPS_SCRIPT_URL}?action=getDaftarKendaraan`;
+const API_URL = \`\${APPS_SCRIPT_URL}?action=getDaftarKendaraan\`;
 
 export const DaftarKendaraan: React.FC = () => {
   const [dataKendaraan, setDataKendaraan] = useState<any[]>([]);
@@ -69,7 +71,7 @@ export const DaftarKendaraan: React.FC = () => {
       const merk = String(item['Merk/Tipe'] || '').toLowerCase();
       const jenis = String(item['Asal Usul'] || '').toLowerCase();
       const tahun = String(item['Tahun Pembuatan'] || '').toLowerCase();
-      const detailStr = `${merk} ${jenis} ${tahun}`;
+      const detailStr = \`\${merk} \${jenis} \${tahun}\`;
       const penanggungJawab = String(item['Driver'] || '').toLowerCase();
       const statusPajak = String(item['Status Pajak'] || 'Tidak ada data').toLowerCase();
       const jatuhTempo = String(item['Jatuh Tempo'] || '').toLowerCase();
@@ -77,8 +79,8 @@ export const DaftarKendaraan: React.FC = () => {
       const stnk = String(item['Status STNK'] || item['STNK'] || '').toLowerCase();
       const bpkb = String(item['Status BPKB'] || item['BPKB'] || '').toLowerCase();
       
-      const kendaraanStatus = item['Kendaraan'] ? String(item['Kendaraan']).toLowerCase() : '';
-      const isSimbakda = kendaraanStatus.includes('terdata');
+      const simbakdaStatus = String(item['Terdata SIMBAKDA'] || '').toLowerCase();
+      const isSimbakda = simbakdaStatus.includes('ya') || simbakdaStatus.includes('terdata') || simbakdaStatus === 'true';
       
       // Global Search
       const matchesSearch = platNomor.includes(searchTerm.toLowerCase()) || 
@@ -172,7 +174,7 @@ export const DaftarKendaraan: React.FC = () => {
           value={filterSimbakda}
           onChange={(e) => setFilterSimbakda(e.target.value as any)}
           className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium shadow-sm appearance-none cursor-pointer min-w-[200px]"
-          style={{ backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+          style={{ backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\\\'http://www.w3.org/2000/svg\\\' fill=\\\'none\\\' viewBox=\\\'0 0 20 20\\\'%3e%3cpath stroke=\\\'%236b7280\\\' stroke-linecap=\\\'round\\\' stroke-linejoin=\\\'round\\\' stroke-width=\\\'1.5\\\' d=\\\'M6 8l4 4 4-4\\\'/%3e%3c/svg%3e")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
         >
           <option value="Semua">Semua Kendaraan</option>
           <option value="Terdata SIMBAKDA">Terdata SIMBAKDA</option>
@@ -331,7 +333,7 @@ export const DaftarKendaraan: React.FC = () => {
                 
                 const jatuhTempo = String(item['Jatuh Tempo'] || '-');
                 const totalPajak = String(item['Total Pajak Kendaraan'] || '-');
-                const formatTotalPajak = totalPajak.startsWith('Rp') ? totalPajak : totalPajak !== '-' && totalPajak !== '' ? `Rp. ${totalPajak}` : '-';
+                const formatTotalPajak = totalPajak.startsWith('Rp') ? totalPajak : totalPajak !== '-' && totalPajak !== '' ? \`Rp. \${totalPajak}\` : '-';
                 
                 // Dokumen
                 const bpkb = String(item['Status BPKB'] || item['BPKB'] || '');
@@ -359,7 +361,7 @@ export const DaftarKendaraan: React.FC = () => {
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${isPajakHijau ? 'bg-emerald-100 text-emerald-700' : isPajakMerah ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700'}`}>
+                      <span className={\`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium \${isPajakHijau ? 'bg-emerald-100 text-emerald-700' : isPajakMerah ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700'}\`}>
                         {statusPajak}
                       </span>
                     </td>
@@ -370,12 +372,12 @@ export const DaftarKendaraan: React.FC = () => {
                       {formatTotalPajak}
                     </td>
                     <td className="py-4 px-4">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-medium ${isStnkAda ? 'bg-blue-50 text-blue-700 border border-blue-200/50' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
+                      <span className={\`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-medium \${isStnkAda ? 'bg-blue-50 text-blue-700 border border-blue-200/50' : 'bg-slate-100 text-slate-500 border border-slate-200'}\`}>
                         {isStnkAda ? 'Ada' : 'Tidak Ada'}
                       </span>
                     </td>
                     <td className="py-4 px-4">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-medium ${isBpkbAda ? 'bg-indigo-50 text-indigo-700 border border-indigo-200/50' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
+                      <span className={\`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-medium \${isBpkbAda ? 'bg-indigo-50 text-indigo-700 border border-indigo-200/50' : 'bg-slate-100 text-slate-500 border border-slate-200'}\`}>
                         {isBpkbAda ? 'Ada' : 'Tidak Ada'}
                       </span>
                     </td>
@@ -428,3 +430,5 @@ export const DaftarKendaraan: React.FC = () => {
     </div>
   );
 };
+`
+fs.writeFileSync('components/DaftarKendaraan.tsx', content);
