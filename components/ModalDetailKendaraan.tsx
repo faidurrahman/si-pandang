@@ -7,6 +7,15 @@ interface ModalDetailKendaraanProps {
 }
 
 export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOpen, onClose, data }) => {
+  const formatImageUrl = (url: string) => {
+    if (!url) return '';
+    const match = url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      return `https://lh3.googleusercontent.com/d/${match[1]}`;
+    }
+    return url;
+  };
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -156,7 +165,7 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
                 <span className="text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide">Foto Kendaraan</span>
                 <div className="aspect-video bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-200 overflow-hidden shadow-inner relative group">
                   {fotoUrl ? (
-                    <img src={`/api/image-proxy?url=${encodeURIComponent(fotoUrl)}`} alt="Foto Kendaraan" className="w-full h-full object-cover" />
+                    <img src={formatImageUrl(fotoUrl)} alt="Foto Kendaraan" className="w-full h-full object-cover" />
                   ) : (
                     <div className="text-slate-400 flex flex-col items-center">
                       <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +182,7 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
                 <span className="text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide">Scan STNK</span>
                 <div className="aspect-video bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-200 overflow-hidden shadow-inner relative group">
                   {stnkUrl ? (
-                    <img src={`/api/image-proxy?url=${encodeURIComponent(stnkUrl)}`} alt="Scan STNK" className="w-full h-full object-cover" />
+                    <img src={formatImageUrl(stnkUrl)} alt="Scan STNK" className="w-full h-full object-cover" />
                   ) : (
                     <div className="text-slate-400 flex flex-col items-center">
                       <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +199,7 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
                 <span className="text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide">Scan BPKB</span>
                 <div className="aspect-video bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-200 overflow-hidden shadow-inner relative group">
                   {bpkbUrl ? (
-                    <img src={`/api/image-proxy?url=${encodeURIComponent(bpkbUrl)}`} alt="Scan BPKB" className="w-full h-full object-cover" />
+                    <img src={formatImageUrl(bpkbUrl)} alt="Scan BPKB" className="w-full h-full object-cover" />
                   ) : (
                     <div className="text-slate-400 flex flex-col items-center">
                       <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

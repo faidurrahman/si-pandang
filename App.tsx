@@ -14,7 +14,6 @@ import { Sidebar } from './components/Sidebar';
 import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
 import { InstallPWA } from './components/InstallPWA';
-import { PwaDebugger } from './components/PwaDebugger';
 import { PantauKGB } from './components/PantauKGB';
 import { LpjKegiatan } from './components/LpjKegiatan';
 import { DataPegawaiPage } from './components/DataPegawaiPage';
@@ -827,7 +826,6 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-      <PwaDebugger />
     </div>
   );
 };

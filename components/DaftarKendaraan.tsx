@@ -4,7 +4,8 @@ import { ModalDetailKendaraan } from './ModalDetailKendaraan';
 
 // URL Google Apps Script yang Anda buat
 // Anda dapat menaruh URL ini di file .env.local Anda dengan nama VITE_APPS_SCRIPT_KENDARAAN_URL
-const API_URL = '/api/proxy?action=getDaftarKendaraan';
+import { APPS_SCRIPT_URL } from '../constants';
+const API_URL = `${APPS_SCRIPT_URL}?action=getDaftarKendaraan`;
 
 export const DaftarKendaraan: React.FC = () => {
   const [dataKendaraan, setDataKendaraan] = useState<any[]>([]);
