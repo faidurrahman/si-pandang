@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 
 export const PwaDebugger: React.FC = () => {
   const [manifestJsonStatus, setManifestJsonStatus] = useState<string>('Checking...');
-  const [manifestWebmanifestStatus, setManifestWebmanifestStatus] = useState<string>('Checking...');
   const [swStatus, setSwStatus] = useState<string>('Checking...');
+  const [swRegStatus, setSwRegStatus] = useState<string>('Checking...');
+  const [isStandalone, setIsStandalone] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
   useEffect(() => {
@@ -20,19 +21,6 @@ export const PwaDebugger: React.FC = () => {
         setManifestJsonStatus(`Failed: ${err.message || err}`);
       });
 
-    // Check /manifest.webmanifest
-    fetch('/manifest.webmanifest')
-      .then((res) => {
-        if (res.ok) {
-          setManifestWebmanifestStatus(`OK (${res.status})`);
-        } else {
-          setManifestWebmanifestStatus(`Error (${res.status})`);
-        }
-      })
-      .catch((err) => {
-        setManifestWebmanifestStatus(`Failed: ${err.message || err}`);
-      });
-
     // Check /sw.js
     fetch('/sw.js')
       .then((res) => {
@@ -45,6 +33,26 @@ export const PwaDebugger: React.FC = () => {
       .catch((err) => {
         setSwStatus(`Failed: ${err.message || err}`);
       });
+
+    // Check Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg) {
+          setSwRegStatus(`Active (Scope: ${reg.scope})`);
+        } else {
+          setSwRegStatus('Not Registered');
+        }
+      }).catch(err => {
+        setSwRegStatus(`Error: ${err.message}`);
+      });
+    } else {
+      setSwRegStatus('Not Supported');
+    }
+
+    // Check if already installed
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+      setIsStandalone(true);
+    }
   }, []);
 
   if (!isOpen) {
@@ -77,21 +85,27 @@ export const PwaDebugger: React.FC = () => {
           </span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-slate-400">manifest.webmanifest:</span>
-          <span className={manifestWebmanifestStatus.includes('OK') ? 'text-emerald-400' : 'text-slate-500'}>
-            {manifestWebmanifestStatus}
+          <span className="text-slate-400">sw.js fetch:</span>
+          <span className={swStatus.includes('OK') ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+            {swStatus}
           </span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-slate-400">sw.js:</span>
-          <span className={swStatus.includes('OK') ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-            {swStatus}
+          <span className="text-slate-400">SW Status:</span>
+          <span className={swRegStatus.includes('Active') ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+            {swRegStatus}
           </span>
         </div>
         <div className="flex justify-between gap-4 border-t border-slate-900 pt-1.5 mt-1.5">
           <span className="text-slate-400">Install Prompt State:</span>
           <span className={(window as any).deferredPrompt ? 'text-amber-400 font-bold animate-pulse' : 'text-slate-500'}>
-            {(window as any).deferredPrompt ? 'READY (Native Prompt Available)' : 'NOT READY'}
+            {(window as any).deferredPrompt ? 'READY (Prompt Avail)' : 'NOT READY'}
+          </span>
+        </div>
+        <div className="flex justify-between gap-4">
+          <span className="text-slate-400">Display Mode:</span>
+          <span className={isStandalone ? 'text-amber-400 font-bold' : 'text-slate-500'}>
+            {isStandalone ? 'STANDALONE (Installed)' : 'BROWSER'}
           </span>
         </div>
       </div>

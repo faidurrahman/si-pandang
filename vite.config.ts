@@ -18,6 +18,11 @@ export default defineConfig(({ mode }) => {
           devOptions: {
             enabled: true
           },
+          workbox: {
+            clientsClaim: true,
+            skipWaiting: true,
+            navigateFallback: '/',
+          },
           includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
           manifest: {
             name: 'SI-PANDANG Kecamatan Ujung Pandang',
