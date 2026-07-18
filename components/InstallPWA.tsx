@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 
 export const InstallPWA: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
+    // Cek jika event sudah ditangkap oleh script di index.html sebelum komponen ini dimount
+    if ((window as any).deferredPWAInstallPrompt) {
+      setDeferredPrompt((window as any).deferredPWAInstallPrompt);
+    }
+
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
+      (window as any).deferredPWAInstallPrompt = e;
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -20,7 +27,12 @@ export const InstallPWA: React.FC = () => {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      alert("Aplikasi ini sudah diinstal atau browser tidak mendukung fitur instalasi PWA.");
+      Swal.fire({
+        icon: 'info',
+        title: 'Info Instalasi',
+        text: 'Aplikasi ini mungkin sudah diinstal, atau Anda menggunakan browser (seperti Safari di iOS/iPhone) yang mengharuskan instalasi manual. Untuk iOS: Ketuk ikon "Share" (Bagikan) lalu pilih "Add to Home Screen".',
+        confirmButtonColor: '#3b82f6'
+      });
       return;
     }
     // Show the install prompt
