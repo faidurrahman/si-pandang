@@ -1,7 +1,7 @@
 
 import { Service } from './types';
 
-export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxb_eQ4PNOyxBy5THasXLvlTJDyIMwtIcVhs-HYFV0--mX4TcYejHD0OlIofQLsV5xZ/exec";
+export const APPS_SCRIPT_URL = "/api/proxy";
 
 export const SERVICES: Service[] = [
   {
