@@ -64,7 +64,19 @@ export const DaftarKendaraan: React.FC = () => {
   };
 
   const filteredData = React.useMemo(() => {
+    if (!dataKendaraan) return [];
+
     let result = dataKendaraan.filter(item => {
+      // 1. FILTER SIMBAKDA (Ketat)
+      let matchesSimbakda = true;
+      const valKendaraan = item['Terdata SIMBAKDA'] ? String(item['Terdata SIMBAKDA']).toLowerCase().trim() : '';
+      
+      if (filterSimbakda === 'Terdata SIMBAKDA') {
+        matchesSimbakda = valKendaraan === 'terdata';
+      } else if (filterSimbakda === 'Tidak Terdata') {
+        matchesSimbakda = valKendaraan === '' || valKendaraan === 'null' || valKendaraan === 'undefined' || valKendaraan !== 'terdata';
+      }
+
       const platNomor = String(item['Polisi'] || '').toLowerCase();
       const merk = String(item['Merk/Tipe'] || '').toLowerCase();
       const jenis = String(item['Asal Usul'] || '').toLowerCase();
@@ -77,20 +89,16 @@ export const DaftarKendaraan: React.FC = () => {
       const stnk = String(item['Status STNK'] || item['STNK'] || '').toLowerCase();
       const bpkb = String(item['Status BPKB'] || item['BPKB'] || '').toLowerCase();
       
-      const kendaraanStatus = item['Kendaraan'] ? String(item['Kendaraan']).toLowerCase() : '';
-      const isSimbakda = kendaraanStatus.includes('terdata');
-      
-      // Global Search
-      const matchesSearch = platNomor.includes(searchTerm.toLowerCase()) || 
-                            merk.includes(searchTerm.toLowerCase()) ||
-                            penanggungJawab.includes(searchTerm.toLowerCase());
-                            
-      // SIMBAKDA Filter
-      let matchesSimbakda = true;
-      if (filterSimbakda === 'Terdata SIMBAKDA') matchesSimbakda = isSimbakda;
-      if (filterSimbakda === 'Tidak Terdata') matchesSimbakda = !isSimbakda;
+      // 2. FILTER GLOBAL
+      let matchesSearch = true;
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        matchesSearch = platNomor.includes(searchLower) || 
+                        merk.includes(searchLower) ||
+                        penanggungJawab.includes(searchLower);
+      }
 
-      // Column Filters
+      // 3. FILTER KOLOM
       const matchPolisi = platNomor.includes(columnFilters.polisi.toLowerCase());
       const matchDetail = detailStr.includes(columnFilters.detail.toLowerCase());
       const matchDriver = penanggungJawab.includes(columnFilters.driver.toLowerCase());
@@ -118,7 +126,8 @@ export const DaftarKendaraan: React.FC = () => {
         matchBpkb = !bpkb || bpkb === 'tidak ada' || bpkb === 'kosong' || bpkb === '-';
       }
 
-      return matchesSearch && matchesSimbakda && matchPolisi && matchDetail && 
+      // SANGAT PENTING: Semua filter HARUS digabung dengan && (AND)
+      return matchesSimbakda && matchesSearch && matchPolisi && matchDetail && 
              matchDriver && matchJatuhTempo && matchTotalPajak && 
              matchStatusPajak && matchStnk && matchBpkb;
     });
@@ -135,6 +144,17 @@ export const DaftarKendaraan: React.FC = () => {
 
     return result;
   }, [dataKendaraan, searchTerm, filterSimbakda, sortConfig, columnFilters]);
+
+  const totalPajakFiltered = React.useMemo(() => {
+    return filteredData.reduce((sum, item) => {
+      const raw = item['Total Pajak Kendaraan'];
+      const num = Number(raw);
+      if (!isNaN(num) && num > 0) {
+        return sum + num;
+      }
+      return sum;
+    }, 0);
+  }, [filteredData]);
 
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -185,6 +205,11 @@ export const DaftarKendaraan: React.FC = () => {
         <table className="w-full text-sm text-left whitespace-nowrap">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
+              <th className="px-4 py-3 align-top min-w-[50px] w-[50px]">
+                <div className="font-bold text-slate-700 uppercase tracking-wider text-xs mb-2 mt-1 text-center">
+                  No.
+                </div>
+              </th>
               <th className="px-4 py-3 align-top min-w-[150px]">
                 <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2" onClick={() => handleSort('Polisi')}>
                   PLAT NOMOR {getSortIcon('Polisi')}
@@ -299,6 +324,7 @@ export const DaftarKendaraan: React.FC = () => {
               // Loading Skeleton
               Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
+                  <td className="py-4 px-4"><div className="h-6 bg-slate-200 rounded w-8 mx-auto"></div></td>
                   <td className="py-4 px-4"><div className="h-6 bg-slate-200 rounded w-24"></div></td>
                   <td className="py-4 px-4">
                     <div className="flex flex-col gap-2">
@@ -330,8 +356,16 @@ export const DaftarKendaraan: React.FC = () => {
                 const isPajakHijau = statusPajakLower.includes('lunas') && !statusPajakLower.includes('belum');
                 
                 const jatuhTempo = String(item['Jatuh Tempo'] || '-');
-                const totalPajak = String(item['Total Pajak Kendaraan'] || '-');
-                const formatTotalPajak = totalPajak.startsWith('Rp') ? totalPajak : totalPajak !== '-' && totalPajak !== '' ? `Rp. ${totalPajak}` : '-';
+                
+                const formatTotalPajak = (() => {
+                  const raw = item['Total Pajak Kendaraan'];
+                  if (!raw || raw === '-' || String(raw).trim() === '') return '-';
+                  const num = Number(raw);
+                  if (!isNaN(num)) {
+                    return `Rp. ${num.toLocaleString('id-ID')}`;
+                  }
+                  return String(raw);
+                })();
                 
                 // Dokumen
                 const bpkb = String(item['Status BPKB'] || item['BPKB'] || '');
@@ -341,6 +375,9 @@ export const DaftarKendaraan: React.FC = () => {
 
                 return (
                   <tr key={index} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="py-4 px-4 text-center font-medium text-slate-500">
+                      {index + 1}
+                    </td>
                     <td className="py-4 px-4 font-bold text-slate-800">
                       {platNomor}
                     </td>
@@ -406,7 +443,7 @@ export const DaftarKendaraan: React.FC = () => {
               })
             ) : (
               <tr>
-                <td colSpan={9} className="py-12 text-center">
+                <td colSpan={10} className="py-12 text-center">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-50 mb-3">
                     <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -418,6 +455,19 @@ export const DaftarKendaraan: React.FC = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Footer Total */}
+      <div className="bg-slate-50 rounded-2xl border border-slate-200 mt-4 px-5 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-sm">
+        <span className="text-sm font-semibold text-slate-600">
+          Total Data: <span className="text-slate-900">{filteredData.length} Kendaraan</span>
+        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-semibold text-slate-600">Total Keseluruhan Pajak:</span>
+          <span className="text-lg font-bold text-blue-700 bg-blue-100 px-4 py-1.5 rounded-full">
+            Rp. {totalPajakFiltered.toLocaleString('id-ID')}
+          </span>
+        </div>
       </div>
 
       <ModalDetailKendaraan 
