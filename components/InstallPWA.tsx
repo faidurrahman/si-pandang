@@ -4,43 +4,60 @@ export const InstallPWA: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
-    // Cek jika event sudah ditangkap oleh script di index.html sebelum komponen ini dimount
-    if ((window as any).deferredPWAInstallPrompt) {
-      setDeferredPrompt((window as any).deferredPWAInstallPrompt);
+    // 1. Periksa langsung jika event sudah ditangkap oleh script di index.html sebelum komponen di-mount
+    if ((window as any).deferredPrompt) {
+      setDeferredPrompt((window as any).deferredPrompt);
     }
 
+    // 2. Listener untuk event beforeinstallprompt jika baru terpicu setelah komponen di-mount
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
-      (window as any).deferredPWAInstallPrompt = e;
+      (window as any).deferredPrompt = e;
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
+    // 3. Polling interval kecil untuk memantau window.deferredPrompt guna menghindari race condition
+    const interval = setInterval(() => {
+      if ((window as any).deferredPrompt && !deferredPrompt) {
+        setDeferredPrompt((window as any).deferredPrompt);
+      }
+    }, 500);
+
+    // 4. Listener saat aplikasi sukses diinstal agar tombol otomatis menghilang
+    const handleAppInstalled = () => {
+      setDeferredPrompt(null);
+      (window as any).deferredPrompt = null;
+    };
+    window.addEventListener('appinstalled', handleAppInstalled);
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+      clearInterval(interval);
     };
-  }, []);
+  }, [deferredPrompt]);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
+    const promptEvent = deferredPrompt || (window as any).deferredPrompt;
+    if (!promptEvent) {
       return;
     }
-    // Show the install prompt
-    deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-      setDeferredPrompt(null);
-    } else {
-      console.log('User dismissed the install prompt');
-    }
+    
+    // Tampilkan prompt instalasi native
+    promptEvent.prompt();
+    
+    // Tunggu pilihan user
+    const { outcome } = await promptEvent.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+    
+    // Bersihkan prompt agar tidak bisa digunakan ulang
+    setDeferredPrompt(null);
+    (window as any).deferredPrompt = null;
   };
 
-  if (!deferredPrompt) {
+  if (!deferredPrompt && !(window as any).deferredPrompt) {
     return null;
   }
 
