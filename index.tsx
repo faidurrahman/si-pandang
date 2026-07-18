@@ -3,17 +3,18 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import { registerSW } from 'virtual:pwa-register';
 
-// Mendaftarkan service worker untuk PWA dengan cara paling eksplisit
+// Mendaftarkan service worker untuk PWA
 if ('serviceWorker' in navigator) {
-  registerSW({ immediate: true });
-
-  // Fallback registrasi vanilla JavaScript untuk menjamin anti-gagal
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(registration => {
-      console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }).catch(err => {
-      console.log('ServiceWorker registration failed: ', err);
-    });
+  const updateSW = registerSW({
+    immediate: true,
+    onNeedRefresh() {
+      if (confirm("Versi terbaru aplikasi tersedia. Muat ulang sekarang?")) {
+        updateSW(true);
+      }
+    },
+    onOfflineReady() {
+      console.log("Aplikasi siap digunakan secara offline.");
+    },
   });
 }
 
