@@ -417,7 +417,7 @@ export const DaftarKendaraan: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-center gap-1.5">
                         <button 
                           className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" 
                           title="Detail"
