@@ -57,7 +57,7 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
   const isBpkbAda = String(bpkbRaw).toLowerCase() === 'ada' || bpkbRaw === true || String(bpkbRaw).toLowerCase() === 'ya' || String(bpkbRaw).toLowerCase() === 'ada asli';
 
   // Fungsi pencari properti yang lebih robust
-  const findProp = (obj, keywords) => {
+  const findProp = (obj: any, keywords: string[]) => {
     if (!obj) return '';
     for (let key in obj) {
       const k = key.toLowerCase();
@@ -70,9 +70,10 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
     return '';
   };
 
+  // Coba cari dari URL spesifik (kalau ada) atau langsung dari key aslinya
   const fotoUrl = data['fotoUrl'] || data['Foto Kendaraan'] || data['Foto'] || findProp(data, ['foto', 'kendaraan']);
-  const stnkUrl = data['stnkUrl'] || data['Scan STNK'] || findProp(data, ['stnk']);
-  const bpkbUrl = data['bpkbUrl'] || data['Scan BPKB'] || findProp(data, ['bpkb']);
+  const stnkUrl = data['stnkUrl'] || data['Scan STNK'] || data['STNK'] || findProp(data, ['stnk']);
+  const bpkbUrl = data['bpkbUrl'] || data['Scan BPKB'] || data['BPKB'] || findProp(data, ['bpkb']);
 
   const InfoItem = ({ label, value, customValue }: { label: string, value?: string, customValue?: React.ReactNode }) => (
     <div className="flex flex-col border-b border-slate-100 pb-3 last:border-0 last:pb-0">

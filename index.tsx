@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
+import App from './App'
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { registerSW } from 'virtual:pwa-register';
 
 // Mendaftarkan service worker untuk PWA
@@ -23,7 +24,7 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <App />
+      <ErrorBoundary><App /></ErrorBoundary>
     </React.StrictMode>
   );
 }

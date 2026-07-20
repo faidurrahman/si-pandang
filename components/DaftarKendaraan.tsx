@@ -116,7 +116,7 @@ export const DaftarKendaraan: React.FC = () => {
         action: 'updateDaftarKendaraan',
         ...formData
       };
-      const response = await fetch(APPS_SCRIPT_URL, {
+      const response = await fetch(API_URL, {
         method: "POST",
         // headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payloadBase64)
