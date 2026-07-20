@@ -47,18 +47,32 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
   const statusPajakRaw = data['Status Pajak'] || data['Status'] || '-';
   const isPajakAman = String(statusPajakRaw).toLowerCase().includes('lunas') || String(statusPajakRaw).toLowerCase().includes('aman') || String(statusPajakRaw).toLowerCase().includes('aktif');
 
-  const tahunGantiPlat = data['Tahun Ganti Plat'] || data['Masa Plat'] || '-';
+  const tahunGantiPlat = data['Jatuh Tempo Plat'] || data['Tahun Ganti Plat'] || data['Masa Plat'] || '-';
   const statusKendaraan = data['Status'] || data['Status Kendaraan'] || data['Keterangan'] || '-';
   
   const stnkRaw = data['Status STNK'] || data['STNK'] || '';
-  const isStnkAda = String(stnkRaw).toLowerCase() === 'ada' || stnkRaw === true || String(stnkRaw).toLowerCase() === 'ya';
+  const isStnkAda = String(stnkRaw).toLowerCase() === 'ada' || stnkRaw === true || String(stnkRaw).toLowerCase() === 'ya' || String(stnkRaw).toLowerCase() === 'ada asli';
 
   const bpkbRaw = data['Status BPKB'] || data['BPKB'] || '';
-  const isBpkbAda = String(bpkbRaw).toLowerCase() === 'ada' || bpkbRaw === true || String(bpkbRaw).toLowerCase() === 'ya';
+  const isBpkbAda = String(bpkbRaw).toLowerCase() === 'ada' || bpkbRaw === true || String(bpkbRaw).toLowerCase() === 'ya' || String(bpkbRaw).toLowerCase() === 'ada asli';
 
-  const fotoUrl = data['fotoUrl'] || data['Foto'] || '';
-  const stnkUrl = data['stnkUrl'] || data['Scan STNK'] || '';
-  const bpkbUrl = data['bpkbUrl'] || data['Scan BPKB'] || '';
+  // Fungsi pencari properti yang lebih robust
+  const findProp = (obj, keywords) => {
+    if (!obj) return '';
+    for (let key in obj) {
+      const k = key.toLowerCase();
+      if (keywords.some(kw => k.includes(kw))) {
+        if (typeof obj[key] === 'string' && (obj[key].startsWith('http') || obj[key].startsWith('data:'))) {
+           return obj[key];
+        }
+      }
+    }
+    return '';
+  };
+
+  const fotoUrl = data['fotoUrl'] || data['Foto Kendaraan'] || data['Foto'] || findProp(data, ['foto', 'kendaraan']);
+  const stnkUrl = data['stnkUrl'] || data['Scan STNK'] || findProp(data, ['stnk']);
+  const bpkbUrl = data['bpkbUrl'] || data['Scan BPKB'] || findProp(data, ['bpkb']);
 
   const InfoItem = ({ label, value, customValue }: { label: string, value?: string, customValue?: React.ReactNode }) => (
     <div className="flex flex-col border-b border-slate-100 pb-3 last:border-0 last:pb-0">
@@ -119,7 +133,7 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
                   </span>
                 }
               />
-              <InfoItem label="Tahun Ganti Plat" value={tahunGantiPlat} />
+              <InfoItem label="Jatuh Tempo Plat" value={tahunGantiPlat} />
             </div>
 
             {/* Kolom Kanan (Informasi Dokumen & Status) */}
@@ -165,7 +179,9 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
                 <span className="text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide">Foto Kendaraan</span>
                 <div className="aspect-video bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-200 overflow-hidden shadow-inner relative group">
                   {fotoUrl ? (
-                    <img src={formatImageUrl(fotoUrl)} alt="Foto Kendaraan" className="w-full h-full object-cover" />
+                    <a href={fotoUrl} target="_blank" rel="noreferrer" className="w-full h-full block">
+                      <img src={formatImageUrl(fotoUrl)} alt="Foto Kendaraan" className="w-full h-full object-cover transition-opacity hover:opacity-90" />
+                    </a>
                   ) : (
                     <div className="text-slate-400 flex flex-col items-center">
                       <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,11 +196,14 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
               {/* Kotak 2: Scan STNK */}
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide">Scan STNK</span>
-                <div className="aspect-video bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-200 overflow-hidden shadow-inner relative group">
+                <div className="aspect-video bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-200 overflow-hidden shadow-inner relative group hover:bg-slate-100 transition-colors">
                   {stnkUrl ? (
-                    <img src={formatImageUrl(stnkUrl)} alt="Scan STNK" className="w-full h-full object-cover" />
+                    <a href={stnkUrl} target="_blank" rel="noreferrer" className="w-full h-full flex flex-col items-center justify-center p-4">
+                      <svg className="w-10 h-10 mb-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                      <span className="text-sm font-semibold text-blue-600 text-center hover:underline">Lihat STNK</span>
+                    </a>
                   ) : (
-                    <div className="text-slate-400 flex flex-col items-center">
+                    <div className="text-slate-400 flex flex-col items-center pointer-events-none">
                       <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
@@ -197,9 +216,12 @@ export const ModalDetailKendaraan: React.FC<ModalDetailKendaraanProps> = ({ isOp
               {/* Kotak 3: Scan BPKB */}
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide">Scan BPKB</span>
-                <div className="aspect-video bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-200 overflow-hidden shadow-inner relative group">
+                <div className="aspect-video bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-200 overflow-hidden shadow-inner relative group hover:bg-slate-100 transition-colors">
                   {bpkbUrl ? (
-                    <img src={formatImageUrl(bpkbUrl)} alt="Scan BPKB" className="w-full h-full object-cover" />
+                    <a href={bpkbUrl} target="_blank" rel="noreferrer" className="w-full h-full flex flex-col items-center justify-center p-4">
+                      <svg className="w-10 h-10 mb-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                      <span className="text-sm font-semibold text-blue-600 text-center hover:underline">Lihat BPKB</span>
+                    </a>
                   ) : (
                     <div className="text-slate-400 flex flex-col items-center">
                       <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

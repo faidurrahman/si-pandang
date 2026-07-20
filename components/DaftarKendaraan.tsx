@@ -1,9 +1,64 @@
+import Swal from 'sweetalert2';
 import React, { useState, useEffect } from 'react';
 import { ModalDetailKendaraan } from './ModalDetailKendaraan';
+import { ModalEditKendaraan } from './ModalEditKendaraan';
 
 import { APPS_SCRIPT_URL } from '../constants';
 
 const API_URL = `${APPS_SCRIPT_URL}?action=getDaftarKendaraan`;
+
+const calculateOverdue = (dateString: string) => {
+  if (!dateString || dateString.toLowerCase() === 'tidak ada data' || dateString === '-' || dateString.trim() === '') {
+    return null;
+  }
+  
+  const targetDate = new Date(dateString);
+  if (isNaN(targetDate.getTime())) {
+    return null;
+  }
+
+  const today = new Date();
+  
+  // Set both to midnight for accurate day comparison
+  targetDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  const isOverdue = targetDate < today;
+
+  let start = isOverdue ? targetDate : today;
+  let end = isOverdue ? today : targetDate;
+
+  let years = end.getFullYear() - start.getFullYear();
+  let months = end.getMonth() - start.getMonth();
+  
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  let days = end.getDate() - start.getDate();
+  if (days < 0) {
+    months--;
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+  }
+
+  if (years === 0 && months === 0) {
+     return { text: isOverdue ? "Menunggak < 1 Bulan" : "Sisa < 1 Bulan", isOverdue };
+  }
+
+  let textParts = [];
+  if (years > 0) textParts.push(`${years} Tahun`);
+  if (months > 0) textParts.push(`${months} Bulan`);
+  
+  const diffText = textParts.join(' ');
+  return {
+    text: isOverdue ? `Menunggak ${diffText}` : `Sisa ${diffText}`,
+    isOverdue
+  };
+};
 
 export const DaftarKendaraan: React.FC = () => {
   const [dataKendaraan, setDataKendaraan] = useState<any[]>([]);
@@ -17,30 +72,86 @@ export const DaftarKendaraan: React.FC = () => {
     driver: '',
     statusPajak: 'Semua',
     jatuhTempo: '',
+    tenggat: 'Semua',
+    jatuhTempoPlat: '',
     totalPajak: '',
     stnk: 'Semua',
     bpkb: 'Semua'
   });
 
+
+  const [filterTenggatPlat, setFilterTenggatPlat] = useState('Semua');
+
+  const [filterDetail, setFilterDetail] = useState<string[]>([]);
+  const [isDetailDropdownOpen, setIsDetailDropdownOpen] = useState(false);
+
+
   const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedKendaraan, setSelectedKendaraan] = useState<any>(null);
 
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      setDataKendaraan(data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        setDataKendaraan(data.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchData();
   }, []);
+
+  const handleUpdate = async (formData: any) => {
+    setIsSubmitting(true);
+    try {
+      const payloadBase64 = {
+        action: 'updateDaftarKendaraan',
+        ...formData
+      };
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        // headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payloadBase64)
+      });
+      
+      const textRes = await response.text();
+      
+      if (textRes.includes("Success")) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil!',
+          text: 'Data kendaraan berhasil diperbarui',
+          confirmButtonColor: '#f59e0b'
+        });
+        setIsEditModalOpen(false);
+        setSelectedKendaraan(null);
+        await fetchData();
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: textRes || 'Terjadi kesalahan saat mengupdate data',
+        });
+      }
+    } catch (error: any) {
+      console.error("Update error:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error Jaringan',
+        text: error.message || 'Gagal terhubung ke server'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -59,9 +170,21 @@ export const DaftarKendaraan: React.FC = () => {
     );
   };
 
+
   const handleColumnFilterChange = (key: keyof typeof columnFilters, value: string) => {
     setColumnFilters(prev => ({ ...prev, [key]: value }));
   };
+
+  const uniqueDetails = React.useMemo(() => {
+    return Array.from(new Set(dataKendaraan.map(item => String(item['Merk/Tipe'] || '')).filter(Boolean))).sort();
+  }, [dataKendaraan]);
+
+  const handleToggleDetail = (val: string) => {
+    setFilterDetail(prev => 
+      prev.includes(val) ? prev.filter(item => item !== val) : [...prev, val]
+    );
+  };
+
 
   const filteredData = React.useMemo(() => {
     if (!dataKendaraan) return [];
@@ -100,7 +223,10 @@ export const DaftarKendaraan: React.FC = () => {
 
       // 3. FILTER KOLOM
       const matchPolisi = platNomor.includes(columnFilters.polisi.toLowerCase());
-      const matchDetail = detailStr.includes(columnFilters.detail.toLowerCase());
+      let matchDetail = true;
+      if (filterDetail.length > 0) {
+        matchDetail = filterDetail.includes(String(item['Merk/Tipe'] || ''));
+      }
       const matchDriver = penanggungJawab.includes(columnFilters.driver.toLowerCase());
       const matchJatuhTempo = jatuhTempo.includes(columnFilters.jatuhTempo.toLowerCase());
       const matchTotalPajak = totalPajak.includes(columnFilters.totalPajak.toLowerCase());
@@ -126,10 +252,36 @@ export const DaftarKendaraan: React.FC = () => {
         matchBpkb = !bpkb || bpkb === 'tidak ada' || bpkb === 'kosong' || bpkb === '-';
       }
 
+      let matchTenggat = true;
+      if (columnFilters.tenggat !== 'Semua') {
+        const rawJatuhTempo = String(item['Jatuh Tempo'] || '');
+        const overdueInfo = calculateOverdue(rawJatuhTempo);
+        if (columnFilters.tenggat === 'Menunggak') {
+          matchTenggat = overdueInfo !== null && overdueInfo.isOverdue === true;
+        } else if (columnFilters.tenggat === 'Aman') {
+          matchTenggat = overdueInfo !== null && overdueInfo.isOverdue === false;
+        }
+      }
+
+      let matchJatuhTempoPlat = true;
+      if (columnFilters.jatuhTempoPlat) {
+        const tglPlat = String(item['Jatuh Tempo Plat'] || '').toLowerCase();
+        matchJatuhTempoPlat = tglPlat.includes(columnFilters.jatuhTempoPlat.toLowerCase());
+      }
+
+      let matchTenggatPlat = true;
+      if (filterTenggatPlat !== 'Semua') {
+        const platOverdueInfo = calculateOverdue(item['Jatuh Tempo Plat']);
+        const isPlatOverdue = platOverdueInfo ? platOverdueInfo.isOverdue : false;
+        
+        if (filterTenggatPlat === 'Menunggak') matchTenggatPlat = isPlatOverdue;
+        if (filterTenggatPlat === 'Aman') matchTenggatPlat = platOverdueInfo && !isPlatOverdue;
+      }
+
       // SANGAT PENTING: Semua filter HARUS digabung dengan && (AND)
       return matchesSimbakda && matchesSearch && matchPolisi && matchDetail && 
              matchDriver && matchJatuhTempo && matchTotalPajak && 
-             matchStatusPajak && matchStnk && matchBpkb;
+             matchStatusPajak && matchStnk && matchBpkb && matchTenggat && matchJatuhTempoPlat && matchTenggatPlat;
     });
 
     if (sortConfig.key) {
@@ -222,17 +374,34 @@ export const DaftarKendaraan: React.FC = () => {
                   className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
                 />
               </th>
-              <th className="px-4 py-3 align-top min-w-[200px]">
+              <th className="px-4 py-3 align-top min-w-[200px] relative">
                 <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2" onClick={() => handleSort('Merk/Tipe')}>
                   DETAIL KENDARAAN {getSortIcon('Merk/Tipe')}
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Filter..." 
-                  value={columnFilters.detail}
-                  onChange={(e) => handleColumnFilterChange('detail', e.target.value)}
-                  className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
-                />
+                <button
+                  onClick={() => setIsDetailDropdownOpen(!isDetailDropdownOpen)}
+                  className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-left flex justify-between items-center"
+                >
+                  <span className="truncate">
+                    {filterDetail.length === 0 ? 'Pilih Detail...' : `${filterDetail.length} terpilih`}
+                  </span>
+                  <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {isDetailDropdownOpen && (
+                  <div className="absolute z-50 mt-1 w-[250px] bg-white border border-slate-200 rounded-md shadow-lg max-h-48 overflow-y-auto left-4">
+                    {uniqueDetails.map((detail, idx) => (
+                      <label key={idx} className="flex items-center px-3 py-2 hover:bg-slate-50 cursor-pointer text-xs text-slate-700">
+                        <input
+                          type="checkbox"
+                          className="mr-2 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          checked={filterDetail.includes(detail)}
+                          onChange={() => handleToggleDetail(detail)}
+                        />
+                        <span className="truncate" title={detail}>{detail}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </th>
               <th className="px-4 py-3 align-top min-w-[180px]">
                 <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2" onClick={() => handleSort('Driver')}>
@@ -262,7 +431,7 @@ export const DaftarKendaraan: React.FC = () => {
               </th>
               <th className="px-4 py-3 align-top min-w-[130px]">
                 <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2" onClick={() => handleSort('Jatuh Tempo')}>
-                  JATUH TEMPO {getSortIcon('Jatuh Tempo')}
+                  JATUH TEMPO PAJAK {getSortIcon('Jatuh Tempo')}
                 </div>
                 <input 
                   type="text" 
@@ -271,6 +440,46 @@ export const DaftarKendaraan: React.FC = () => {
                   onChange={(e) => handleColumnFilterChange('jatuhTempo', e.target.value)}
                   className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
                 />
+              </th>
+              <th className="px-4 py-3 align-top min-w-[140px]">
+                <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2">
+                  TENGGAT WAKTU PAJAK
+                </div>
+                <select 
+                  value={columnFilters.tenggat}
+                  onChange={(e) => handleColumnFilterChange('tenggat', e.target.value)}
+                  className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm cursor-pointer"
+                >
+                  <option value="Semua">Semua</option>
+                  <option value="Menunggak">Menunggak</option>
+                  <option value="Aman">Aman</option>
+                </select>
+              </th>
+              <th className="px-4 py-3 align-top min-w-[130px]">
+                <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2" onClick={() => handleSort('Jatuh Tempo Plat')}>
+                  JATUH TEMPO PLAT {getSortIcon('Jatuh Tempo Plat')}
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Filter..." 
+                  value={columnFilters.jatuhTempoPlat}
+                  onChange={(e) => handleColumnFilterChange('jatuhTempoPlat', e.target.value)}
+                  className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
+                />
+              </th>
+              <th className="px-4 py-3 align-top min-w-[140px]">
+                <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2">
+                  TENGGAT WAKTU PLAT
+                </div>
+                <select 
+                  value={filterTenggatPlat}
+                  onChange={(e) => setFilterTenggatPlat(e.target.value)}
+                  className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm cursor-pointer"
+                >
+                  <option value="Semua">Semua</option>
+                  <option value="Menunggak">Menunggak</option>
+                  <option value="Aman">Aman</option>
+                </select>
               </th>
               <th className="px-4 py-3 align-top min-w-[140px]">
                 <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2" onClick={() => handleSort('Total Pajak Kendaraan')}>
@@ -336,6 +545,9 @@ export const DaftarKendaraan: React.FC = () => {
                   <td className="py-4 px-4"><div className="h-6 bg-slate-200 rounded-full w-20"></div></td>
                   <td className="py-4 px-4"><div className="h-4 bg-slate-200 rounded w-20"></div></td>
                   <td className="py-4 px-4"><div className="h-4 bg-slate-200 rounded w-24"></div></td>
+                  <td className="py-4 px-4"><div className="h-4 bg-slate-200 rounded w-20"></div></td>
+                  <td className="py-4 px-4"><div className="h-4 bg-slate-200 rounded w-24"></div></td>
+                  <td className="py-4 px-4"><div className="h-6 bg-slate-200 rounded-full w-16"></div></td>
                   <td className="py-4 px-4"><div className="h-6 bg-slate-200 rounded-full w-16"></div></td>
                   <td className="py-4 px-4"><div className="h-6 bg-slate-200 rounded-full w-16"></div></td>
                   <td className="py-4 px-4"><div className="h-6 bg-slate-200 rounded w-16 mx-auto"></div></td>
@@ -401,7 +613,32 @@ export const DaftarKendaraan: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-4 px-4 text-sm text-slate-600">
-                      {jatuhTempo}
+                      <span>{jatuhTempo}</span>
+                    </td>
+                    <td className="py-4 px-4">
+                      {(() => {
+                        const overdueInfo = calculateOverdue(jatuhTempo);
+                        if (!overdueInfo) return <span className="text-slate-400 text-xs">-</span>;
+                        return (
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-bold ${overdueInfo.isOverdue ? 'bg-rose-100 text-rose-700 border border-rose-200/50' : 'bg-emerald-100 text-emerald-700 border border-emerald-200/50'}`}>
+                            {overdueInfo.text}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td className="py-4 px-4 text-sm text-slate-600">
+                      <span>{String(item['Jatuh Tempo Plat'] || '-')}</span>
+                    </td>
+                    <td className="py-4 px-4">
+                      {(() => {
+                        const platOverdueInfo = calculateOverdue(String(item['Jatuh Tempo Plat'] || '-'));
+                        if (!platOverdueInfo) return <span className="text-slate-400 text-xs">-</span>;
+                        return (
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-bold ${platOverdueInfo.isOverdue ? 'bg-rose-100 text-rose-700 border border-rose-200/50' : 'bg-emerald-100 text-emerald-700 border border-emerald-200/50'}`}>
+                            {platOverdueInfo.text}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="py-4 px-4 text-sm text-slate-600 font-medium">
                       {formatTotalPajak}
@@ -431,7 +668,14 @@ export const DaftarKendaraan: React.FC = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         </button>
-                        <button className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit">
+                        <button 
+                          className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" 
+                          title="Edit"
+                          onClick={() => {
+                            setSelectedKendaraan(item);
+                            setIsEditModalOpen(true);
+                          }}
+                        >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                           </svg>
@@ -443,7 +687,7 @@ export const DaftarKendaraan: React.FC = () => {
               })
             ) : (
               <tr>
-                <td colSpan={10} className="py-12 text-center">
+                <td colSpan={11} className="py-12 text-center">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-50 mb-3">
                     <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -474,6 +718,14 @@ export const DaftarKendaraan: React.FC = () => {
         isOpen={isDetailModalOpen} 
         onClose={() => setIsDetailModalOpen(false)} 
         data={selectedKendaraan} 
+      />
+
+      <ModalEditKendaraan
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={handleUpdate}
+        isSubmitting={isSubmitting}
+        data={selectedKendaraan}
       />
     </div>
   );

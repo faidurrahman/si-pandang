@@ -27,13 +27,13 @@ function doPost(e) {
     // LOGIKA DAFTAR HADIR & KEGIATAN
     // -------------------------------------------------------------
     if (data.action === 'addDataKegiatan') {
-      let sheetDataKegiatan = ss.getSheetByName('Data_Kegiatan');
+      var sheetDataKegiatan = ss.getSheetByName('Data_Kegiatan');
       if (!sheetDataKegiatan) {
         sheetDataKegiatan = ss.insertSheet('Data_Kegiatan');
         sheetDataKegiatan.appendRow(['id_kegiatan', 'nama_kegiatan', 'hari_tanggal', 'waktu', 'tempat']);
       }
       
-      let idKegiatan = data.id_kegiatan || Utilities.getUuid();
+      var idKegiatan = data.id_kegiatan || Utilities.getUuid();
       
       sheetDataKegiatan.appendRow([
         idKegiatan,
@@ -48,20 +48,20 @@ function doPost(e) {
     }
 
     if (data.action === 'addDaftarHadir') {
-      let sheetDaftarHadir = ss.getSheetByName('Daftar_Hadir');
+      var sheetDaftarHadir = ss.getSheetByName('Daftar_Hadir');
       if (!sheetDaftarHadir) {
         sheetDaftarHadir = ss.insertSheet('Daftar_Hadir');
         sheetDaftarHadir.appendRow(['timestamp', 'id_kegiatan', 'nama_lengkap', 'instansi', 'gender', 'no_hp', 'email', 'ttd_digital']);
       }
       
       // Upload TTD ke Google Drive
-      let ttdUrl = '';
+      var ttdUrl = '';
       if (data.ttd_digital) {
         try {
-          let driveFolder = DriveApp.getFolderById(FOLDER_ID);
-          let namaFile = 'TTD_' + (data.nama_lengkap || 'Unknown') + '_' + new Date().getTime() + '.png';
-          let blob = Utilities.newBlob(Utilities.base64Decode(data.ttd_digital), 'image/png', namaFile);
-          let uploadedFile = driveFolder.createFile(blob);
+          var folder = DriveApp.getFolderById(FOLDER_ID);
+          var namaFile = 'TTD_' + (data.nama_lengkap || 'Unknown') + '_' + new Date().getTime() + '.png';
+          var blob = Utilities.newBlob(Utilities.base64Decode(data.ttd_digital), 'image/png', namaFile);
+          var uploadedFile = folder.createFile(blob);
           uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
           ttdUrl = uploadedFile.getUrl();
         } catch (e) {
@@ -86,10 +86,10 @@ function doPost(e) {
 
 
     if (data.action === 'updateDaftarKendaraan') {
-      let sheets = ss.getSheets();
-      let sheetKendaraan = null;
-      for (let s = 0; s < sheets.length; s++) {
-        let sName = sheets[s].getName().trim().toUpperCase();
+      var sheets = ss.getSheets();
+      var sheetKendaraan = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
         if (sName === 'DAFTAR KENDARAAN') {
           sheetKendaraan = sheets[s];
           break;
@@ -103,9 +103,9 @@ function doPost(e) {
     }
 
     if (data.action === 'updateDaftarPegawai') {
-      let sheets = ss.getSheets();
-      let sheetDaftar = null;
-      for (let s = 0; s < sheets.length; s++) {
+      var sheets = ss.getSheets();
+      var sheetDaftar = null;
+      for (var s = 0; s < sheets.length; s++) {
         if (sheets[s].getName().trim().toUpperCase() === 'DAFTAR PEGAWAI') {
           sheetDaftar = sheets[s];
           break;
@@ -120,10 +120,10 @@ function doPost(e) {
     
     if (data.action === 'addPegawai') {
       // Cari sheet KGB (mengatasi kemungkinan ada spasi di nama sheet)
-      let sheets = ss.getSheets();
-      let sheetKgb = null;
-      for (let s = 0; s < sheets.length; s++) {
-        let sName = sheets[s].getName().trim().toUpperCase();
+      var sheets = ss.getSheets();
+      var sheetKgb = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
         if (sName === 'KGB') {
           sheetKgb = sheets[s];
           break;
@@ -143,17 +143,17 @@ function doPost(e) {
       }
 
       // ID Folder Google Drive untuk menyimpan file SK dan KGB (Sesuai permintaan)
-      let driveFolderId = '1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs'; 
-      let driveFolder = DriveApp.getFolderById(folderId);
+      var folderId = '1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs'; 
+      var folder = DriveApp.getFolderById(folderId);
 
-      let skUrl = '';
-      let kgbUrl = '';
+      var skUrl = '';
+      var kgbUrl = '';
 
       // Proses upload file jika ada (mengubah base64 kembali menjadi file)
       if (data.files && data.files.length > 0) {
         data.files.forEach(function(file) {
-          let blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimetype, file.filename);
-          let uploadedFile = driveFolder.createFile(blob);
+          var blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimetype, file.filename);
+          var uploadedFile = folder.createFile(blob);
           
           // Set permission agar file bisa dilihat oleh siapa saja yang memiliki link
           uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -168,15 +168,15 @@ function doPost(e) {
       }
 
       // Cari baris terakhir yang memiliki data di kolom A (ID)
-      let columnA = sheetKgb.getRange('A:A').getValues();
-      let lastRow = 0;
-      for (let i = columnA.length - 1; i >= 0; i--) {
+      var columnA = sheetKgb.getRange('A:A').getValues();
+      var lastRow = 0;
+      for (var i = columnA.length - 1; i >= 0; i--) {
         if (columnA[i][0] !== "") {
           lastRow = i + 1;
           break;
         }
       }
-      let targetRow = lastRow + 1;
+      var targetRow = lastRow + 1;
 
       // Pastikan targetRow tidak melebihi jumlah baris maksimum sheet
       if (targetRow > sheetKgb.getMaxRows()) {
@@ -204,10 +204,10 @@ function doPost(e) {
     }
 
     if (data.action === 'deletePegawai') {
-      let sheets = ss.getSheets();
-      let sheetKgb = null;
-      for (let s = 0; s < sheets.length; s++) {
-        let sName = sheets[s].getName().trim().toUpperCase();
+      var sheets = ss.getSheets();
+      var sheetKgb = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
         if (sName === 'KGB') {
           sheetKgb = sheets[s];
           break;
@@ -215,12 +215,12 @@ function doPost(e) {
       }
       if (!sheetKgb) return ContentService.createTextOutput("Sheet KGB not found").setMimeType(ContentService.MimeType.TEXT);
       
-      let rows = sheetKgb.getDataRange().getValues();
-      let idToDelete = data.id;
-      let rowIndex = -1;
+      var rows = sheetKgb.getDataRange().getValues();
+      var idToDelete = data.id;
+      var rowIndex = -1;
 
       // Cari baris berdasarkan ID (Kolom A / index 0)
-      for (let i = 1; i < rows.length; i++) {
+      for (var i = 1; i < rows.length; i++) {
         if (String(rows[i][0]) === String(idToDelete)) {
           rowIndex = i + 1; // 1-based index
           break;
@@ -237,10 +237,10 @@ function doPost(e) {
     }
 
     if (data.action === 'updatePegawai') {
-      let sheets = ss.getSheets();
-      let sheetKgb = null;
-      for (let s = 0; s < sheets.length; s++) {
-        let sName = sheets[s].getName().trim().toUpperCase();
+      var sheets = ss.getSheets();
+      var sheetKgb = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
         if (sName === 'KGB') {
           sheetKgb = sheets[s];
           break;
@@ -248,12 +248,12 @@ function doPost(e) {
       }
       if (!sheetKgb) return ContentService.createTextOutput("Sheet KGB not found").setMimeType(ContentService.MimeType.TEXT);
       
-      let rows = sheetKgb.getDataRange().getValues();
-      let idToUpdate = data.id;
-      let rowIndex = -1;
+      var rows = sheetKgb.getDataRange().getValues();
+      var idToUpdate = data.id;
+      var rowIndex = -1;
 
       // Cari baris berdasarkan ID (Kolom A / index 0)
-      for (let i = 1; i < rows.length; i++) {
+      for (var i = 1; i < rows.length; i++) {
         if (String(rows[i][0]) === String(idToUpdate)) {
           rowIndex = i + 1; // 1-based index
           break;
@@ -262,17 +262,17 @@ function doPost(e) {
 
       if (rowIndex !== -1) {
         // ID Folder Google Drive untuk menyimpan file SK dan KGB
-        let driveFolderId = '1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs'; 
-        let driveFolder = DriveApp.getFolderById(folderId);
+        var folderId = '1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs'; 
+        var folder = DriveApp.getFolderById(folderId);
 
-        let skUrl = '';
-        let kgbUrl = '';
+        var skUrl = '';
+        var kgbUrl = '';
 
         // Proses upload file jika ada
         if (data.files && data.files.length > 0) {
           data.files.forEach(function(file) {
-            let blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimetype, file.filename);
-            let uploadedFile = driveFolder.createFile(blob);
+            var blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimetype, file.filename);
+            var uploadedFile = folder.createFile(blob);
             
             uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
             
@@ -366,19 +366,19 @@ function handleInsertNewSubmission(sheet, data) {
     let fileUrls = [];
     let filenames = [];
     
-    const driveFolder = DriveApp.getFolderById(FOLDER_ID);
+    const folder = DriveApp.getFolderById(FOLDER_ID);
 
     if (data.files && data.files.length > 0) {
       data.files.forEach(f => {
         const blob = Utilities.newBlob(Utilities.base64Decode(f.data), f.mimetype || 'application/octet-stream', f.filename);
-        const file = driveFolder.createFile(blob);
+        const file = folder.createFile(blob);
         file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
         fileUrls.push(file.getUrl());
         filenames.push(f.filename);
       });
     } else if (data.file) {
       const blob = Utilities.newBlob(Utilities.base64Decode(data.file), data.mimetype || 'application/octet-stream', data.filename);
-      const file = driveFolder.createFile(blob);
+      const file = folder.createFile(blob);
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       fileUrls.push(file.getUrl());
       filenames.push(data.filename);
@@ -461,11 +461,11 @@ function handleMarkAsRead(sheet, data) {
  * Menandai SEMUA notifikasi sebagai sudah dibaca (Kolom J = 1)
  */
 function handleMarkAllAsRead(sheet) {
-  let rows = sheet.getDataRange().getValues();
+  var rows = sheet.getDataRange().getValues();
   if (rows.length <= 1) return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
   
   // Update Kolom J (10) untuk semua baris data (mulai baris 2)
-  let range = sheet.getRange(2, 10, rows.length - 1, 1);
+  var range = sheet.getRange(2, 10, rows.length - 1, 1);
   range.setValue(1);
   
   return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
@@ -477,10 +477,10 @@ function doGet(e) {
     
     // Cek parameter action untuk Daftar Pegawai
     if (e.parameter && e.parameter.action === 'getDaftarPegawai') {
-      let sheets = ss.getSheets();
-      let sheetDaftar = null;
-      for (let s = 0; s < sheets.length; s++) {
-        let sName = sheets[s].getName().trim().toUpperCase();
+      var sheets = ss.getSheets();
+      var sheetDaftar = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
         if (sName === 'DAFTAR PEGAWAI') {
           sheetDaftar = sheets[s];
           break;
@@ -497,10 +497,10 @@ function doGet(e) {
 
     // Cek parameter action KGB
     if (e.parameter && e.parameter.action === 'getKGB') {
-      let sheets = ss.getSheets();
-      let sheetKgb = null;
-      for (let s = 0; s < sheets.length; s++) {
-        let sName = sheets[s].getName().trim().toUpperCase();
+      var sheets = ss.getSheets();
+      var sheetKgb = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
         if (sName === 'KGB') {
           sheetKgb = sheets[s];
           break;
@@ -518,10 +518,10 @@ function doGet(e) {
     
 
     if (e.parameter && e.parameter.action === 'getDaftarKendaraan') {
-      let sheets = ss.getSheets();
-      let sheetKendaraan = null;
-      for (let s = 0; s < sheets.length; s++) {
-        let sName = sheets[s].getName().trim().toUpperCase();
+      var sheets = ss.getSheets();
+      var sheetKendaraan = null;
+      for (var s = 0; s < sheets.length; s++) {
+        var sName = sheets[s].getName().trim().toUpperCase();
         if (sName === 'DAFTAR KENDARAAN') {
           sheetKendaraan = sheets[s];
           break;
@@ -531,8 +531,8 @@ function doGet(e) {
         return ContentService.createTextOutput(JSON.stringify({ data: [] }))
           .setMimeType(ContentService.MimeType.JSON);
       }
-      let lastRow = sheetKendaraan.getLastRow();
-      let lastColumn = sheetKendaraan.getLastColumn();
+      var lastRow = sheetKendaraan.getLastRow();
+      var lastColumn = sheetKendaraan.getLastColumn();
       if (lastRow < 2) {
         return ContentService.createTextOutput(JSON.stringify({ data: [] }))
           .setMimeType(ContentService.MimeType.JSON);
@@ -543,33 +543,29 @@ function doGet(e) {
       // Namun, jika "Kolom AC adalah index 28 (0-indexed)", berarti minimal ada 29 kolom.
       // Kita perlu pastikan Math.max(lastColumn, 29) digunakan saat getValues
       
-      let dataValues = sheetKendaraan.getRange(1, 1, lastRow, Math.max(lastColumn, 29)).getValues();
-      let headers = dataValues[0];
-      let startRow = 1;
+      var dataValues = sheetKendaraan.getRange(1, 1, lastRow, Math.max(lastColumn, 29)).getValues();
+      var headers = dataValues[0];
+      var startRow = 1;
       
-      for (let r = 0; r < Math.min(dataValues.length, 5); r++) {
-        let rowStr = dataValues[r].join(" ").toLowerCase();
-        if (rowStr.includes("polisi") || rowStr.includes("nomor polisi") || rowStr.includes("bpkb") || rowStr.includes("stnk")) {
-          headers = dataValues[r];
-          startRow = r + 1;
-          break;
-        }
+      if (!headers.includes('Polisi') && !headers.includes('Nomor Polisi')) {
+        headers = dataValues[1];
+        startRow = 2;
       }
       
-      let items = [];
+      var items = [];
       
-      for (let i = startRow; i < dataValues.length; i++) {
-        let row = dataValues[i];
-        let obj = {};
-        for (let c = 0; c < headers.length; c++) {
-          let key = headers[c] ? String(headers[c]).trim() : '';
+      for (var i = startRow; i < dataValues.length; i++) {
+        var row = dataValues[i];
+        var obj = {};
+        for (var c = 0; c < headers.length; c++) {
+          var key = headers[c] ? String(headers[c]).trim() : '';
             if (key) {
               obj[key] = row[c];
             }
           }
           
           // Tangani kolom AC (index 28) = "Jatuh Tempo Plat"
-          let tglPlat = row[28];
+          var tglPlat = row[28];
           if (tglPlat instanceof Date) {
             tglPlat = Utilities.formatDate(tglPlat, Session.getScriptTimeZone(), "dd MMM yyyy");
           } else {
@@ -586,7 +582,7 @@ function doGet(e) {
 
     // Cek parameter action untuk Daftar Hadir
     if (e.parameter && e.parameter.action === 'getDataKegiatan') {
-      let sheetDataKegiatan = ss.getSheetByName('Data_Kegiatan');
+      var sheetDataKegiatan = ss.getSheetByName('Data_Kegiatan');
       if (!sheetDataKegiatan) {
         return ContentService.createTextOutput(JSON.stringify({ data: [] }))
           .setMimeType(ContentService.MimeType.JSON);
@@ -597,7 +593,7 @@ function doGet(e) {
     }
 
     if (e.parameter && e.parameter.action === 'getDaftarHadir') {
-      let sheetDaftarHadir = ss.getSheetByName('Daftar_Hadir');
+      var sheetDaftarHadir = ss.getSheetByName('Daftar_Hadir');
       if (!sheetDaftarHadir) {
         return ContentService.createTextOutput(JSON.stringify({ data: [] }))
           .setMimeType(ContentService.MimeType.JSON);
@@ -666,12 +662,12 @@ function saveFileToDrive(base64Data, fileName) {
   if (!base64Data) return "";
   
   // Hapus header metadata (misal: "data:image/png;base64,")
-  let data = base64Data.split(',')[1] || base64Data;
-  let blob = Utilities.newBlob(Utilities.base64Decode(data), 'application/octet-stream', fileName);
+  var data = base64Data.split(',')[1] || base64Data;
+  var blob = Utilities.newBlob(Utilities.base64Decode(data), 'application/octet-stream', fileName);
   
   // WAJIB gunakan ID Folder ini:
-  let driveFolder = DriveApp.getFolderById("1QH5UtqHcjmVvYvdmSuqd2QaeDDBna1gZ");
-  let file = driveFolder.createFile(blob);
+  var folder = DriveApp.getFolderById("1QH5UtqHcjmVvYvdmSuqd2QaeDDBna1gZ");
+  var file = folder.createFile(blob);
   
   // Set izin agar publik bisa melihat via link
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -685,24 +681,13 @@ function handleUpdateDaftarKendaraan(sheet, data) {
 
   let headerRow = 1;
   let headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  let checkRows = sheet.getRange(1, 1, Math.min(lastRow, 5), sheet.getLastColumn()).getValues();
-  for (let r = 0; r < checkRows.length; r++) {
-    let rowStr = checkRows[r].join(" ").toLowerCase();
-    if (rowStr.includes("polisi") || rowStr.includes("nomor polisi") || rowStr.includes("bpkb") || rowStr.includes("stnk")) {
-      headers = checkRows[r];
-      headerRow = r + 1;
-      break;
-    }
+  if (!headers.includes('Polisi') && !headers.includes('Nomor Polisi')) {
+    headers = sheet.getRange(2, 1, 1, sheet.getLastColumn()).getValues()[0];
+    headerRow = 2;
   }
   
-  let noPolisiColIdx = 0;
-  for (let c = 0; c < headers.length; c++) {
-    let hStr = String(headers[c]).trim().toLowerCase();
-    if (hStr === 'polisi' || hStr === 'nomor polisi' || hStr === 'nopol' || hStr === 'plat') {
-      noPolisiColIdx = c + 1;
-      break;
-    }
-  }
+  let noPolisiColIdx = headers.indexOf('Polisi') + 1;
+  if (noPolisiColIdx === 0) noPolisiColIdx = headers.indexOf('Nomor Polisi') + 1;
   if (noPolisiColIdx === 0) noPolisiColIdx = 4; // default to 4 if not found
   
   const idRange = sheet.getRange(1, noPolisiColIdx, lastRow, 1).getValues();
