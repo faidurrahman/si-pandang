@@ -193,17 +193,14 @@ export const LaporanPjlp: React.FC = () => {
         `}</style>
         
         {petugasList.map((petugas) => {
-          // Chunk fotos into groups of 18 (3 cols x 6 rows)
-          const MAX_PHOTOS = 18;
-          const photoChunks = petugas.fotos.length > 0 
-            ? petugas.fotos.reduce((acc, curr, i) => {
-                if (i % MAX_PHOTOS === 0) acc.push([]);
-                acc[acc.length - 1].push(curr);
-                return acc;
-              }, [] as string[][])
-            : [[]]; // At least one empty chunk to render the page
+          // Memecah foto menjadi kelompok-kelompok berisi maksimal 18 foto
+          const chunkedPhotos: string[][] = [];
+          for (let i = 0; i < petugas.fotos.length; i += 18) {
+            chunkedPhotos.push(petugas.fotos.slice(i, i + 18));
+          }
+          if (chunkedPhotos.length === 0) chunkedPhotos.push([]);
 
-          return photoChunks.map((chunk, chunkIndex) => (
+          return chunkedPhotos.map((chunk, chunkIndex) => (
             <div key={`${petugas.id}-page-${chunkIndex}`} className="page-break-container">
               {/* Header Global */}
               <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-2">
@@ -218,9 +215,9 @@ export const LaporanPjlp: React.FC = () => {
               </div>
 
               {/* Grid Foto */}
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2 mt-2">
                 {chunk.map((foto, index) => (
-                  <div key={index} className="w-full aspect-square overflow-hidden bg-gray-100">
+                  <div key={index} className="w-[140px] h-[140px] sm:w-[150px] sm:h-[150px] mx-auto overflow-hidden border border-gray-300">
                     <img 
                       src={foto} 
                       alt={`Dokumentasi ${index}`} 
@@ -229,7 +226,7 @@ export const LaporanPjlp: React.FC = () => {
                   </div>
                 ))}
                 {chunk.length === 0 && (
-                  <div className="w-full aspect-square border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
+                  <div className="w-[140px] h-[140px] sm:w-[150px] sm:h-[150px] mx-auto border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
                     Tidak ada foto dokumentasi
                   </div>
                 )}
