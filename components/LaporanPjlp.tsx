@@ -69,16 +69,22 @@ export const LaporanPjlp: React.FC = () => {
     <div className="w-full">
       {/* Editor Section (Hidden on Print) */}
       <div className="print:hidden max-w-4xl mx-auto space-y-6">
+        {/* Action Header */}
+        <div className="flex justify-end">
+          <button
+            onClick={handlePrint}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-semibold flex items-center gap-2 transition-colors shadow-sm"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Download PDF
+          </button>
+        </div>
+
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-          <div className="flex justify-between items-center mb-6">
+          <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-800">Laporan PJLP / Satgas</h2>
-            <button
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-              Cetak Laporan
-            </button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -167,13 +173,21 @@ export const LaporanPjlp: React.FC = () => {
       </div>
 
       {/* Print Section (Only visible on Print) */}
-      <div className="hidden print:block w-full bg-white text-black">
+      <div className="hidden print:block w-full bg-white text-black font-sans">
         <style>{`
           @media print {
-            @page { size: 215mm 330mm; margin: 10mm; }
+            @page { 
+              size: 215mm 330mm; /* Ukuran Kertas F4/Legal */
+              margin: 2.54cm; /* Margin Normal standar MS Word */
+            }
             body { background: white; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
-            .print-page { page-break-after: always; width: 100%; position: relative; }
-            .print-page:last-child { page-break-after: auto; }
+            .page-break-container { 
+              page-break-after: always; 
+              page-break-inside: avoid;
+              width: 100%;
+              position: relative;
+            }
+            .page-break-container:last-child { page-break-after: auto; }
             .no-print { display: none !important; }
           }
         `}</style>
@@ -190,30 +204,32 @@ export const LaporanPjlp: React.FC = () => {
             : [[]]; // At least one empty chunk to render the page
 
           return photoChunks.map((chunk, chunkIndex) => (
-            <div key={`${petugas.id}-page-${chunkIndex}`} className="print-page flex flex-col justify-start">
+            <div key={`${petugas.id}-page-${chunkIndex}`} className="page-break-container">
               {/* Header Global */}
-              <div className="text-center mb-3 text-black">
-                <h1 className="text-xl font-bold uppercase tracking-wider">{judul}</h1>
-                <h2 className="text-lg font-bold uppercase leading-tight">{instansi}</h2>
-                <h3 className="text-base font-semibold uppercase">{periode}</h3>
+              <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-4">
+                <h1 className="text-xl tracking-wider">{judul}</h1>
+                <h2 className="text-lg mt-1">{instansi}</h2>
+                <h3 className="text-base mt-1">{periode}</h3>
               </div>
 
               {/* Nama Petugas */}
-              <div className="mb-1 text-left font-bold text-lg uppercase text-black">
+              <div className="text-left font-bold text-lg uppercase text-black mb-2">
                 {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
               </div>
 
               {/* Grid Foto */}
-              <div className="mb-4">
-                <div className="grid grid-cols-3 grid-rows-6 gap-2 mt-2">
-                  {chunk.map((foto, fIndex) => (
-                    <div key={fIndex} className="w-full h-32 md:h-[135px]">
-                      <img src={foto} alt={`Dokumentasi ${fIndex + 1}`} className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
+              <div className="grid grid-cols-3 gap-3 md:gap-4">
+                {chunk.map((foto, index) => (
+                  <div key={index} className="w-full aspect-square overflow-hidden bg-gray-100">
+                    <img 
+                      src={foto} 
+                      alt={`Dokumentasi ${index}`} 
+                      className="w-full h-full object-cover object-center" 
+                    />
+                  </div>
+                ))}
                 {chunk.length === 0 && (
-                  <div className="w-full h-40 border border-slate-300 border-dashed flex items-center justify-center text-slate-400">
+                  <div className="w-full aspect-square border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
                     Tidak ada foto dokumentasi
                   </div>
                 )}
