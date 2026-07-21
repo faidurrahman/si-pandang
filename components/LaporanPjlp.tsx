@@ -119,15 +119,9 @@ export const LaporanPjlp: React.FC = () => {
               </button>
               
               <h4 className="font-bold text-slate-700 mb-4">Petugas #{index + 1}</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1 uppercase">Nama Petugas</label>
-                  <input type="text" value={petugas.nama} onChange={e => handlePetugasChange(petugas.id, 'nama', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: Budi Santoso" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1 uppercase">No. Kontak / Keterangan</label>
-                  <input type="text" value={petugas.keterangan} onChange={e => handlePetugasChange(petugas.id, 'keterangan', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: 08123456789 / Lokasi A" />
-                </div>
+              <div className="mb-4">
+                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase">Nama Petugas</label>
+                <input type="text" value={petugas.nama} onChange={e => handlePetugasChange(petugas.id, 'nama', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: Budi Santoso" />
               </div>
 
               <div>
@@ -176,9 +170,9 @@ export const LaporanPjlp: React.FC = () => {
       <div className="hidden print:block w-full bg-white text-black">
         <style>{`
           @media print {
-            @page { size: A4; margin: 15mm; }
+            @page { size: legal; margin: 15mm; }
             body { background: white; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
-            .print-page { page-break-after: always; width: 100%; min-height: 100vh; position: relative; }
+            .print-page { page-break-after: always; width: 100%; position: relative; }
             .print-page:last-child { page-break-after: auto; }
             .no-print { display: none !important; }
           }
@@ -196,17 +190,17 @@ export const LaporanPjlp: React.FC = () => {
             : [[]]; // At least one empty chunk to render the page
 
           return photoChunks.map((chunk, chunkIndex) => (
-            <div key={`${petugas.id}-page-${chunkIndex}`} className="print-page flex flex-col justify-start" style={{ minHeight: 'calc(100vh - 30mm)' }}>
+            <div key={`${petugas.id}-page-${chunkIndex}`} className="print-page flex flex-col justify-start">
               {/* Header Global */}
-              <div className="text-center mb-8">
+              <div className="text-center mb-8 text-black">
                 <h1 className="text-xl font-bold uppercase tracking-wider">{judul}</h1>
                 <h2 className="text-lg font-bold uppercase leading-tight mt-1">{instansi}</h2>
                 <h3 className="text-base font-semibold uppercase mt-1">{periode}</h3>
               </div>
 
               {/* Nama Petugas */}
-              <div className="mb-4 text-left font-bold text-lg uppercase">
-                {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
+              <div className="mb-2 text-left font-bold text-lg uppercase text-black">
+                {petugas.nama}
               </div>
 
               {/* Grid Foto */}
