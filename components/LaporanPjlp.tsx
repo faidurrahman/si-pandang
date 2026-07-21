@@ -196,63 +196,33 @@ export const LaporanPjlp: React.FC = () => {
             : [[]]; // At least one empty chunk to render the page
 
           return photoChunks.map((chunk, chunkIndex) => (
-            <div key={`${petugas.id}-page-${chunkIndex}`} className="print-page flex flex-col justify-between" style={{ minHeight: 'calc(100vh - 30mm)' }}>
-              <div>
-                {/* Kop Laporan */}
-                <div className="text-center mb-4">
-                  <h1 className="text-xl font-bold uppercase tracking-wider">{instansi}</h1>
-                  <h2 className="text-lg font-bold uppercase leading-tight mt-1">{judul}</h2>
-                  <h3 className="text-base font-semibold uppercase mt-1">{periode}</h3>
-                  <hr className="border-black border-t-2 my-4" />
-                </div>
-
-                {/* Grid Foto */}
-                <div className="mb-4">
-                  <div className="grid grid-cols-3 gap-2">
-                    {chunk.map((foto, fIndex) => (
-                      <div key={fIndex} className="aspect-[4/3] w-full border border-black p-1">
-                        <img src={foto} alt={`Dokumentasi ${fIndex + 1}`} className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                  {chunk.length === 0 && (
-                    <div className="w-full h-40 border border-black flex items-center justify-center text-slate-400">
-                      Tidak ada foto dokumentasi
-                    </div>
-                  )}
-                </div>
+            <div key={`${petugas.id}-page-${chunkIndex}`} className="print-page flex flex-col justify-start" style={{ minHeight: 'calc(100vh - 30mm)' }}>
+              {/* Header Global */}
+              <div className="text-center mb-8">
+                <h1 className="text-xl font-bold uppercase tracking-wider">{judul}</h1>
+                <h2 className="text-lg font-bold uppercase leading-tight mt-1">{instansi}</h2>
+                <h3 className="text-base font-semibold uppercase mt-1">{periode}</h3>
               </div>
 
-              {/* Identitas & Tanda Tangan (Footer) */}
-              <div className="flex justify-between items-end mt-auto pt-4 pb-6">
-                {/* Identitas (Kiri) */}
-                <div className="w-2/3">
-                  <table className="text-sm text-left">
-                    <tbody>
-                      <tr>
-                        <td className="font-bold py-1 pr-4 align-top w-28 whitespace-nowrap">Nama Petugas</td>
-                        <td className="py-1 pr-2 align-top">:</td>
-                        <td className="py-1 align-top">{petugas.nama || '-'}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-bold py-1 pr-4 align-top w-28 whitespace-nowrap">Keterangan / Kontak</td>
-                        <td className="py-1 pr-2 align-top">:</td>
-                        <td className="py-1 align-top">{petugas.keterangan || '-'}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-bold py-1 pr-4 align-top w-28 whitespace-nowrap">Jabatan</td>
-                        <td className="py-1 pr-2 align-top">:</td>
-                        <td className="py-1 align-top">{judul}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+              {/* Nama Petugas */}
+              <div className="mb-4 text-left font-bold text-lg uppercase">
+                {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
+              </div>
+
+              {/* Grid Foto */}
+              <div className="mb-4">
+                <div className="grid grid-cols-3 gap-2">
+                  {chunk.map((foto, fIndex) => (
+                    <div key={fIndex} className="aspect-[4/3] w-full">
+                      <img src={foto} alt={`Dokumentasi ${fIndex + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
                 </div>
-                
-                {/* Tanda Tangan (Kanan) */}
-                <div className="w-1/3 text-center">
-                  <p className="mb-20 text-sm">Petugas Yang Melaporkan,</p>
-                  <p className="font-bold underline text-sm">{petugas.nama || '__________________'}</p>
-                </div>
+                {chunk.length === 0 && (
+                  <div className="w-full h-40 border border-slate-300 border-dashed flex items-center justify-center text-slate-400">
+                    Tidak ada foto dokumentasi
+                  </div>
+                )}
               </div>
             </div>
           ));
