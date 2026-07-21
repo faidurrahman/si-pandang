@@ -170,7 +170,7 @@ export const LaporanPjlp: React.FC = () => {
       <div className="hidden print:block w-full bg-white text-black">
         <style>{`
           @media print {
-            @page { size: legal; margin: 15mm; }
+            @page { size: 215mm 330mm; margin: 10mm; }
             body { background: white; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
             .print-page { page-break-after: always; width: 100%; position: relative; }
             .print-page:last-child { page-break-after: auto; }
@@ -192,22 +192,22 @@ export const LaporanPjlp: React.FC = () => {
           return photoChunks.map((chunk, chunkIndex) => (
             <div key={`${petugas.id}-page-${chunkIndex}`} className="print-page flex flex-col justify-start">
               {/* Header Global */}
-              <div className="text-center mb-8 text-black">
+              <div className="text-center mb-3 text-black">
                 <h1 className="text-xl font-bold uppercase tracking-wider">{judul}</h1>
-                <h2 className="text-lg font-bold uppercase leading-tight mt-1">{instansi}</h2>
-                <h3 className="text-base font-semibold uppercase mt-1">{periode}</h3>
+                <h2 className="text-lg font-bold uppercase leading-tight">{instansi}</h2>
+                <h3 className="text-base font-semibold uppercase">{periode}</h3>
               </div>
 
               {/* Nama Petugas */}
-              <div className="mb-2 text-left font-bold text-lg uppercase text-black">
-                {petugas.nama}
+              <div className="mb-1 text-left font-bold text-lg uppercase text-black">
+                {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
               </div>
 
               {/* Grid Foto */}
               <div className="mb-4">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 grid-rows-6 gap-2 mt-2">
                   {chunk.map((foto, fIndex) => (
-                    <div key={fIndex} className="aspect-[4/3] w-full">
+                    <div key={fIndex} className="w-full h-32 md:h-[135px]">
                       <img src={foto} alt={`Dokumentasi ${fIndex + 1}`} className="w-full h-full object-cover" />
                     </div>
                   ))}
