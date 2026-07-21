@@ -178,7 +178,7 @@ export const LaporanPjlp: React.FC = () => {
           @media print {
             @page { 
               size: 215mm 330mm; /* Ukuran Kertas F4/Legal */
-              margin: 2.54cm; /* Margin Normal standar MS Word */
+              margin: 10mm 15mm; /* Atas/Bawah 10mm, Kiri/Kanan 15mm */
             }
             body { background: white; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
             .page-break-container { 
@@ -206,19 +206,19 @@ export const LaporanPjlp: React.FC = () => {
           return photoChunks.map((chunk, chunkIndex) => (
             <div key={`${petugas.id}-page-${chunkIndex}`} className="page-break-container">
               {/* Header Global */}
-              <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-4">
+              <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-2">
                 <h1 className="text-xl tracking-wider">{judul}</h1>
                 <h2 className="text-lg mt-1">{instansi}</h2>
                 <h3 className="text-base mt-1">{periode}</h3>
               </div>
 
               {/* Nama Petugas */}
-              <div className="text-left font-bold text-lg uppercase text-black mb-2">
+              <div className="text-left font-bold text-lg uppercase text-black mb-1">
                 {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
               </div>
 
               {/* Grid Foto */}
-              <div className="grid grid-cols-3 gap-3 md:gap-4">
+              <div className="grid grid-cols-3 gap-2">
                 {chunk.map((foto, index) => (
                   <div key={index} className="w-full aspect-square overflow-hidden bg-gray-100">
                     <img 
