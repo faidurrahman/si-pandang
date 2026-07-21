@@ -1,7 +1,7 @@
 
 import { Service } from './types';
 
-export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiSwMP-Yev_GrE0b1STevFVHoUSrsA8G-Ba6fUdLIXrEKmY_Oo0TRKhJYJDHdEjlxn/exec";
+export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwMs-o6uTECCabx7plhXaJ31arDLVaNsuG83GLGceYkIt4N1lkS5Pc_4HTrHWX5JaU/exec";
 
 export const SERVICES: Service[] = [
   {
