@@ -176,71 +176,87 @@ export const LaporanPjlp: React.FC = () => {
       <div className="hidden print:block w-full bg-white text-black">
         <style>{`
           @media print {
-            @page { size: A4; margin: 20mm; }
-            body { background: white; margin: 0; }
+            @page { size: A4; margin: 15mm; }
+            body { background: white; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
             .print-page { page-break-after: always; width: 100%; min-height: 100vh; position: relative; }
             .print-page:last-child { page-break-after: auto; }
             .no-print { display: none !important; }
           }
         `}</style>
         
-        {petugasList.map((petugas, index) => (
-          <div key={petugas.id} className="print-page pb-10">
-            {/* Kop Laporan */}
-            <div className="text-center mb-8 border-b-2 border-black pb-4">
-              <h1 className="text-2xl font-bold uppercase">{instansi}</h1>
-              <h2 className="text-xl font-bold uppercase mt-1">{judul}</h2>
-              <h3 className="text-lg font-semibold uppercase mt-1">{periode}</h3>
-            </div>
+        {petugasList.map((petugas) => {
+          // Chunk fotos into groups of 18 (3 cols x 6 rows)
+          const MAX_PHOTOS = 18;
+          const photoChunks = petugas.fotos.length > 0 
+            ? petugas.fotos.reduce((acc, curr, i) => {
+                if (i % MAX_PHOTOS === 0) acc.push([]);
+                acc[acc.length - 1].push(curr);
+                return acc;
+              }, [] as string[][])
+            : [[]]; // At least one empty chunk to render the page
 
-            {/* Grid Foto */}
-            <div className="mb-8">
-              <div className="grid grid-cols-2 gap-4">
-                {petugas.fotos.map((foto, fIndex) => (
-                  <div key={fIndex} className="aspect-[4/3] w-full border-2 border-slate-800 p-1">
-                    <img src={foto} alt={`Dokumentasi ${fIndex + 1}`} className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-              {petugas.fotos.length === 0 && (
-                <div className="w-full h-40 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400">
-                  Tidak ada foto dokumentasi
+          return photoChunks.map((chunk, chunkIndex) => (
+            <div key={`${petugas.id}-page-${chunkIndex}`} className="print-page flex flex-col justify-between" style={{ minHeight: 'calc(100vh - 30mm)' }}>
+              <div>
+                {/* Kop Laporan */}
+                <div className="text-center mb-4">
+                  <h1 className="text-xl font-bold uppercase tracking-wider">{instansi}</h1>
+                  <h2 className="text-lg font-bold uppercase leading-tight mt-1">{judul}</h2>
+                  <h3 className="text-base font-semibold uppercase mt-1">{periode}</h3>
+                  <hr className="border-black border-t-2 my-4" />
                 </div>
-              )}
-            </div>
 
-            {/* Identitas Petugas */}
-            <div className="mt-8 border-t border-slate-300 pt-6">
-              <table className="w-full text-left text-lg">
-                <tbody>
-                  <tr>
-                    <td className="w-48 font-bold py-2">Nama Petugas</td>
-                    <td className="w-4 py-2">:</td>
-                    <td className="py-2">{petugas.nama || '-'}</td>
-                  </tr>
-                  <tr>
-                    <td className="font-bold py-2">Keterangan / Kontak</td>
-                    <td className="py-2">:</td>
-                    <td className="py-2">{petugas.keterangan || '-'}</td>
-                  </tr>
-                  <tr>
-                    <td className="font-bold py-2">Jabatan</td>
-                    <td className="py-2">:</td>
-                    <td className="py-2">{judul}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Tanda Tangan */}
-            <div className="mt-16 flex justify-end">
-              <div className="text-center w-64">
-                <p className="mb-20">Petugas Yang Melaporkan,</p>
-                <p className="font-bold underline">{petugas.nama || '__________________'}</p>
+                {/* Grid Foto */}
+                <div className="mb-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    {chunk.map((foto, fIndex) => (
+                      <div key={fIndex} className="aspect-[4/3] w-full border border-black p-1">
+                        <img src={foto} alt={`Dokumentasi ${fIndex + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                  {chunk.length === 0 && (
+                    <div className="w-full h-40 border border-black flex items-center justify-center text-slate-400">
+                      Tidak ada foto dokumentasi
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Identitas & Tanda Tangan (Footer) */}
+              <div className="flex justify-between items-end mt-auto pt-4 pb-6">
+                {/* Identitas (Kiri) */}
+                <div className="w-2/3">
+                  <table className="text-sm text-left">
+                    <tbody>
+                      <tr>
+                        <td className="font-bold py-1 pr-4 align-top w-28 whitespace-nowrap">Nama Petugas</td>
+                        <td className="py-1 pr-2 align-top">:</td>
+                        <td className="py-1 align-top">{petugas.nama || '-'}</td>
+                      </tr>
+                      <tr>
+                        <td className="font-bold py-1 pr-4 align-top w-28 whitespace-nowrap">Keterangan / Kontak</td>
+                        <td className="py-1 pr-2 align-top">:</td>
+                        <td className="py-1 align-top">{petugas.keterangan || '-'}</td>
+                      </tr>
+                      <tr>
+                        <td className="font-bold py-1 pr-4 align-top w-28 whitespace-nowrap">Jabatan</td>
+                        <td className="py-1 pr-2 align-top">:</td>
+                        <td className="py-1 align-top">{judul}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                {/* Tanda Tangan (Kanan) */}
+                <div className="w-1/3 text-center">
+                  <p className="mb-20 text-sm">Petugas Yang Melaporkan,</p>
+                  <p className="font-bold underline text-sm">{petugas.nama || '__________________'}</p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ));
+        })}
       </div>
     </div>
   );
