@@ -19,6 +19,7 @@ import { LpjKegiatan } from './components/LpjKegiatan';
 import { DataPegawaiPage } from './components/DataPegawaiPage';
 import { DaftarHadirAdmin } from './components/DaftarHadirAdmin';
 import { FormKehadiran } from './components/FormKehadiran';
+import { LaporanPjlp } from './components/LaporanPjlp';
 
 const SHEET_ID = "1PfITx5bKWrTM9m63L8fomxNf5LicNaDJ5tdpHP-C7GA";
 
@@ -29,7 +30,7 @@ const MAPS_LINK = "https://maps.app.goo.gl/SX1s5Pf62GeDYKaG9";
 const EMAIL_ADDRESS = "data.kecujungpandang@gmail.com";
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'rekap-bmd' | 'daftar-kendaraan' | 'lpj-kegiatan' | 'data-pegawai' | 'daftar-hadir'>('layanan');
+  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'rekap-bmd' | 'daftar-kendaraan' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir'>('layanan');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -471,7 +472,7 @@ const App: React.FC = () => {
         onLogout={handleLogout} 
       />
 
-      <section className={`relative overflow-hidden bg-slate-900 pt-32 pb-20 md:pt-40 md:pb-28 shadow-2xl z-10 ${activeTab === 'lpj-kegiatan' ? 'print:hidden' : ''}`}>
+      <section className={`relative overflow-hidden bg-slate-900 pt-32 pb-20 md:pt-40 md:pb-28 shadow-2xl z-10 ${activeTab === 'lpj-kegiatan' || activeTab === 'laporan-pjlp' ? 'print:hidden' : ''}`}>
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[20rem] sm:w-[30rem] h-[20rem] sm:h-[30rem] bg-blue-500/10 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"></div>
         {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent opacity-50"></div>
@@ -679,6 +680,8 @@ const App: React.FC = () => {
           <DaftarKendaraan />
         ) : activeTab === 'lpj-kegiatan' ? (
           <LpjKegiatan />
+        ) : activeTab === 'laporan-pjlp' ? (
+          <LaporanPjlp />
         ) : activeTab === 'data-pegawai' ? (
           <DataPegawaiPage />
         ) : activeTab === 'daftar-hadir' ? (
@@ -741,7 +744,7 @@ const App: React.FC = () => {
       </section>
       )}
 
-      <footer className="bg-[#050b18] pt-20 pb-12 px-6 relative overflow-hidden">
+      <footer className="bg-[#050b18] pt-20 pb-12 px-6 relative overflow-hidden print:hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent"></div>
         <div className="max-w-6xl mx-auto flex flex-col items-center relative z-10">
            <h3 className="text-white font-black text-3xl md:text-4xl tracking-tighter mb-4 uppercase text-center">SI-PANDANG</h3>

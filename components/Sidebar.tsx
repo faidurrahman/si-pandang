@@ -3,8 +3,8 @@ import React from 'react';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  activeTab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'data-pegawai' | 'daftar-hadir' | 'rekap-bmd' | 'daftar-kendaraan';
-  onNavigate: (tab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'data-pegawai' | 'daftar-hadir' | 'rekap-bmd' | 'daftar-kendaraan') => void;
+  activeTab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir' | 'rekap-bmd' | 'daftar-kendaraan';
+  onNavigate: (tab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir' | 'rekap-bmd' | 'daftar-kendaraan') => void;
   isLoggedIn: boolean;
   onLoginClick: () => void;
   onLogout: () => void;
@@ -14,6 +14,15 @@ const WA_MESSAGE = encodeURIComponent("Halo Sub bagian Umum dan Kepegawaian, say
 const WA_LINK = `https://wa.me/6285242728901?text=${WA_MESSAGE}`;
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, onNavigate, isLoggedIn, onLoginClick, onLogout }) => {
+  const [isLaporanOpen, setIsLaporanOpen] = React.useState(activeTab === 'lpj-kegiatan' || activeTab === 'laporan-pjlp');
+
+  // Update accordion state if activeTab changes externally
+  React.useEffect(() => {
+    if (activeTab === 'lpj-kegiatan' || activeTab === 'laporan-pjlp') {
+      setIsLaporanOpen(true);
+    }
+  }, [activeTab]);
+
   return (
     <>
       {/* Backdrop */}
@@ -114,17 +123,41 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
                 <span className="text-xs uppercase tracking-widest">Daftar Kendaraan</span>
               </button>
 
-              <button 
-                onClick={() => { onNavigate('lpj-kegiatan'); onClose(); }}
-                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'lpj-kegiatan' ? 'bg-blue-500/15 text-blue-400 font-semibold rounded-xl border border-blue-500/20' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl border border-transparent'}`}
-              >
-                <div className={`flex items-center justify-center transition-all ${activeTab === 'lpj-kegiatan' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <div className="flex flex-col">
+                <button 
+                  onClick={() => setIsLaporanOpen(!isLaporanOpen)}
+                  className={`w-full px-4 py-3 flex items-center justify-between transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'lpj-kegiatan' || activeTab === 'laporan-pjlp' ? 'bg-blue-500/5 text-blue-400 font-semibold rounded-xl' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`flex items-center justify-center transition-all ${activeTab === 'lpj-kegiatan' || activeTab === 'laporan-pjlp' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <span className="text-xs uppercase tracking-widest">Laporan</span>
+                  </div>
+                  <svg className={`w-4 h-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
+                </button>
+                
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isLaporanOpen ? 'max-h-40 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                  <button 
+                    onClick={() => { onNavigate('lpj-kegiatan'); onClose(); }}
+                    className={`w-full pl-12 pr-4 py-2 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'lpj-kegiatan' ? 'text-blue-400 font-semibold' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    <div className={`w-1.5 h-1.5 rounded-full ${activeTab === 'lpj-kegiatan' ? 'bg-blue-400' : 'bg-slate-600'}`}></div>
+                    <span className="text-[11px] uppercase tracking-widest">LPJ Kegiatan</span>
+                  </button>
+                  <button 
+                    onClick={() => { onNavigate('laporan-pjlp'); onClose(); }}
+                    className={`w-full pl-12 pr-4 py-2 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'laporan-pjlp' ? 'text-blue-400 font-semibold' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    <div className={`w-1.5 h-1.5 rounded-full ${activeTab === 'laporan-pjlp' ? 'bg-blue-400' : 'bg-slate-600'}`}></div>
+                    <span className="text-[11px] uppercase tracking-widest">Laporan PJLP / Satgas</span>
+                  </button>
                 </div>
-                <span className="text-xs uppercase tracking-widest">LPJ Kegiatan</span>
-              </button>
+              </div>
 
               <button 
                 onClick={() => { onNavigate('data-pegawai'); onClose(); }}
