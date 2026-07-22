@@ -81,14 +81,21 @@ export const LaporanPjlp: React.FC = () => {
           const element = document.getElementById(elementId);
           
           if (element) {
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const canvas = await html2canvas(element, { 
+              scale: 2, 
+              useCORS: true,
+              windowWidth: 816
+            });
             const imgData = canvas.toDataURL('image/png');
             
             if (!isFirstPage) {
               pdf.addPage();
             }
             
-            pdf.addImage(imgData, 'PNG', 0, 0, 215, 330);
+            const pdfWidth = 215;
+            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
             isFirstPage = false;
           }
         }
