@@ -202,22 +202,28 @@ export const LaporanPjlp: React.FC = () => {
 
           return chunkedPhotos.map((chunk, chunkIndex) => (
             <div key={`${petugas.id}-page-${chunkIndex}`} className="page-break-container">
-              {/* Header Global */}
-              <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-2">
-                <h1 className="text-xl tracking-wider">{judul}</h1>
-                <h2 className="text-lg mt-1">{instansi}</h2>
-                <h3 className="text-base mt-1">{periode}</h3>
-              </div>
+              {chunkIndex === 0 && (
+                <>
+                  {/* Header Global */}
+                  <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-4">
+                    <h1 className="text-xl tracking-wider">{judul}</h1>
+                    <h2 className="text-lg mt-1">{instansi}</h2>
+                    <h3 className="text-base mt-1">{periode}</h3>
+                  </div>
 
-              {/* Nama Petugas */}
-              <div className="text-left font-bold text-lg uppercase text-black mb-1">
-                {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
-              </div>
+                  {/* Nama Petugas */}
+                  <div className="text-left font-bold text-lg uppercase text-black mb-2">
+                    {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
+                  </div>
+                </>
+              )}
+
+              {chunkIndex > 0 && <div className="mt-8"></div>}
 
               {/* Grid Foto */}
-              <div className="grid grid-cols-3 gap-2 mt-2">
+              <div className="grid grid-cols-3 gap-3 w-fit mx-auto mt-2">
                 {chunk.map((foto, index) => (
-                  <div key={index} className="w-[140px] h-[140px] sm:w-[150px] sm:h-[150px] mx-auto overflow-hidden border border-gray-300">
+                  <div key={index} className="w-[140px] h-[140px] sm:w-[150px] sm:h-[150px] overflow-hidden border border-gray-300">
                     <img 
                       src={foto} 
                       alt={`Dokumentasi ${index}`} 
@@ -226,7 +232,7 @@ export const LaporanPjlp: React.FC = () => {
                   </div>
                 ))}
                 {chunk.length === 0 && (
-                  <div className="w-[140px] h-[140px] sm:w-[150px] sm:h-[150px] mx-auto border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
+                  <div className="w-[140px] h-[140px] sm:w-[150px] sm:h-[150px] border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
                     Tidak ada foto dokumentasi
                   </div>
                 )}
