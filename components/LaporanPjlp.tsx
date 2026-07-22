@@ -230,7 +230,7 @@ export const LaporanPjlp: React.FC = () => {
         <style>{`
           @media print {
             @page { 
-              size: 215mm 330mm; /* Ukuran Kertas F4/Legal */
+              size: legal; /* ukuran 8.5 x 14 inch / 216mm x 356mm */
               margin: 10mm 15mm; /* Atas/Bawah 10mm, Kiri/Kanan 15mm */
             }
             body { background: white; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
@@ -245,7 +245,7 @@ export const LaporanPjlp: React.FC = () => {
           }
         `}</style>
         
-        {petugasList.map((petugas) => {
+        {petugasList.map((petugas, petugasIndex) => {
           // Memecah foto menjadi kelompok-kelompok berisi maksimal 18 foto
           const chunkedPhotos: string[][] = [];
           for (let i = 0; i < petugas.fotos.length; i += 18) {
@@ -260,20 +260,20 @@ export const LaporanPjlp: React.FC = () => {
               className="page-break-container bg-white"
               style={isDownloading ? { width: '215mm', minHeight: '330mm', padding: '10mm 15mm', boxSizing: 'border-box' } : {}}
             >
-              {chunkIndex === 0 && (
-                <>
-                  {/* Header Global */}
-                  <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-4">
-                    <h1 className="text-xl tracking-wider">{judul}</h1>
-                    <h2 className="text-lg mt-1">{instansi}</h2>
-                    <h3 className="text-base mt-1">{periode}</h3>
-                  </div>
+              {/* Header Global HANYA muncul di petugas pertama (index 0) dan halaman pertama (index 0) */}
+              {petugasIndex === 0 && chunkIndex === 0 && (
+                <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-4">
+                  <h1 className="text-xl tracking-wider">{judul}</h1>
+                  <h2 className="text-lg mt-1">{instansi}</h2>
+                  <h3 className="text-base mt-1">{periode}</h3>
+                </div>
+              )}
 
-                  {/* Nama Petugas */}
-                  <div className="text-left font-bold text-lg uppercase text-black mb-2">
-                    {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
-                  </div>
-                </>
+              {/* Nama Petugas SELALU muncul di halaman pertama milik masing-masing petugas, walaupun tanpa Header Global */}
+              {chunkIndex === 0 && (
+                <div className="text-left font-bold text-lg uppercase text-black mb-2 mt-2">
+                  {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
+                </div>
               )}
 
               {chunkIndex > 0 && <div className="mt-8"></div>}
@@ -281,7 +281,7 @@ export const LaporanPjlp: React.FC = () => {
               {/* Grid Foto */}
               <div className="grid grid-cols-3 gap-2 w-full mt-2">
                 {chunk.map((foto, index) => (
-                  <div key={index} className="w-full h-[120px] overflow-hidden border border-gray-300 bg-gray-100">
+                  <div key={index} className="w-full aspect-[4/3] overflow-hidden border border-gray-300 bg-gray-100">
                     <img 
                       src={foto} 
                       alt={`Dokumentasi ${index}`} 
@@ -290,7 +290,7 @@ export const LaporanPjlp: React.FC = () => {
                   </div>
                 ))}
                 {chunk.length === 0 && (
-                  <div className="w-full h-[120px] border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
+                  <div className="w-full aspect-[4/3] border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
                     Tidak ada foto dokumentasi
                   </div>
                 )}
