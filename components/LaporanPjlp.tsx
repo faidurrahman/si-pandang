@@ -279,18 +279,18 @@ export const LaporanPjlp: React.FC = () => {
               {chunkIndex > 0 && <div className="mt-8"></div>}
 
               {/* Grid Foto */}
-              <div className="grid grid-cols-3 gap-3 w-full mt-2">
+              <div className="grid grid-cols-3 gap-2 w-full mt-2">
                 {chunk.map((foto, index) => (
-                  <div key={index} className="w-full aspect-[4/3] overflow-hidden border border-gray-300">
+                  <div key={index} className="w-full h-[120px] overflow-hidden border border-gray-300 bg-gray-100">
                     <img 
                       src={foto} 
                       alt={`Dokumentasi ${index}`} 
-                      className="w-full h-full object-cover object-center" 
+                      className="w-full h-full object-cover object-center block" 
                     />
                   </div>
                 ))}
                 {chunk.length === 0 && (
-                  <div className="w-full aspect-[4/3] border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
+                  <div className="w-full h-[120px] border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
                     Tidak ada foto dokumentasi
                   </div>
                 )}
