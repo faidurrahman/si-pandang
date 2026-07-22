@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Petugas {
   id: string;
@@ -13,6 +15,7 @@ export const LaporanPjlp: React.FC = () => {
   const [periode, setPeriode] = useState('BULAN JUNI 2026');
 
   const [petugasList, setPetugasList] = useState<Petugas[]>([]);
+  const [isDownloading, setIsDownloading] = useState(false);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const handleAddPetugas = () => {
@@ -61,8 +64,43 @@ export const LaporanPjlp: React.FC = () => {
     }));
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handleDirectDownloadPDF = async () => {
+    setIsDownloading(true);
+    // Beri waktu sejenak agar React me-render elemen off-screen
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    const pdf = new jsPDF('p', 'mm', [215, 330]);
+    let isFirstPage = true;
+
+    try {
+      for (const petugas of petugasList) {
+        // Hitung jumlah halaman untuk petugas ini
+        const chunkCount = Math.ceil(Math.max(1, petugas.fotos.length) / 18);
+        for (let i = 0; i < chunkCount; i++) {
+          const elementId = `pdf-page-${petugas.id}-${i}`;
+          const element = document.getElementById(elementId);
+          
+          if (element) {
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL('image/png');
+            
+            if (!isFirstPage) {
+              pdf.addPage();
+            }
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, 215, 330);
+            isFirstPage = false;
+          }
+        }
+      }
+      
+      pdf.save('Laporan_Satgas_PJLP.pdf');
+    } catch (error) {
+      console.error("Gagal men-generate PDF:", error);
+      alert("Terjadi kesalahan saat membuat PDF.");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -72,13 +110,21 @@ export const LaporanPjlp: React.FC = () => {
         {/* Action Header */}
         <div className="flex justify-end">
           <button
-            onClick={handlePrint}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-semibold flex items-center gap-2 transition-colors shadow-sm"
+            onClick={handleDirectDownloadPDF}
+            disabled={isDownloading}
+            className={`${isDownloading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white px-4 py-2 rounded-md font-semibold flex items-center gap-2 transition-colors shadow-sm`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-            </svg>
-            Download PDF
+            {isDownloading ? (
+              <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+            )}
+            {isDownloading ? 'Memproses PDF...' : 'Download PDF'}
           </button>
         </div>
 
@@ -172,8 +218,8 @@ export const LaporanPjlp: React.FC = () => {
         </div>
       </div>
 
-      {/* Print Section (Only visible on Print) */}
-      <div className="hidden print:block w-full bg-white text-black font-sans">
+      {/* Print Section (Only visible on Print or when downloading PDF) */}
+      <div className={`${isDownloading ? 'block absolute left-[-9999px] top-0' : 'hidden print:block'} w-full bg-white text-black font-sans`}>
         <style>{`
           @media print {
             @page { 
@@ -201,7 +247,12 @@ export const LaporanPjlp: React.FC = () => {
           if (chunkedPhotos.length === 0) chunkedPhotos.push([]);
 
           return chunkedPhotos.map((chunk, chunkIndex) => (
-            <div key={`${petugas.id}-page-${chunkIndex}`} className="page-break-container">
+            <div 
+              id={`pdf-page-${petugas.id}-${chunkIndex}`}
+              key={`${petugas.id}-page-${chunkIndex}`} 
+              className="page-break-container bg-white"
+              style={isDownloading ? { width: '215mm', minHeight: '330mm', padding: '10mm 15mm', boxSizing: 'border-box' } : {}}
+            >
               {chunkIndex === 0 && (
                 <>
                   {/* Header Global */}
