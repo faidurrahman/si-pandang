@@ -159,7 +159,20 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
             </div>
             <div>
               <label className={labelClass}>Jatuh Tempo</label>
-              <input type="text" name="Jatuh Tempo" value={formData['Jatuh Tempo'] || ''} onChange={handleChange} className={inputClass} placeholder="Contoh: 20 Jan 2018" />
+              <input 
+                type="date" 
+                name="Jatuh Tempo" 
+                value={
+                  formData['Jatuh Tempo'] 
+                    ? (() => {
+                        const d = new Date(formData['Jatuh Tempo']);
+                        return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+                      })()
+                    : ''
+                } 
+                onChange={handleChange} 
+                className={inputClass} 
+              />
             </div>
             <div>
               <label className={labelClass}>Jatuh Tempo Plat</label>
