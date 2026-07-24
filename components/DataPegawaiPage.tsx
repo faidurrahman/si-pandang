@@ -75,13 +75,15 @@ export const DataPegawaiPage: React.FC = () => {
       const response = await fetch(`${APPS_SCRIPT_URL}?action=getDaftarPegawai&t=${new Date().getTime()}`);
       if (!response.ok) throw new Error("Gagal mengambil data dari server.");
       const result = await response.json();
-      if (result.data && result.data.length > 1) {
-        const rows = result.data.slice(1);
-        const mapped: DataPegawai[] = rows.map((row: any[], index: number) => {
-          const nipStr = String(row[3]).replace(/'/g, '').trim() || '';
+      if (result.data && result.data.length > 0) {
+        const isArrOfArr = Array.isArray(result.data[0]);
+        const rows = isArrOfArr ? result.data.slice(1) : result.data;
+        const mapped: DataPegawai[] = rows.map((row: any, index: number) => {
+          const isArr = Array.isArray(row);
+          const nipStr = String(isArr ? row[3] : (row['NIP'] || '')).replace(/'/g, '').trim();
           
-          let masaTahun = Number(row[13]) || 0;
-          let masaBulan = Number(row[14]) || 0;
+          let masaTahun = Number(isArr ? row[13] : (row['Masa Kerja Tahun'] || 0)) || 0;
+          let masaBulan = Number(isArr ? row[14] : (row['Masa Kerja Bulan'] || 0)) || 0;
           
           const masaNip = calculateMasaKerjaFromNip(nipStr);
           if (masaNip) {
@@ -91,33 +93,33 @@ export const DataPegawaiPage: React.FC = () => {
           
           return {
             id: nipStr || String(index),
-            nama: row[1] || '',
-            tempatTanggalLahir: row[2] || '',
+            nama: isArr ? (row[1] || '') : (row['Nama'] || ''),
+            tempatTanggalLahir: isArr ? (row[2] || '') : (row['Tempat Tanggal Lahir'] || ''),
             nip: nipStr,
-            unitKerja: row[4] || '',
-            golongan: row[5] || '',
-            golonganPangkat: row[6] || '',
-            tmtGolongan: safeDateToISO(row[7]),
-            eselon: row[8] || '',
-            namaJabatan: row[9] || '',
-            tmtJabatan: safeDateToISO(row[10]),
-            statusPegawai: row[11] || '',
-            tmtPegawai: safeDateToISO(row[12]),
+            unitKerja: isArr ? (row[4] || '') : (row['Unit Kerja'] || ''),
+            golongan: isArr ? (row[5] || '') : (row['Golongan'] || ''),
+            golonganPangkat: isArr ? (row[6] || '') : (row['Golongan Pangkat'] || ''),
+            tmtGolongan: safeDateToISO(isArr ? row[7] : row['TMT Golongan']),
+            eselon: isArr ? (row[8] || '') : (row['Eselon'] || ''),
+            namaJabatan: isArr ? (row[9] || '') : (row['Nama Jabatan'] || ''),
+            tmtJabatan: safeDateToISO(isArr ? row[10] : row['TMT Jabatan']),
+            statusPegawai: isArr ? (row[11] || '') : (row['Status Pegawai'] || ''),
+            tmtPegawai: safeDateToISO(isArr ? row[12] : row['TMT Pegawai']),
             masaKerjaTahun: masaTahun,
             masaKerjaBulan: masaBulan,
-            jenisKelamin: row[15] || '',
-            agama: row[16] || '',
-            statusPerkawinan: row[17] || '',
-            pendidikanAwal: row[18] || '',
-            pendidikanAkhir: row[19] || '',
-            noAskes: String(row[20]).replace(/'/g, '').trim() || '',
-            noNpwp: String(row[21]).replace(/'/g, '').trim() || '',
-            noKtp: String(row[22]).replace(/'/g, '').trim() || '',
-            alamatRumah: row[23] || '',
-            kelurahan: row[24] || '',
-            kecamatan: row[25] || '',
-            telp: String(row[26]).replace(/'/g, '').trim() || '',
-            email: row[27] || ''
+            jenisKelamin: isArr ? (row[15] || '') : (row['Jenis Kelamin'] || ''),
+            agama: isArr ? (row[16] || '') : (row['Agama'] || ''),
+            statusPerkawinan: isArr ? (row[17] || '') : (row['Status Perkawinan'] || ''),
+            pendidikanAwal: isArr ? (row[18] || '') : (row['Pendidikan Awal'] || ''),
+            pendidikanAkhir: isArr ? (row[19] || '') : (row['Pendidikan Akhir'] || ''),
+            noAskes: String(isArr ? row[20] : (row['No Askes'] || '')).replace(/'/g, '').trim(),
+            noNpwp: String(isArr ? row[21] : (row['No NPWP'] || '')).replace(/'/g, '').trim(),
+            noKtp: String(isArr ? row[22] : (row['No KTP'] || '')).replace(/'/g, '').trim(),
+            alamatRumah: isArr ? (row[23] || '') : (row['Alamat Rumah'] || ''),
+            kelurahan: isArr ? (row[24] || '') : (row['Kelurahan'] || ''),
+            kecamatan: isArr ? (row[25] || '') : (row['Kecamatan'] || ''),
+            telp: String(isArr ? row[26] : (row['Telp'] || row['HP'] || '')).replace(/'/g, '').trim(),
+            email: isArr ? (row[27] || '') : (row['E-mail'] || row['HP'] || '')
           };
         }).filter(p => p.nip); // Hanya masukkan jika ada NIP
         const getGolonganWeight = (item: DataPegawai) => {

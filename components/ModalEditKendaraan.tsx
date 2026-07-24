@@ -52,10 +52,10 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl m-4">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-slate-100 bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+        <div className="bg-orange-500 text-white p-4 md:px-6 md:py-4 flex justify-between items-center sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <div className="bg-white/20 p-2 rounded-lg">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,8 +78,8 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <form onSubmit={handleSubmit} className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 md:p-6">
             <div>
               <label className={labelClass}>No</label>
               <input type="text" name="No" value={formData['No'] || ''} onChange={handleChange} className={inputClass} readOnly />
@@ -149,7 +149,7 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
               <input type="text" name="Keterangan" value={formData['Keterangan'] || ''} onChange={handleChange} className={inputClass} />
             </div>
             
-            <div className="lg:col-span-3 border-t border-slate-200 mt-2 pt-6 pb-2">
+            <div className="col-span-1 sm:col-span-2 md:col-span-3 border-t border-slate-200 mt-2 pt-6 pb-2">
               <h3 className="font-bold text-slate-800 text-sm mb-4 uppercase tracking-wide">Pajak & Penanggung Jawab</h3>
             </div>
             
@@ -189,7 +189,7 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
             </div>
             <div>
               <label className={labelClass}>Status BPKB</label>
-              <select name="Status BPKB" value={formData['Status BPKB'] || ''} onChange={handleChange} className={inputClass}>
+              <select name="Status BPKB" value={formData['Status BPKB'] || formData['BPKB'] || ''} onChange={handleChange} className={inputClass}>
                 <option value="">Pilih...</option>
                 <option value="Ada Asli">Ada Asli</option>
                 <option value="Ada">Ada</option>
@@ -198,7 +198,7 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
             </div>
             <div>
               <label className={labelClass}>Status STNK</label>
-              <select name="Status STNK" value={formData['Status STNK'] || ''} onChange={handleChange} className={inputClass}>
+              <select name="Status STNK" value={formData['Status STNK'] || formData['STNK'] || ''} onChange={handleChange} className={inputClass}>
                 <option value="">Pilih...</option>
                 <option value="Ada Asli">Ada Asli</option>
                 <option value="Ada">Ada</option>
@@ -206,7 +206,7 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
               </select>
             </div>
             
-            <div className="lg:col-span-3 border-t border-slate-200 mt-2 pt-6 pb-2">
+            <div className="col-span-1 sm:col-span-2 md:col-span-3 border-t border-slate-200 mt-2 pt-6 pb-2">
               <h3 className="font-bold text-slate-800 text-sm mb-4 uppercase tracking-wide">Arsip Dokumen Fisik (Upload File)</h3>
             </div>
             
@@ -255,7 +255,7 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
 
           </div>
           
-          <div className="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-4 pb-4 px-4 md:pt-6 md:pb-6 md:px-6 border-t border-slate-100 bg-slate-50 sticky bottom-0 z-10">
             <button
               type="button"
               onClick={onClose}

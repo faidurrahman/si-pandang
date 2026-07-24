@@ -210,7 +210,7 @@ export const LaporanPjlp: React.FC = () => {
                   multiple 
                   accept="image/*" 
                   className="hidden" 
-                  ref={el => fileInputRefs.current[petugas.id] = el}
+                  ref={el => { fileInputRefs.current[petugas.id] = el; }}
                   onChange={(e) => handleImageUpload(petugas.id, e)}
                 />
               </div>

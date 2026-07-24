@@ -81,10 +81,10 @@ export const DaftarKendaraan: React.FC = () => {
 
 
   const [filterTenggatPlat, setFilterTenggatPlat] = useState('Semua');
-
   const [filterDetail, setFilterDetail] = useState<string[]>([]);
   const [isDetailDropdownOpen, setIsDetailDropdownOpen] = useState(false);
-
+  const [filterPolisi, setFilterPolisi] = useState<string[]>([]);
+  const [isPolisiDropdownOpen, setIsPolisiDropdownOpen] = useState(false);
 
   const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -114,7 +114,9 @@ export const DaftarKendaraan: React.FC = () => {
     try {
       const payloadBase64 = {
         action: 'updateDaftarKendaraan',
-        ...formData
+        ...formData,
+        'BPKB': formData['Status BPKB'] || formData['BPKB'] || '',
+        'STNK': formData['Status STNK'] || formData['STNK'] || ''
       };
       const response = await fetch(API_URL, {
         method: "POST",
@@ -186,6 +188,16 @@ export const DaftarKendaraan: React.FC = () => {
   };
 
 
+  const uniquePolisi = React.useMemo(() => {
+    return Array.from(new Set(dataKendaraan.map(item => String(item['Polisi'] || '')).filter(Boolean))).sort();
+  }, [dataKendaraan]);
+
+  const handleTogglePolisi = (val: string) => {
+    setFilterPolisi(prev => 
+      prev.includes(val) ? prev.filter(item => item !== val) : [...prev, val]
+    );
+  };
+
   const filteredData = React.useMemo(() => {
     if (!dataKendaraan) return [];
 
@@ -222,7 +234,10 @@ export const DaftarKendaraan: React.FC = () => {
       }
 
       // 3. FILTER KOLOM
-      const matchPolisi = platNomor.includes(columnFilters.polisi.toLowerCase());
+      let matchPolisi = true;
+      if (filterPolisi.length > 0) {
+        matchPolisi = filterPolisi.includes(String(item['Polisi'] || ''));
+      }
       let matchDetail = true;
       if (filterDetail.length > 0) {
         matchDetail = filterDetail.includes(String(item['Merk/Tipe'] || ''));
@@ -362,17 +377,34 @@ export const DaftarKendaraan: React.FC = () => {
                   No.
                 </div>
               </th>
-              <th className="px-4 py-3 align-top min-w-[150px]">
+              <th className="px-4 py-3 align-top min-w-[170px] relative">
                 <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2" onClick={() => handleSort('Polisi')}>
                   PLAT NOMOR {getSortIcon('Polisi')}
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Filter..." 
-                  value={columnFilters.polisi}
-                  onChange={(e) => handleColumnFilterChange('polisi', e.target.value)}
-                  className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
-                />
+                <button
+                  onClick={() => setIsPolisiDropdownOpen(!isPolisiDropdownOpen)}
+                  className="w-full px-2 py-1 text-xs rounded border border-slate-200 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-left flex justify-between items-center"
+                >
+                  <span className="truncate">
+                    {filterPolisi.length === 0 ? 'Pilih Plat...' : `${filterPolisi.length} terpilih`}
+                  </span>
+                  <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {isPolisiDropdownOpen && (
+                  <div className="absolute z-50 mt-1 w-[200px] bg-white border border-slate-200 rounded-md shadow-lg max-h-48 overflow-y-auto left-4">
+                    {uniquePolisi.map((polisi, idx) => (
+                      <label key={idx} className="flex items-center px-3 py-2 hover:bg-slate-50 cursor-pointer text-xs text-slate-700">
+                        <input
+                          type="checkbox"
+                          className="mr-2 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          checked={filterPolisi.includes(polisi)}
+                          onChange={() => handleTogglePolisi(polisi)}
+                        />
+                        <span className="truncate" title={polisi}>{polisi}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </th>
               <th className="px-4 py-3 align-top min-w-[200px] relative">
                 <div className="font-bold text-slate-700 uppercase tracking-wider text-xs cursor-pointer hover:text-blue-600 transition-colors select-none flex items-center mb-2" onClick={() => handleSort('Merk/Tipe')}>

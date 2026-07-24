@@ -44,23 +44,25 @@ export const PantauKGB: React.FC = () => {
         throw new Error("Format data tidak valid. Pastikan Apps Script telah di-deploy ulang.");
       }
       
-      if (json.data && json.data.length > 1) { // Skip header row
-        const rows = json.data.slice(1);
-        const mappedData: PegawaiKGB[] = rows.map((row: any[]) => {
-          const tmtStr = row[6] ? String(row[6]) : '';
+      if (json.data && json.data.length > 0) { // Check if we have data
+        const isArrOfArr = Array.isArray(json.data[0]);
+        const rows = isArrOfArr ? json.data.slice(1) : json.data;
+        const mappedData: PegawaiKGB[] = rows.map((row: any) => {
+          const isArr = Array.isArray(row);
+          const tmtStr = isArr ? (row[6] ? String(row[6]) : '') : (row['tmtKgb'] || row['TMT Terakhir'] || row['TMT'] || '');
           const { status, jadwal } = calculateStatus(tmtStr);
           
           return {
-            id: String(row[0]),
-            timestamp: String(row[1]),
-            nama: String(row[2]),
-            nip: String(row[3]).replace(/^'/, ''),
-            pangkat: String(row[4]),
-            jabatan: String(row[5]),
+            id: String(isArr ? row[0] : (row['id'] || row['No'] || '')),
+            timestamp: String(isArr ? row[1] : (row['timestamp'] || row['Timestamp'] || '')),
+            nama: String(isArr ? row[2] : (row['nama'] || row['Nama'] || '')),
+            nip: String(isArr ? row[3] : (row['nip'] || row['NIP'] || '')).replace(/^'/, ''),
+            pangkat: String(isArr ? row[4] : (row['pangkat'] || row['Pangkat/Jabatan'] || row['Pangkat'] || '')),
+            jabatan: String(isArr ? row[5] : (row['jabatan'] || row['Jabatan'] || '')),
             tmtKgb: tmtStr,
-            gajiPokok: String(row[7]),
-            skUrl: String(row[8]),
-            kgbUrl: String(row[9]),
+            gajiPokok: String(isArr ? row[7] : (row['gaji'] || row['Gaji Pokok Terakhir'] || row['Gaji'] || '')),
+            skUrl: String(isArr ? row[8] : (row['skUrl'] || row['Upload SK Terakhir'] || row['SK'] || '')),
+            kgbUrl: String(isArr ? row[9] : (row['kgbUrl'] || row['Upload KGB Terakhir'] || row['KGB'] || '')),
             jadwalBerikutnya: jadwal,
             status: status as 'Aman' | 'Mendekati' | 'Lewat Jadwal'
           };
