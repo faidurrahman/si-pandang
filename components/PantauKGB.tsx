@@ -84,11 +84,27 @@ export const PantauKGB: React.FC = () => {
   }, []);
 
   // Helper: Calculate Status
+  const parseCustomDate = (dateStr: string) => {
+    if (!dateStr) return new Date(NaN);
+    
+    // Check if format is DD/MM/YYYY
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      // Determine if DD/MM or MM/DD depending on values, but assume DD/MM/YYYY
+      if (month >= 0 && month <= 11 && day >= 1 && day <= 31 && year > 1900) {
+        return new Date(year, month, day);
+      }
+    }
+    return new Date(dateStr);
+  };
+
   const calculateStatus = (tmtDateStr: string) => {
     if (!tmtDateStr) return { status: 'Aman', jadwal: '-' };
     
-    // Handle date format if necessary, assuming YYYY-MM-DD or standard JS date string
-    const tmt = new Date(tmtDateStr);
+    const tmt = parseCustomDate(tmtDateStr);
     if (isNaN(tmt.getTime())) return { status: 'Aman', jadwal: '-' };
 
     const nextKGB = new Date(tmt);
@@ -502,7 +518,7 @@ export const PantauKGB: React.FC = () => {
                         <div className="text-xs text-slate-500 mt-0.5">{pegawai.jabatan}</div>
                       </td>
                       <td className="px-6 py-4 font-medium">
-                        {pegawai.tmtKgb ? new Date(pegawai.tmtKgb).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                        {pegawai.tmtKgb ? parseCustomDate(pegawai.tmtKgb).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                       </td>
                       <td className="px-6 py-4 font-bold text-slate-700">
                         {pegawai.jadwalBerikutnya}

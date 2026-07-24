@@ -20,6 +20,18 @@ export const DataPegawaiPage: React.FC = () => {
   const safeDateToISO = (val: any) => {
     if (!val) return '';
     try {
+      if (typeof val === 'string' && val.includes('/')) {
+        const parts = val.split('/');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const year = parseInt(parts[2], 10);
+          if (month >= 0 && month <= 11 && day >= 1 && day <= 31 && year > 1900) {
+            const d = new Date(year, month, day);
+            return d.toISOString().split('T')[0];
+          }
+        }
+      }
       let d = new Date(val);
       if (isNaN(d.getTime())) {
         if (typeof val === 'string') {
