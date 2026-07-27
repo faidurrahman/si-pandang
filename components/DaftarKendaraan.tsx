@@ -310,7 +310,7 @@ export const DaftarKendaraan: React.FC = () => {
     }
 
     return result;
-  }, [dataKendaraan, searchTerm, filterSimbakda, sortConfig, columnFilters]);
+  }, [dataKendaraan, searchTerm, filterSimbakda, sortConfig, columnFilters, filterPolisi, filterDetail, filterTenggatPlat]);
 
   const totalPajakFiltered = React.useMemo(() => {
     return filteredData.reduce((sum, item) => {
