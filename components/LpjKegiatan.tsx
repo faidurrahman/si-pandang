@@ -66,7 +66,7 @@ export const LpjKegiatan: React.FC = () => {
   const handlePrint = async () => {
     setIsGenerating(true);
 
-    // Tunggu DOM update agar scale kembali ke 1 untuk html2canvas
+    // Tunggu DOM update agar scale kembali ke 1 dan layout menyesuaikan
     await new Promise(resolve => setTimeout(resolve, 300));
 
     try {
@@ -106,7 +106,7 @@ export const LpjKegiatan: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 w-full">
+    <div className="flex flex-col lg:flex-row gap-6 w-full print:block print:m-0 print:p-0">
       {/* Form Input Section (Hidden during print) */}
       <div className="w-full lg:w-1/3 flex flex-col gap-6 print:hidden">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
@@ -233,16 +233,16 @@ export const LpjKegiatan: React.FC = () => {
       </div>
 
       {/* Document Preview Section */}
-      <div ref={previewContainerRef} className="w-full lg:w-2/3 bg-gray-200 py-8 flex flex-col items-center overflow-y-auto overflow-x-hidden">
+      <div ref={previewContainerRef} className="w-full lg:w-2/3 bg-gray-200 py-8 print:py-0 print:p-0 print:m-0 print:bg-transparent print:block flex flex-col items-center overflow-y-auto overflow-x-hidden">
         
         {/* Scaled Wrapper to fix layout height */}
-        <div className="w-full flex justify-center transition-all duration-300" style={{ height: `${scaledHeight}px` }}>
+        <div className="w-full flex justify-center transition-all duration-300 print:!h-auto print:block" style={{ height: `${scaledHeight}px` }}>
           
-          <div className="flex flex-col items-center gap-8 origin-top transition-transform duration-300"
+          <div className="flex flex-col items-center gap-8 print:gap-0 origin-top transition-transform duration-300 print:!transform-none print:!w-full print:block"
                style={{ transform: `scale(${currentScale})`, width: '816px' }}>
             
             {/* Page 1: Cover */}
-            <div ref={coverRef} className="bg-white shadow-lg box-border overflow-hidden w-[816px] h-[1344px] p-10 flex flex-col items-center text-center relative shrink-0"
+            <div ref={coverRef} className="lpj-container bg-white shadow-lg box-border overflow-hidden w-[816px] h-[1344px] pt-[96px] pr-[96px] pb-[96px] pl-[144px] print:pt-0 print:pr-0 print:pb-0 print:pl-0 print:p-0 print:m-0 print:w-full print:h-full print:shadow-none print:border-none flex flex-col items-center text-center relative shrink-0"
                  style={{ backgroundColor: 'white' }}>
           <div className="pt-8 w-full">
             <h1 className="text-2xl font-black text-black uppercase leading-relaxed">
@@ -278,16 +278,18 @@ export const LpjKegiatan: React.FC = () => {
 
         {/* Page 2 and beyond: Dokumentasi Lapangan */}
         {photoPages.length > 0 && photoPages.map((pagePhotos, pageIndex) => (
-          <div key={pageIndex} className="pdf-page-doc bg-white shadow-lg box-border overflow-hidden w-[816px] h-[1344px] p-10 flex flex-col shrink-0"
+          <div key={pageIndex} className="pdf-page-doc lpj-container bg-white shadow-lg box-border overflow-hidden w-[816px] h-[1344px] pt-[96px] pr-[96px] pb-[96px] pl-[144px] print:pt-0 print:pr-0 print:pb-0 print:pl-0 print:p-0 print:m-0 print:w-full print:h-full print:shadow-none print:border-none flex flex-col shrink-0"
                style={{ backgroundColor: 'white' }}>
             <h2 className="text-xl font-bold text-black uppercase text-center underline whitespace-pre-wrap">
               {pageIndex === 0 ? judulDokumentasi : ''}
             </h2>
             <div className="flex-1 min-h-0 mt-6 w-full">
-              <div className="grid grid-cols-2 grid-rows-3 gap-6 h-full">
+              <div className="grid grid-cols-2 grid-rows-3 gap-2 h-full">
                 {pagePhotos.map((src, index) => (
-                  <div key={index} className="relative w-full h-full overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50">
-                    <img src={src} alt={`Dokumentasi ${pageIndex * 6 + index + 1}`} className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
+                  <div key={index} className="w-full h-full flex items-center justify-center">
+                    <div className="relative w-[90%] h-[90%] overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50">
+                      <img src={src} alt={`Dokumentasi ${pageIndex * 6 + index + 1}`} className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -303,17 +305,28 @@ export const LpjKegiatan: React.FC = () => {
       <style>{`
         @media print {
           @page {
-            size: legal;
-            margin: 0;
+            size: 215.9mm 355.6mm; /* Legal */
+            margin: 25.4mm 25.4mm 25.4mm 38mm; /* top right bottom left */
           }
-          body {
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100%;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
             background: white !important;
           }
+          header, nav, footer {
+            display: none !important;
+          }
           /* Hide everything except the print area */
           #root > div {
             display: none;
+          }
+          .lpj-container {
+            width: 100%;
+            page-break-after: always;
+            padding: 0 !important;
           }
           .print\\:block {
             display: block !important;
