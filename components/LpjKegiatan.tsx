@@ -283,11 +283,11 @@ export const LpjKegiatan: React.FC = () => {
             <h2 className="text-xl font-bold text-black uppercase text-center underline whitespace-pre-wrap">
               {pageIndex === 0 ? judulDokumentasi : ''}
             </h2>
-            <div className="flex-1 min-h-0 mt-6 w-full">
-              <div className="grid grid-cols-2 grid-rows-3 gap-2 h-full">
+            <div className="flex-1 min-h-0 mt-6 pb-24 w-full">
+              <div className="grid grid-cols-2 grid-rows-3 gap-x-6 gap-y-0 h-full">
                 {pagePhotos.map((src, index) => (
                   <div key={index} className="w-full h-full flex items-center justify-center">
-                    <div className="relative w-[90%] h-[90%] overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50">
+                    <div className="relative w-[90%] h-[95%] overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50">
                       <img src={src} alt={`Dokumentasi ${pageIndex * 6 + index + 1}`} className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
                     </div>
                   </div>
