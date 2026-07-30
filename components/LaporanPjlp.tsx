@@ -69,7 +69,8 @@ export const LaporanPjlp: React.FC = () => {
     // Beri waktu sejenak agar React me-render elemen off-screen
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const pdf = new jsPDF('p', 'mm', [215, 330]);
+    const pdf = new jsPDF('p', 'mm', 'legal');
+    const legalWidth = 215.9;
     let isFirstPage = true;
 
     try {
@@ -92,7 +93,7 @@ export const LaporanPjlp: React.FC = () => {
               pdf.addPage();
             }
             
-            const pdfWidth = 215;
+            const pdfWidth = legalWidth;
             const imgHeight = (canvas.height * pdfWidth) / canvas.width;
             
             pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
@@ -258,7 +259,7 @@ export const LaporanPjlp: React.FC = () => {
               id={`pdf-page-${petugas.id}-${chunkIndex}`}
               key={`${petugas.id}-page-${chunkIndex}`} 
               className="page-break-container bg-white"
-              style={isDownloading ? { width: '215mm', minHeight: '330mm', padding: '10mm 15mm', boxSizing: 'border-box' } : {}}
+              style={isDownloading ? { width: '215.9mm', minHeight: '355.6mm', padding: '10mm 15mm', boxSizing: 'border-box' } : {}}
             >
               {/* Header Global HANYA muncul di petugas pertama (index 0) dan halaman pertama (index 0) */}
               {petugasIndex === 0 && chunkIndex === 0 && (
