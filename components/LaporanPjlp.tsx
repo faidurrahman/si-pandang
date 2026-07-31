@@ -1,12 +1,20 @@
 import React, { useState, useRef } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { DraggableFoto } from './DraggableFoto';
+
+interface FotoData {
+  id: string;
+  url: string;
+  offsetX: number;
+  offsetY: number;
+}
 
 interface Petugas {
   id: string;
   nama: string;
   keterangan: string;
-  fotos: string[]; // array of base64 images
+  fotos: FotoData[];
 }
 
 export const LaporanPjlp: React.FC = () => {
@@ -35,14 +43,19 @@ export const LaporanPjlp: React.FC = () => {
     const files = e.target.files;
     if (!files) return;
 
-    const newFotos: string[] = [];
+    const newFotos: FotoData[] = [];
     let processed = 0;
 
     Array.from(files).forEach(file => {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          newFotos.push(event.target.result as string);
+          newFotos.push({
+            id: Math.random().toString(36).substr(2, 9),
+            url: event.target.result as string,
+            offsetX: 50,
+            offsetY: 50
+          });
         }
         processed++;
         if (processed === files.length) {
@@ -62,6 +75,50 @@ export const LaporanPjlp: React.FC = () => {
       }
       return p;
     }));
+  };
+
+  const handleUpdateFotoPosition = (petugasId: string, fotoIndex: number, posX: number, posY: number) => {
+    setPetugasList(prev => prev.map(p => {
+      if (p.id === petugasId) {
+        const newFotos = [...p.fotos];
+        if (newFotos[fotoIndex]) {
+          newFotos[fotoIndex] = { ...newFotos[fotoIndex], offsetX: posX, offsetY: posY };
+        }
+        return { ...p, fotos: newFotos };
+      }
+      return p;
+    }));
+  };
+
+  const handleDragStart = (e: React.DragEvent, petugasId: string, index: number) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ petugasId, index }));
+  };
+
+  const handleDrop = (e: React.DragEvent, targetPetugasId: string, targetIndex: number) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData('text/plain');
+    if (!data) return;
+    try {
+      const { petugasId, index: sourceIndex } = JSON.parse(data);
+      if (petugasId !== targetPetugasId) return; // Only reorder within same Petugas for now
+      if (sourceIndex === targetIndex) return;
+
+      setPetugasList(prev => prev.map(p => {
+        if (p.id === targetPetugasId) {
+          const newFotos = [...p.fotos];
+          const [movedFoto] = newFotos.splice(sourceIndex, 1);
+          newFotos.splice(targetIndex, 0, movedFoto);
+          return { ...p, fotos: newFotos };
+        }
+        return p;
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
   const handleDirectDownloadPDF = async () => {
@@ -188,15 +245,17 @@ export const LaporanPjlp: React.FC = () => {
                 <label className="block text-xs font-bold text-slate-700 mb-2 uppercase">Foto Dokumentasi Kegiatan</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-3">
                   {petugas.fotos.map((foto, fIndex) => (
-                    <div key={fIndex} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group">
-                      <img src={foto} alt={`Dokumentasi ${fIndex + 1}`} className="w-full h-full object-cover" />
-                      <button 
-                        onClick={() => handleRemoveFoto(petugas.id, fIndex)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                      </button>
-                    </div>
+                    <DraggableFoto
+                      key={foto.id}
+                      foto={foto}
+                      index={fIndex}
+                      petugasId={petugas.id}
+                      onRemove={handleRemoveFoto}
+                      onUpdatePosition={handleUpdateFotoPosition}
+                      onDragStart={handleDragStart}
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                    />
                   ))}
                   <div 
                     onClick={() => fileInputRefs.current[petugas.id]?.click()}
@@ -259,20 +318,20 @@ export const LaporanPjlp: React.FC = () => {
               id={`pdf-page-${petugas.id}-${chunkIndex}`}
               key={`${petugas.id}-page-${chunkIndex}`} 
               className="page-break-container bg-white"
-              style={isDownloading ? { width: '215.9mm', minHeight: '355.6mm', padding: '10mm 15mm', boxSizing: 'border-box' } : {}}
+              style={isDownloading ? { width: '215.9mm', minHeight: '355.6mm', padding: '10mm 25.4mm 25.4mm 25.4mm', boxSizing: 'border-box' } : {}}
             >
               {/* Header Global HANYA muncul di petugas pertama (index 0) dan halaman pertama (index 0) */}
               {petugasIndex === 0 && chunkIndex === 0 && (
-                <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-4">
-                  <h1 className="text-xl tracking-wider">{judul}</h1>
-                  <h2 className="text-lg mt-1">{instansi}</h2>
-                  <h3 className="text-base mt-1">{periode}</h3>
+                <div className="text-center font-sans font-bold leading-tight text-black uppercase mb-1">
+                  <h1 className="text-[12pt] tracking-wider m-0">{judul}</h1>
+                  <h2 className="text-[12pt] m-0">{instansi}</h2>
+                  <h3 className="text-[12pt] m-0">{periode}</h3>
                 </div>
               )}
 
               {/* Nama Petugas SELALU muncul di halaman pertama milik masing-masing petugas, walaupun tanpa Header Global */}
               {chunkIndex === 0 && (
-                <div className="text-left font-bold text-lg uppercase text-black mb-2 mt-2">
+                <div className="text-left font-bold text-[12pt] uppercase text-black leading-tight mb-1">
                   {petugas.nama} {petugas.keterangan && `- ${petugas.keterangan}`}
                 </div>
               )}
@@ -280,18 +339,22 @@ export const LaporanPjlp: React.FC = () => {
               {chunkIndex > 0 && <div className="mt-8"></div>}
 
               {/* Grid Foto */}
-              <div className="grid grid-cols-3 gap-2 w-full mt-2">
+              <div className="grid grid-cols-3 gap-[3.17mm] w-max mx-auto mt-1">
                 {chunk.map((foto, index) => (
-                  <div key={index} className="w-full aspect-[4/3] overflow-hidden border border-gray-300 bg-gray-100">
-                    <img 
-                      src={foto} 
-                      alt={`Dokumentasi ${index}`} 
-                      className="w-full h-full object-cover object-center block" 
+                  <div key={index} style={{ width: '54.88mm', height: '42.55mm' }} className="overflow-hidden border border-gray-300 bg-gray-100 relative shrink-0">
+                    <div 
+                      className="absolute inset-0 w-full h-full"
+                      style={{
+                        backgroundImage: `url("${foto.url}")`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: `${foto.offsetX || 50}% ${foto.offsetY || 50}%`,
+                        backgroundRepeat: 'no-repeat'
+                      }}
                     />
                   </div>
                 ))}
                 {chunk.length === 0 && (
-                  <div className="w-full aspect-[4/3] border border-slate-300 border-dashed flex items-center justify-center text-slate-400 col-span-3">
+                  <div style={{ width: '54.88mm', height: '42.55mm' }} className="border border-slate-300 border-dashed flex items-center justify-center text-slate-400">
                     Tidak ada foto dokumentasi
                   </div>
                 )}
