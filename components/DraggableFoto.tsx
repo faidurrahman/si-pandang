@@ -16,10 +16,11 @@ interface DraggableFotoProps {
   onDragStart: (e: React.DragEvent, petugasId: string, index: number) => void;
   onDrop: (e: React.DragEvent, targetPetugasId: string, targetIndex: number) => void;
   onDragOver: (e: React.DragEvent) => void;
+  className?: string;
 }
 
 export const DraggableFoto: React.FC<DraggableFotoProps> = ({
-  foto, index, petugasId, onRemove, onUpdatePosition, onDragStart, onDrop, onDragOver
+  foto, index, petugasId, onRemove, onUpdatePosition, onDragStart, onDrop, onDragOver, className
 }) => {
   const [isPanning, setIsPanning] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -76,7 +77,7 @@ export const DraggableFoto: React.FC<DraggableFotoProps> = ({
 
   return (
     <div 
-      className="relative aspect-[4/3] rounded-lg overflow-hidden border border-slate-300 group"
+      className={`relative ${className || 'aspect-[4/3]'} rounded-lg overflow-hidden border border-slate-300 group`}
       onDragOver={onDragOver}
       onDrop={(e) => onDrop(e, petugasId, index)}
     >

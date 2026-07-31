@@ -1,13 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { DraggableFoto } from './DraggableFoto';
+
+interface FotoData {
+  id: string;
+  url: string;
+  offsetX: number;
+  offsetY: number;
+}
 
 export const LpjKegiatan: React.FC = () => {
   const [judul, setJudul] = useState('');
   const [judulDokumentasi, setJudulDokumentasi] = useState('');
   const [tanggal, setTanggal] = useState('');
   const [tahunAnggaran, setTahunAnggaran] = useState(new Date().getFullYear().toString());
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<FotoData[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -54,13 +62,44 @@ export const LpjKegiatan: React.FC = () => {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      const newPhotos = filesArray.map(file => URL.createObjectURL(file));
+      const newPhotos: FotoData[] = filesArray.map(file => ({
+        id: Math.random().toString(36).substring(2, 9),
+        url: URL.createObjectURL(file),
+        offsetX: 50,
+        offsetY: 50
+      }));
       setPhotos(prev => [...prev, ...newPhotos]);
     }
   };
 
-  const handleRemovePhoto = (index: number) => {
+  const handleRemovePhoto = (petugasId: string, index: number) => {
     setPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateFotoPosition = (petugasId: string, index: number, posX: number, posY: number) => {
+    setPhotos(prev => prev.map((f, i) => i === index ? { ...f, offsetX: posX, offsetY: posY } : f));
+  };
+
+  const handleDragStart = (e: React.DragEvent, petugasId: string, index: number) => {
+    e.dataTransfer.setData('sourceIndex', index.toString());
+  };
+
+  const handleDrop = (e: React.DragEvent, targetPetugasId: string, targetIndex: number) => {
+    e.preventDefault();
+    const sourceIndexStr = e.dataTransfer.getData('sourceIndex');
+    if (!sourceIndexStr) return;
+    const sourceIndex = parseInt(sourceIndexStr, 10);
+    
+    setPhotos(prev => {
+      const newFotos = [...prev];
+      const [movedItem] = newFotos.splice(sourceIndex, 1);
+      newFotos.splice(targetIndex, 0, movedItem);
+      return newFotos;
+    });
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
   const handlePrint = async () => {
@@ -189,11 +228,11 @@ export const LpjKegiatan: React.FC = () => {
               <div>
                 <p className="text-xs font-semibold text-slate-500 mb-2">{photos.length} foto terpilih:</p>
                 <div className="flex gap-2 flex-wrap">
-                  {photos.map((src, idx) => (
-                    <div key={idx} className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200">
-                      <img src={src} alt="thumb" className="w-full h-full object-cover" />
+                  {photos.map((foto, idx) => (
+                    <div key={foto.id} className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200">
+                      <img src={foto.url} alt="thumb" className="w-full h-full object-cover" />
                       <button 
-                        onClick={() => handleRemovePhoto(idx)}
+                        onClick={() => handleRemovePhoto('lpj', idx)}
                         className="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-[10px] rounded-bl-md hover:bg-red-600"
                       >
                         ×
@@ -285,13 +324,26 @@ export const LpjKegiatan: React.FC = () => {
             </h2>
             <div className="flex-1 min-h-0 mt-6 pb-24 w-full">
               <div className="grid grid-cols-2 grid-rows-3 gap-x-6 gap-y-0 h-full">
-                {pagePhotos.map((src, index) => (
-                  <div key={index} className="w-full h-full flex items-center justify-center">
+                {pagePhotos.map((foto, index) => {
+                  const globalIndex = pageIndex * 6 + index;
+                  return (
+                  <div key={foto.id} className="w-full h-full flex items-center justify-center">
                     <div className="relative w-[90%] h-[95%] overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50">
-                      <img src={src} alt={`Dokumentasi ${pageIndex * 6 + index + 1}`} className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
+                      <DraggableFoto
+                        foto={foto}
+                        index={globalIndex}
+                        petugasId="lpj"
+                        onRemove={handleRemovePhoto}
+                        onUpdatePosition={handleUpdateFotoPosition}
+                        onDragStart={handleDragStart}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                        className="w-full h-full"
+                      />
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
