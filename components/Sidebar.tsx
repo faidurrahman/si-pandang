@@ -8,12 +8,13 @@ interface SidebarProps {
   isLoggedIn: boolean;
   onLoginClick: () => void;
   onLogout: () => void;
+  visitorCount?: number | null;
 }
 
 const WA_MESSAGE = encodeURIComponent("Halo Sub bagian Umum dan Kepegawaian, saya ingin bertanya tentang kelengkapan berkas.");
 const WA_LINK = `https://wa.me/6285242728901?text=${WA_MESSAGE}`;
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, onNavigate, isLoggedIn, onLoginClick, onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, onNavigate, isLoggedIn, onLoginClick, onLogout, visitorCount }) => {
   const [isLaporanOpen, setIsLaporanOpen] = React.useState(activeTab === 'lpj-kegiatan' || activeTab === 'laporan-pjlp');
 
   // Update accordion state if activeTab changes externally
@@ -242,7 +243,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
         </div>
 
         {/* Footer */}
-        <div className="p-8 mt-auto">
+        <div className="p-8 mt-auto flex flex-col gap-3">
+          {visitorCount !== undefined && visitorCount !== null && (
+            <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20 flex flex-col items-center justify-center">
+              <div className="flex items-center gap-2 text-blue-400 mb-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <span className="text-[10px] font-bold uppercase tracking-wider">Total Pengunjung</span>
+              </div>
+              <span className="text-xl font-black text-white">{visitorCount.toLocaleString('id-ID')}</span>
+            </div>
+          )}
           <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-center">
             <p className="text-[9px] font-black text-amber-400/50 uppercase tracking-[0.3em] mb-1">Versi 2.0</p>
             <p className="text-[10px] font-medium text-white/30 uppercase">Digitalisasi Kepegawaian</p>

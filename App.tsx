@@ -48,6 +48,7 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showGuidePopup, setShowGuidePopup] = useState(false);
+  const [visitorCount, setVisitorCount] = useState<number | null>(null);
 
   // Pagination & Monitoring State
   const [itemsPerPage, setItemsPerPage] = useState(50);
@@ -55,6 +56,39 @@ const App: React.FC = () => {
   const [monitoringSearchTerm, setMonitoringSearchTerm] = useState('');
 
   const notifRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleVisitor = async () => {
+      try {
+        const hasVisited = sessionStorage.getItem('hasVisitedSession');
+        const action = hasVisited ? 'getVisitor' : 'addVisitor';
+        
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            action: action
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result && result.count !== undefined) {
+            setVisitorCount(result.count);
+            if (!hasVisited) {
+              sessionStorage.setItem('hasVisitedSession', 'true');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error handling visitor count:', error);
+      }
+    };
+
+    handleVisitor();
+  }, []);
 
   useEffect(() => {
     const hasSeenGuide = localStorage.getItem('hasSeenGuidePopup');
@@ -470,6 +504,7 @@ const App: React.FC = () => {
         isLoggedIn={isLoggedIn} 
         onLoginClick={() => setShowLoginModal(true)} 
         onLogout={handleLogout} 
+        visitorCount={visitorCount}
       />
 
       <section className={`relative overflow-hidden bg-slate-900 pt-32 pb-20 md:pt-40 md:pb-28 shadow-2xl z-10 ${activeTab === 'lpj-kegiatan' || activeTab === 'laporan-pjlp' ? 'print:hidden' : ''}`}>
