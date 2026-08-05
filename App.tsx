@@ -49,6 +49,7 @@ const App: React.FC = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showGuidePopup, setShowGuidePopup] = useState(false);
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
+  const [showVisitor, setShowVisitor] = useState(false);
 
   // Pagination & Monitoring State
   const [itemsPerPage, setItemsPerPage] = useState(50);
@@ -63,19 +64,11 @@ const App: React.FC = () => {
         const hasVisited = sessionStorage.getItem('hasVisitedSession');
         const action = hasVisited ? 'getVisitor' : 'addVisitor';
         
-        const response = await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            action: action
-          })
-        });
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=${action}`);
 
         if (response.ok) {
           const result = await response.json();
-          if (result && result.count !== undefined) {
+          if (result && result.success) {
             setVisitorCount(result.count);
             if (!hasVisited) {
               sessionStorage.setItem('hasVisitedSession', 'true');
@@ -557,7 +550,7 @@ const App: React.FC = () => {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="mb-8 md:mb-12 text-center">
                 <h2 className="text-xl md:text-3xl font-bold text-[#0a1e3b]">Layanan Kepegawaian</h2>
-                <div className="mt-6 md:mt-8 relative max-w-2xl mx-auto">
+                <div className="mt-4 md:mt-6 relative max-w-2xl mx-auto">
                     <input 
                       type="text" 
                       placeholder="Cari layanan..." 
@@ -864,6 +857,31 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Visitor Counter - Samping Kanan */}
+      <div className={`fixed top-1/2 right-0 z-50 flex items-center transition-transform duration-300 ${showVisitor ? 'translate-x-0' : 'translate-x-[85%]'}`}>
+        
+        {/* Tombol Toggle (Selalu terlihat sebagian saat disembunyikan) */}
+        <button 
+          onClick={() => setShowVisitor(!showVisitor)}
+          className="bg-orange-500 text-white p-2 rounded-l-md shadow-lg hover:bg-orange-600 focus:outline-none flex items-center justify-center transition-colors"
+          title="Lihat Jumlah Pengunjung"
+        >
+          <svg className={`w-5 h-5 transition-transform duration-300 ${showVisitor ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Panah dinamis: jika terbuka panah ke kanan, jika tertutup panah ke kiri */}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+
+        {/* Panel Konten Counter */}
+        <div className="bg-white/95 backdrop-blur-sm shadow-xl border-y border-l border-slate-200 p-3 rounded-bl-lg w-36 flex items-center gap-3">
+          <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+          <div className="flex flex-col">
+            <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Pengunjung</span>
+            <span className="text-sm font-bold text-slate-800">{visitorCount !== null && visitorCount > 0 ? visitorCount : '...'}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
