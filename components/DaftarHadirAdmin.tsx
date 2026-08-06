@@ -200,25 +200,26 @@ export const DaftarHadirAdmin: React.FC = () => {
       // Load kop logos dynamically using urlToBase64
       const [leftLogoBase64, rightLogoBase64] = await Promise.all([
         urlToBase64('/logo-pemkot.png'),
-        urlToBase64('/logo-kecamatan.png')
+        urlToBase64('/Logo Kecamatan.png')
       ]);
       
       // Draw logos
       const logoY = 12;
       
+      let leftHeight = 22;
       try {
       if (leftLogoBase64) {
         const leftProps = doc.getImageProperties(leftLogoBase64);
         const leftWidth = 18;
-        const leftHeight = (leftProps.height * leftWidth) / leftProps.width;
+        leftHeight = (leftProps.height * leftWidth) / leftProps.width;
         let lFormat = 'PNG';
         if (leftLogoBase64.startsWith('data:image/jpeg')) lFormat = 'JPEG';
         doc.addImage(leftLogoBase64, lFormat, 14, logoY, leftWidth, leftHeight);
       }
       if (rightLogoBase64) {
         const rightProps = doc.getImageProperties(rightLogoBase64);
-        const rightWidth = 18;
-        const rightHeight = (rightProps.height * rightWidth) / rightProps.width;
+        const rightHeight = leftHeight;
+        const rightWidth = (rightProps.width * rightHeight) / rightProps.height;
         let rFormat = 'PNG';
         if (rightLogoBase64.startsWith('data:image/jpeg')) rFormat = 'JPEG';
         doc.addImage(rightLogoBase64, rFormat, pageWidth - 14 - rightWidth, logoY, rightWidth, rightHeight);
@@ -510,11 +511,19 @@ export const DaftarHadirAdmin: React.FC = () => {
 
             {selectedRekapKegiatan ? (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8 overflow-x-auto custom-scrollbar">
-                <div className="mb-6 text-center text-black">
-                  <h3 className="text-xl font-bold uppercase mb-2">{selectedRekapKegiatan.nama}</h3>
-                  <p>{selectedRekapKegiatan.hariTanggal}</p>
-                  <p>{selectedRekapKegiatan.tempat}</p>
-                  <p>{selectedRekapKegiatan.waktu}</p>
+                <div className="mb-6 flex items-start justify-between text-black px-4">
+                  <div className="flex-shrink-0">
+                    <img src="/logo-pemkot.png" alt="Logo Pemkot" className="h-20 w-auto object-contain" />
+                  </div>
+                  <div className="flex-1 text-center px-4">
+                    <h3 className="text-xl font-bold uppercase mb-2">{selectedRekapKegiatan.nama}</h3>
+                    <p>{selectedRekapKegiatan.hariTanggal}</p>
+                    <p>{selectedRekapKegiatan.tempat}</p>
+                    <p>{selectedRekapKegiatan.waktu}</p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <img src="/Logo Kecamatan.png" alt="Logo Kecamatan" className="h-20 w-auto object-contain" />
+                  </div>
                 </div>
                 
                 <table className="w-full text-sm border-collapse border border-black bg-white min-w-[800px]">
