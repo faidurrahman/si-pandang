@@ -214,15 +214,15 @@ export const DaftarHadirAdmin: React.FC = () => {
         leftHeight = (leftProps.height * leftWidth) / leftProps.width;
         let lFormat = 'PNG';
         if (leftLogoBase64.startsWith('data:image/jpeg')) lFormat = 'JPEG';
-        doc.addImage(leftLogoBase64, lFormat, 14, logoY, leftWidth, leftHeight);
-      }
       if (rightLogoBase64) {
         const rightProps = doc.getImageProperties(rightLogoBase64);
-        const rightHeight = leftHeight;
+        const rightHeight = leftHeight * 1.5; /* Perbesar 1.5x */
         const rightWidth = (rightProps.width * rightHeight) / rightProps.height;
         let rFormat = 'PNG';
         if (rightLogoBase64.startsWith('data:image/jpeg')) rFormat = 'JPEG';
-        doc.addImage(rightLogoBase64, rFormat, pageWidth - 14 - rightWidth, logoY, rightWidth, rightHeight);
+        const adjustedY = logoY - ((rightHeight - leftHeight) / 2);
+        doc.addImage(rightLogoBase64, rFormat, pageWidth - 14 - rightWidth, adjustedY, rightWidth, rightHeight);
+      }
       }
 } catch(err) {
   console.error("Error drawing logos", err);
@@ -512,7 +512,7 @@ export const DaftarHadirAdmin: React.FC = () => {
             {selectedRekapKegiatan ? (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8 overflow-x-auto custom-scrollbar">
                 <div className="mb-6 flex items-start justify-between text-black px-4">
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 flex items-center justify-center w-24">
                     <img src="/logo-pemkot.png" alt="Logo Pemkot" className="h-20 w-auto object-contain" />
                   </div>
                   <div className="flex-1 text-center px-4">
@@ -521,8 +521,8 @@ export const DaftarHadirAdmin: React.FC = () => {
                     <p>{selectedRekapKegiatan.tempat}</p>
                     <p>{selectedRekapKegiatan.waktu}</p>
                   </div>
-                  <div className="flex-shrink-0">
-                    <img src="/Logo Kecamatan.png" alt="Logo Kecamatan" className="h-20 w-auto object-contain" />
+                  <div className="flex-shrink-0 flex items-center justify-center w-24">
+                    <img src="/Logo Kecamatan.png" alt="Logo Kecamatan" className="h-[120px] w-auto object-contain -my-4" />
                   </div>
                 </div>
                 

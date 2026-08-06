@@ -307,7 +307,7 @@ export const LaporanPjlp: React.FC = () => {
         
         {petugasList.map((petugas, petugasIndex) => {
           // Memecah foto menjadi kelompok-kelompok berisi maksimal 18 foto
-          const chunkedPhotos: string[][] = [];
+          const chunkedPhotos: FotoData[][] = [];
           for (let i = 0; i < petugas.fotos.length; i += 18) {
             chunkedPhotos.push(petugas.fotos.slice(i, i + 18));
           }
