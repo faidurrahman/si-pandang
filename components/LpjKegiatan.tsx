@@ -307,11 +307,10 @@ export const LpjKegiatan: React.FC = () => {
               className="w-96 h-auto mx-auto mt-8 object-contain"
               crossOrigin="anonymous"
             />
-          </div>
-
-          <div className="mt-auto text-center pb-8 w-full">
-            <p className="text-xl font-bold text-black uppercase">TAHUN ANGGARAN {tahunAnggaran}</p>
-            <p className="text-xl font-bold text-black uppercase mt-1">KECAMATAN UJUNG PANDANG</p>
+            <div className="text-center mt-[120px] w-full">
+              <p className="text-2xl font-black text-black uppercase">TAHUN ANGGARAN {tahunAnggaran}</p>
+              <p className="text-2xl font-black text-black uppercase mt-1">KECAMATAN UJUNG PANDANG</p>
+            </div>
           </div>
         </div>
 
