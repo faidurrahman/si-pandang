@@ -265,7 +265,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ initialService
                     Klik untuk upload berkas
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
-                    PDF, DOC, XLS, atau Gambar (Max 10MB)
+                    PDF, DOC, XLS, atau Gambar (Max 25MB)
                   </p>
                 </div>
               </div>
