@@ -45,7 +45,9 @@ const App: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState<Submission | null>(null);
   const [editingReport, setEditingReport] = useState<Submission | null>(null);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showGuidePopup, setShowGuidePopup] = useState(false);
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
@@ -324,6 +326,7 @@ const App: React.FC = () => {
   const handleLogin = (success: boolean) => {
     if (success) {
       setIsLoggedIn(true);
+      localStorage.setItem('isLoggedIn', 'true');
       setShowLoginModal(false);
       setActiveTab('monitoring');
     }
@@ -331,6 +334,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    localStorage.removeItem('isLoggedIn');
     setActiveTab('layanan');
     setIsNotifOpen(false);
   };
