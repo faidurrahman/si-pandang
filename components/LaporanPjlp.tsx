@@ -140,12 +140,12 @@ export const LaporanPjlp: React.FC = () => {
           
           if (element) {
             const canvas = await html2canvas(element, { 
-              scale: 1.5, // Reduced scale to save memory and reduce file size
+              scale: 2, // Reverted to scale 2 for better image quality
               useCORS: true,
               windowWidth: 816
             });
-            // Use JPEG compression with quality 0.7 instead of lossless PNG
-            const imgData = canvas.toDataURL('image/jpeg', 0.7);
+            // Use JPEG compression with quality 0.85 for a good balance of size and quality
+            const imgData = canvas.toDataURL('image/jpeg', 0.85);
             
             if (!isFirstPage) {
               pdf.addPage();
