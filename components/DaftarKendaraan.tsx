@@ -95,7 +95,7 @@ export const DaftarKendaraan: React.FC = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(API_URL + "&t=" + new Date().getTime());
       const data = await response.json();
       setDataKendaraan(data.data || []);
     } catch (error) {
@@ -118,6 +118,19 @@ export const DaftarKendaraan: React.FC = () => {
         'BPKB': formData['Status BPKB'] || formData['BPKB'] || '',
         'STNK': formData['Status STNK'] || formData['STNK'] || ''
       };
+      
+      // Pastikan format date Jatuh Tempo valid sebelum dikirim agar Google Sheets mengenali
+      if (payloadBase64['Jatuh Tempo']) {
+        const jt = payloadBase64['Jatuh Tempo'];
+        if (typeof jt === 'string' && jt.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const d = new Date(jt);
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          payloadBase64['Jatuh Tempo'] = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+        // Send as Jatuh Tempo Pajak as well, because the backend Google Apps Script deployed version expects it
+        payloadBase64['Jatuh Tempo Pajak'] = payloadBase64['Jatuh Tempo'];
+      }
+
       const response = await fetch(API_URL, {
         method: "POST",
         // headers: { "Content-Type": "text/plain;charset=utf-8" },

@@ -158,7 +158,7 @@ export const ModalEditKendaraan: React.FC<ModalEditKendaraanProps> = ({ isOpen, 
               <input type="text" name="Total Pajak Kendaraan" value={formData['Total Pajak Kendaraan'] || ''} onChange={handleChange} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>Jatuh Tempo</label>
+              <label className={labelClass}>Jatuh Tempo Pajak</label>
               <input 
                 type="date" 
                 name="Jatuh Tempo" 

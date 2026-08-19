@@ -684,8 +684,8 @@ function handleUpdateDaftarKendaraan(sheet, data) {
   if (lastRow < 2) return ContentService.createTextOutput("Empty Sheet").setMimeType(ContentService.MimeType.TEXT);
 
   let headerRow = 1;
-  let headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  let checkRows = sheet.getRange(1, 1, Math.min(lastRow, 5), sheet.getLastColumn()).getValues();
+  let headers = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 29)).getValues()[0];
+  let checkRows = sheet.getRange(1, 1, Math.min(lastRow, 5), Math.max(sheet.getLastColumn(), 29)).getValues();
   for (let r = 0; r < checkRows.length; r++) {
     let rowStr = checkRows[r].join(" ").toLowerCase();
     if (rowStr.includes("polisi") || rowStr.includes("nomor polisi") || rowStr.includes("bpkb") || rowStr.includes("stnk")) {
