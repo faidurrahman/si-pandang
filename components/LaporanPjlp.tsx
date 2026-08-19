@@ -140,11 +140,12 @@ export const LaporanPjlp: React.FC = () => {
           
           if (element) {
             const canvas = await html2canvas(element, { 
-              scale: 2, 
+              scale: 1.5, // Reduced scale to save memory and reduce file size
               useCORS: true,
               windowWidth: 816
             });
-            const imgData = canvas.toDataURL('image/png');
+            // Use JPEG compression with quality 0.7 instead of lossless PNG
+            const imgData = canvas.toDataURL('image/jpeg', 0.7);
             
             if (!isFirstPage) {
               pdf.addPage();
@@ -153,7 +154,8 @@ export const LaporanPjlp: React.FC = () => {
             const pdfWidth = legalWidth;
             const imgHeight = (canvas.height * pdfWidth) / canvas.width;
             
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
+            // Add image as JPEG and use FAST compression flag
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight, undefined, 'FAST');
             isFirstPage = false;
           }
         }

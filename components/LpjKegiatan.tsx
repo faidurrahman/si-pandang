@@ -115,9 +115,9 @@ export const LpjKegiatan: React.FC = () => {
 
       // 1. Capture Cover Page
       if (coverRef.current) {
-        const coverCanvas = await html2canvas(coverRef.current, { scale: 2, useCORS: true });
-        const coverImgData = coverCanvas.toDataURL('image/png');
-        pdf.addImage(coverImgData, 'PNG', 0, 0, legalWidth, legalHeight);
+        const coverCanvas = await html2canvas(coverRef.current, { scale: 1.5, useCORS: true });
+        const coverImgData = coverCanvas.toDataURL('image/jpeg', 0.8);
+        pdf.addImage(coverImgData, 'JPEG', 0, 0, legalWidth, legalHeight, undefined, 'FAST');
       }
 
       // 2. Capture Dokumentasi Page (if photos exist)
@@ -125,13 +125,13 @@ export const LpjKegiatan: React.FC = () => {
         const pages = document.querySelectorAll('.pdf-page-doc');
         for (let i = 0; i < pages.length; i++) {
           pdf.addPage();
-          const pageCanvas = await html2canvas(pages[i] as HTMLElement, { scale: 2, useCORS: true });
-          const pageImgData = pageCanvas.toDataURL('image/png');
+          const pageCanvas = await html2canvas(pages[i] as HTMLElement, { scale: 1.5, useCORS: true });
+          const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.7);
           
           const imgProps = pdf.getImageProperties(pageImgData);
           const pdfHeight = (imgProps.height * legalWidth) / imgProps.width;
           
-          pdf.addImage(pageImgData, 'PNG', 0, 0, legalWidth, pdfHeight);
+          pdf.addImage(pageImgData, 'JPEG', 0, 0, legalWidth, pdfHeight, undefined, 'FAST');
         }
       }
 
