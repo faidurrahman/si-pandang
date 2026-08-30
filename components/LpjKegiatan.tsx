@@ -16,6 +16,7 @@ export const LpjKegiatan: React.FC = () => {
   const [tanggal, setTanggal] = useState('');
   const [tahunAnggaran, setTahunAnggaran] = useState(new Date().getFullYear().toString());
   const [photos, setPhotos] = useState<FotoData[]>([]);
+  const [photoLayout, setPhotoLayout] = useState<'portrait' | 'landscape'>('portrait');
   const [isGenerating, setIsGenerating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -53,7 +54,8 @@ export const LpjKegiatan: React.FC = () => {
     return chunked;
   };
 
-  const photoPages = chunkArray(photos, 6);
+  const photosPerPage = photoLayout === 'portrait' ? 6 : 3;
+  const photoPages = chunkArray(photos, photosPerPage);
 
   const pagesCount = 1 + photoPages.length;
   const unscaledHeight = (pagesCount * 1344) + ((pagesCount - 1) * 32);
@@ -202,6 +204,20 @@ export const LpjKegiatan: React.FC = () => {
             </div>
 
             <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Orientasi Foto Dokumentasi</label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="photoLayout" value="portrait" checked={photoLayout === 'portrait'} onChange={() => setPhotoLayout('portrait')} className="text-blue-600 focus:ring-blue-500 w-4 h-4" />
+                  <span className="text-sm text-slate-700">Portrait (6 Foto/Halaman)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="photoLayout" value="landscape" checked={photoLayout === 'landscape'} onChange={() => setPhotoLayout('landscape')} className="text-blue-600 focus:ring-blue-500 w-4 h-4" />
+                  <span className="text-sm text-slate-700">Landscape (3 Foto/Halaman)</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Upload Foto Dokumentasi</label>
               <div 
                 className="border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-blue-400 transition-colors cursor-pointer"
@@ -322,9 +338,9 @@ export const LpjKegiatan: React.FC = () => {
               {pageIndex === 0 ? judulDokumentasi : ''}
             </h2>
             <div className="flex-1 min-h-0 mt-6 pb-24 w-full">
-              <div className="grid grid-cols-2 grid-rows-3 gap-x-6 gap-y-0 h-full">
+              <div className={`grid ${photoLayout === 'portrait' ? 'grid-cols-2 grid-rows-3' : 'grid-cols-1 grid-rows-3'} gap-x-6 gap-y-0 h-full`}>
                 {pagePhotos.map((foto, index) => {
-                  const globalIndex = pageIndex * 6 + index;
+                  const globalIndex = pageIndex * photosPerPage + index;
                   return (
                   <div key={foto.id} className="w-full h-full flex items-center justify-center">
                     <div className="relative w-[90%] h-[95%] overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50">
