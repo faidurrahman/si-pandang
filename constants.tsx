@@ -30,8 +30,11 @@ export const SERVICES: Service[] = [
     category: 'Kesejahteraan',
     estimatedTime: '3 Hari Kerja',
     requirements: [
-      { id: 'kgb1', label: 'Fotocopy SK pangkat terakhir', isMandatory: true },
-      { id: 'kgb2', label: 'Fotocopy SK KGB terakhir', isMandatory: true }
+      { id: 'kgb1', label: 'Fotocopy SK pangkat terakhir', isMandatory: true, category: 'KGB PNS' },
+      { id: 'kgb2', label: 'Fotocopy SK KGB terakhir', isMandatory: true, category: 'KGB PNS' },
+      { id: 'kgb3', label: 'SK', isMandatory: true, category: 'KGB PPPK Penuh Waktu' },
+      { id: 'kgb4', label: 'SKP 1 Tahun Terakhir', isMandatory: true, category: 'KGB PPPK Penuh Waktu' },
+      { id: 'kgb5', label: 'Daftar Gaji / Ampra Gaji', isMandatory: true, category: 'KGB PPPK Penuh Waktu' }
     ]
   },
   {

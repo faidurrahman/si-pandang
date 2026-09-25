@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Service } from '../types';
 
 interface ServiceModalProps {
@@ -11,6 +11,22 @@ const WA_MESSAGE = encodeURIComponent("Halo Sub bagian Umum dan Kepegawaian, say
 const WA_LINK = `https://wa.me/6285242728901?text=${WA_MESSAGE}`;
 
 export const ServiceModal: React.FC<ServiceModalProps> = ({ service, onClose, onApply }) => {
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+
+  useEffect(() => {
+    setActiveCategory('all');
+  }, [service?.id]);
+
+  const categories = useMemo(() => {
+    if (!service?.requirements) return [];
+    const cats = service.requirements
+      .map(r => r.category)
+      .filter((c): c is string => Boolean(c));
+    return Array.from(new Set(cats));
+  }, [service?.requirements]);
+
+  const hasCategories = categories.length > 0;
+
   if (!service) return null;
 
   return (
@@ -53,20 +69,90 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ service, onClose, on
             <h3 className="text-sm font-extrabold text-[#0a192f]">Persyaratan Berkas</h3>
           </div>
 
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {service.requirements?.map((req) => (
-              <li key={req.id} className="group relative flex items-start p-3 md:p-4 bg-white border border-slate-200 rounded-xl transition-all duration-200 shadow-sm hover:border-blue-300 hover:shadow-md">
-                <div className="mt-0.5 h-5 w-5 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <p className="ml-3 text-slate-600 text-[10px] md:text-[11px] font-medium leading-relaxed">
-                  {req.label}
-                </p>
-              </li>
-            ))}
-          </ul>
+          {/* Category Tabs if service has categorized requirements */}
+          {hasCategories && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              <button
+                type="button"
+                onClick={() => setActiveCategory('all')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeCategory === 'all'
+                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                }`}
+              >
+                Semua ({service.requirements?.length})
+              </button>
+              {categories.map((cat) => {
+                const count = service.requirements?.filter(r => r.category === cat).length || 0;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeCategory === cat
+                        ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                    }`}
+                  >
+                    {cat} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Categorized Display when 'all' is selected */}
+          {hasCategories && activeCategory === 'all' ? (
+            <div className="space-y-4">
+              {categories.map((cat) => {
+                const catReqs = service.requirements?.filter(r => r.category === cat) || [];
+                if (catReqs.length === 0) return null;
+                return (
+                  <div key={cat} className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 font-bold text-[10px] md:text-[11px] rounded-md border border-blue-100">
+                        {cat}
+                      </span>
+                    </div>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {catReqs.map((req) => (
+                        <li key={req.id} className="group relative flex items-start p-3 md:p-4 bg-white border border-slate-200 rounded-xl transition-all duration-200 shadow-sm hover:border-blue-300 hover:shadow-md">
+                          <div className="mt-0.5 h-5 w-5 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <p className="ml-3 text-slate-600 text-[10px] md:text-[11px] font-medium leading-relaxed">
+                            {req.label}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {(hasCategories 
+                ? service.requirements?.filter(r => r.category === activeCategory)
+                : service.requirements
+              )?.map((req) => (
+                <li key={req.id} className="group relative flex items-start p-3 md:p-4 bg-white border border-slate-200 rounded-xl transition-all duration-200 shadow-sm hover:border-blue-300 hover:shadow-md">
+                  <div className="mt-0.5 h-5 w-5 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="ml-3 text-slate-600 text-[10px] md:text-[11px] font-medium leading-relaxed">
+                    {req.label}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
 
           {service.downloadUrl && (
             <a 

@@ -37,7 +37,7 @@ export interface Service {
   icon: string;
   description: string;
   color?: string;
-  requirements?: Array<{id: string, label: string, isMandatory: boolean}>;
+  requirements?: Array<{id: string, label: string, isMandatory: boolean, category?: string}>;
   downloadUrl?: string;
   downloadLabel?: string;
 }

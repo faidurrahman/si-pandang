@@ -338,12 +338,12 @@ export const LpjKegiatan: React.FC = () => {
               {pageIndex === 0 ? judulDokumentasi : ''}
             </h2>
             <div className="flex-1 min-h-0 mt-6 pb-24 w-full">
-              <div className={`grid ${photoLayout === 'portrait' ? 'grid-cols-2 grid-rows-3' : 'grid-cols-1 grid-rows-3'} gap-x-6 gap-y-0 h-full`}>
+              <div className={`grid ${photoLayout === 'portrait' ? 'grid-cols-2 grid-rows-3 gap-x-6 gap-y-0' : 'grid-cols-1 grid-rows-3 gap-y-4'} h-full`}>
                 {pagePhotos.map((foto, index) => {
                   const globalIndex = pageIndex * photosPerPage + index;
                   return (
                   <div key={foto.id} className="w-full h-full flex items-center justify-center">
-                    <div className="relative w-[90%] h-[95%] overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50">
+                    <div className={`relative ${photoLayout === 'portrait' ? 'w-[90%] h-[95%]' : 'w-full h-full'} overflow-hidden rounded-md shadow-sm border border-slate-200 bg-slate-50`}>
                       <DraggableFoto
                         foto={foto}
                         index={globalIndex}
@@ -354,6 +354,7 @@ export const LpjKegiatan: React.FC = () => {
                         onDrop={handleDrop}
                         onDragOver={handleDragOver}
                         className="w-full h-full"
+                        fitMode={photoLayout === 'landscape' ? 'contain' : 'cover'}
                       />
                     </div>
                   </div>

@@ -17,10 +17,11 @@ interface DraggableFotoProps {
   onDrop: (e: React.DragEvent, targetPetugasId: string, targetIndex: number) => void;
   onDragOver: (e: React.DragEvent) => void;
   className?: string;
+  fitMode?: 'cover' | 'contain';
 }
 
 export const DraggableFoto: React.FC<DraggableFotoProps> = ({
-  foto, index, petugasId, onRemove, onUpdatePosition, onDragStart, onDrop, onDragOver, className
+  foto, index, petugasId, onRemove, onUpdatePosition, onDragStart, onDrop, onDragOver, className, fitMode = 'cover'
 }) => {
   const [isPanning, setIsPanning] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -87,7 +88,7 @@ export const DraggableFoto: React.FC<DraggableFotoProps> = ({
         onMouseDown={handleMouseDown}
         style={{
           backgroundImage: `url("${foto.url}")`,
-          backgroundSize: 'cover',
+          backgroundSize: fitMode,
           backgroundPosition: `${currentOffset.x}% ${currentOffset.y}%`,
           backgroundRepeat: 'no-repeat'
         }}
