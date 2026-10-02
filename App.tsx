@@ -15,6 +15,7 @@ import { EditReportModal } from './components/EditReportModal';
 import { LoginModal } from './components/LoginModal';
 import { InstallPWA } from './components/InstallPWA';
 import { PantauKGB } from './components/PantauKGB';
+import { PantauKP } from './components/PantauKP';
 import { LpjKegiatan } from './components/LpjKegiatan';
 import { DataPegawaiPage } from './components/DataPegawaiPage';
 import { DaftarHadirAdmin } from './components/DaftarHadirAdmin';
@@ -30,7 +31,7 @@ const MAPS_LINK = "https://maps.app.goo.gl/SX1s5Pf62GeDYKaG9";
 const EMAIL_ADDRESS = "data.kecujungpandang@gmail.com";
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'rekap-bmd' | 'daftar-kendaraan' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir'>('layanan');
+  const [activeTab, setActiveTab] = useState<'layanan' | 'monitoring' | 'pantau-kgb' | 'pantau-kp' | 'rekap-bmd' | 'daftar-kendaraan' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir'>('layanan');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -706,6 +707,8 @@ const App: React.FC = () => {
           </div>
          ) : activeTab === 'pantau-kgb' ? (
           <PantauKGB />
+        ) : activeTab === 'pantau-kp' ? (
+          <PantauKP />
         ) : activeTab === 'rekap-bmd' ? (
           <DashboardRekapBmd />
         ) : activeTab === 'daftar-kendaraan' ? (

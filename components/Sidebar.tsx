@@ -3,8 +3,8 @@ import React from 'react';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  activeTab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir' | 'rekap-bmd' | 'daftar-kendaraan';
-  onNavigate: (tab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir' | 'rekap-bmd' | 'daftar-kendaraan') => void;
+  activeTab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'pantau-kp' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir' | 'rekap-bmd' | 'daftar-kendaraan';
+  onNavigate: (tab: 'layanan' | 'monitoring' | 'pantau-kgb' | 'pantau-kp' | 'lpj-kegiatan' | 'laporan-pjlp' | 'data-pegawai' | 'daftar-hadir' | 'rekap-bmd' | 'daftar-kendaraan') => void;
   isLoggedIn: boolean;
   onLoginClick: () => void;
   onLogout: () => void;
@@ -100,6 +100,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeTab, on
                   </svg>
                 </div>
                 <span className="text-xs uppercase tracking-widest">Pantau KGB</span>
+              </button>
+
+              <button 
+                onClick={() => { onNavigate('pantau-kp'); onClose(); }}
+                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ease-in-out cursor-pointer group ${activeTab === 'pantau-kp' ? 'bg-blue-500/15 text-blue-400 font-semibold rounded-xl border border-blue-500/20' : 'text-slate-300 font-medium hover:bg-white/5 hover:text-white rounded-xl border border-transparent'}`}
+              >
+                <div className={`flex items-center justify-center transition-all ${activeTab === 'pantau-kp' ? 'text-blue-400' : 'text-slate-400 group-hover:text-white'}`}>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 11l7-7 7 7M5 19l7-7 7 7" />
+                  </svg>
+                </div>
+                <span className="text-xs uppercase tracking-widest">Pantau KP</span>
               </button>
               <button 
                 onClick={() => { onNavigate('rekap-bmd'); onClose(); }}

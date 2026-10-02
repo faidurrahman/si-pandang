@@ -57,6 +57,21 @@ export interface PegawaiKGB {
   status?: 'Aman' | 'Mendekati' | 'Lewat Jadwal';
 }
 
+export interface PegawaiKP {
+  id: string;
+  nama: string;
+  nip: string;
+  pangkat: string;
+  jabatan: string;
+  tmtKp: string;
+  gajiPokok?: string;
+  skUrl?: string;
+  kpUrl?: string;
+  // Calculated fields for frontend
+  jadwalBerikutnya?: string;
+  status?: 'Aman' | 'Mendekati' | 'Lewat Jadwal';
+}
+
 export interface DataPegawai {
   id: string;
   nama: string;

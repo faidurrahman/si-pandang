@@ -3,7 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 
 // Hardcoded for now to avoid import issues with .tsx files in Node
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbZhgNE9xw61qu6_em3bsXaiUtvOQ9uWwX6PJ2numIdG4ZbTQfYRUFW4YEBdon-6I6/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNEQ96Lz5bZVz-Xy83qQyeXCBeXYrAn3OTC9IUvgtYAXJVJVSLENcwOD7-6BrwO619/exec";
 
 async function startServer() {
   const app = express();

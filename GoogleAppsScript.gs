@@ -143,8 +143,16 @@ function doPost(e) {
       }
 
       // ID Folder Google Drive untuk menyimpan file SK dan KGB (Sesuai permintaan)
-      let driveFolderId = '1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs'; 
-      let driveFolder = DriveApp.getFolderById(folderId);
+      let driveFolder;
+      try {
+        driveFolder = DriveApp.getFolderById('1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs');
+      } catch (e) {
+        try {
+          driveFolder = DriveApp.getFolderById(FOLDER_ID);
+        } catch (err) {
+          driveFolder = DriveApp.getRootFolder();
+        }
+      }
 
       let skUrl = '';
       let kgbUrl = '';
@@ -262,8 +270,16 @@ function doPost(e) {
 
       if (rowIndex !== -1) {
         // ID Folder Google Drive untuk menyimpan file SK dan KGB
-        let driveFolderId = '1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs'; 
-        let driveFolder = DriveApp.getFolderById(folderId);
+        let driveFolder;
+        try {
+          driveFolder = DriveApp.getFolderById('1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs');
+        } catch (e) {
+          try {
+            driveFolder = DriveApp.getFolderById(FOLDER_ID);
+          } catch (err) {
+            driveFolder = DriveApp.getRootFolder();
+          }
+        }
 
         let skUrl = '';
         let kgbUrl = '';
@@ -298,6 +314,188 @@ function doPost(e) {
         
         SpreadsheetApp.flush();
         return ContentService.createTextOutput("Success Update KGB").setMimeType(ContentService.MimeType.TEXT);
+      } else {
+        return ContentService.createTextOutput("ID Not Found").setMimeType(ContentService.MimeType.TEXT);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // LOGIKA PANTAU KP (Kenaikan Pangkat)
+    // -------------------------------------------------------------
+    if (data.action === 'addPegawaiKP' || data.action === 'addKP') {
+      let sheets = ss.getSheets();
+      let sheetKp = null;
+      for (let s = 0; s < sheets.length; s++) {
+        let sName = sheets[s].getName().trim().toUpperCase();
+        if (sName === 'KP' || sName === 'PANTAU KP') {
+          sheetKp = sheets[s];
+          break;
+        }
+      }
+
+      if (!sheetKp) {
+        sheetKp = ss.insertSheet('KP');
+        sheetKp.appendRow(['ID', 'Timestamp', 'Nama', 'NIP', 'Pangkat', 'Jabatan', 'TMT KP', 'Gaji Pokok', 'URL SK', 'URL KP']);
+      }
+      
+      if (sheetKp.getMaxRows() === 0) {
+        sheetKp.insertRows(1, 1);
+      }
+
+      let driveFolder;
+      try {
+        driveFolder = DriveApp.getFolderById('1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs');
+      } catch (e) {
+        try {
+          driveFolder = DriveApp.getFolderById(FOLDER_ID);
+        } catch (err) {
+          driveFolder = DriveApp.getRootFolder();
+        }
+      }
+
+      let skUrl = '';
+      let kpUrl = '';
+
+      if (data.files && data.files.length > 0) {
+        data.files.forEach(function(file) {
+          let blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimetype, file.filename);
+          let uploadedFile = driveFolder.createFile(blob);
+          uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          
+          if (file.type === 'sk') {
+            skUrl = uploadedFile.getUrl();
+          } else if (file.type === 'kp' || file.type === 'sk_kp') {
+            kpUrl = uploadedFile.getUrl();
+          }
+        });
+      }
+
+      let columnA = sheetKp.getRange('A:A').getValues();
+      let lastRow = 0;
+      for (let i = columnA.length - 1; i >= 0; i--) {
+        if (columnA[i][0] !== "") {
+          lastRow = i + 1;
+          break;
+        }
+      }
+      let targetRow = lastRow + 1;
+
+      if (targetRow > sheetKp.getMaxRows()) {
+        sheetKp.insertRowAfter(sheetKp.getMaxRows());
+      }
+
+      sheetKp.getRange(targetRow, 1, 1, 10).setValues([[
+        data.id || '',
+        data.timestamp || new Date().toISOString(),
+        data.nama || '',
+        "'" + (data.nip || ''),
+        data.pangkat || '',
+        data.jabatan || '',
+        data.tmtKp || data.tmtKgb || '',
+        data.gajiPokok || '',
+        skUrl,
+        kpUrl
+      ]]);
+
+      SpreadsheetApp.flush();
+      return ContentService.createTextOutput("Success Insert KP").setMimeType(ContentService.MimeType.TEXT);
+    }
+
+    if (data.action === 'deletePegawaiKP' || data.action === 'deleteKP') {
+      let sheets = ss.getSheets();
+      let sheetKp = null;
+      for (let s = 0; s < sheets.length; s++) {
+        let sName = sheets[s].getName().trim().toUpperCase();
+        if (sName === 'KP' || sName === 'PANTAU KP') {
+          sheetKp = sheets[s];
+          break;
+        }
+      }
+      if (!sheetKp) return ContentService.createTextOutput("Sheet KP not found").setMimeType(ContentService.MimeType.TEXT);
+      
+      let rows = sheetKp.getDataRange().getValues();
+      let idToDelete = data.id;
+      let rowIndex = -1;
+
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][0]) === String(idToDelete)) {
+          rowIndex = i + 1;
+          break;
+        }
+      }
+
+      if (rowIndex !== -1) {
+        sheetKp.deleteRow(rowIndex);
+        SpreadsheetApp.flush();
+        return ContentService.createTextOutput("Success Delete KP").setMimeType(ContentService.MimeType.TEXT);
+      } else {
+        return ContentService.createTextOutput("ID Not Found").setMimeType(ContentService.MimeType.TEXT);
+      }
+    }
+
+    if (data.action === 'updatePegawaiKP' || data.action === 'updateKP') {
+      let sheets = ss.getSheets();
+      let sheetKp = null;
+      for (let s = 0; s < sheets.length; s++) {
+        let sName = sheets[s].getName().trim().toUpperCase();
+        if (sName === 'KP' || sName === 'PANTAU KP') {
+          sheetKp = sheets[s];
+          break;
+        }
+      }
+      if (!sheetKp) return ContentService.createTextOutput("Sheet KP not found").setMimeType(ContentService.MimeType.TEXT);
+      
+      let rows = sheetKp.getDataRange().getValues();
+      let idToUpdate = data.id;
+      let rowIndex = -1;
+
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][0]) === String(idToUpdate)) {
+          rowIndex = i + 1;
+          break;
+        }
+      }
+
+      if (rowIndex !== -1) {
+        let driveFolder;
+        try {
+          driveFolder = DriveApp.getFolderById('1k7GNGD9kAbn2JjfZV4gJIGLya_WVaKVs');
+        } catch (e) {
+          try {
+            driveFolder = DriveApp.getFolderById(FOLDER_ID);
+          } catch (err) {
+            driveFolder = DriveApp.getRootFolder();
+          }
+        }
+
+        let skUrl = '';
+        let kpUrl = '';
+
+        if (data.files && data.files.length > 0) {
+          data.files.forEach(function(file) {
+            let blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimetype, file.filename);
+            let uploadedFile = driveFolder.createFile(blob);
+            uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+            
+            if (file.type === 'sk') {
+              skUrl = uploadedFile.getUrl();
+            } else if (file.type === 'kp' || file.type === 'sk_kp') {
+              kpUrl = uploadedFile.getUrl();
+            }
+          });
+        }
+
+        if (data.nama) sheetKp.getRange(rowIndex, 3).setValue(data.nama);
+        if (data.nip) sheetKp.getRange(rowIndex, 4).setValue("'" + data.nip);
+        if (data.pangkat) sheetKp.getRange(rowIndex, 5).setValue(data.pangkat);
+        if (data.jabatan) sheetKp.getRange(rowIndex, 6).setValue(data.jabatan);
+        if (data.tmtKp || data.tmtKgb) sheetKp.getRange(rowIndex, 7).setValue(data.tmtKp || data.tmtKgb);
+        if (data.gajiPokok) sheetKp.getRange(rowIndex, 8).setValue(data.gajiPokok);
+        if (skUrl) sheetKp.getRange(rowIndex, 9).setValue(skUrl);
+        if (kpUrl) sheetKp.getRange(rowIndex, 10).setValue(kpUrl);
+        
+        SpreadsheetApp.flush();
+        return ContentService.createTextOutput("Success Update KP").setMimeType(ContentService.MimeType.TEXT);
       } else {
         return ContentService.createTextOutput("ID Not Found").setMimeType(ContentService.MimeType.TEXT);
       }
@@ -511,6 +709,26 @@ function doGet(e) {
           .setMimeType(ContentService.MimeType.JSON);
       }
       const data = sheetKgb.getDataRange().getValues();
+      return ContentService.createTextOutput(JSON.stringify({ data: data }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Cek parameter action KP
+    if (e.parameter && (e.parameter.action === 'getKP' || e.parameter.action === 'getPantauKP')) {
+      let sheets = ss.getSheets();
+      let sheetKp = null;
+      for (let s = 0; s < sheets.length; s++) {
+        let sName = sheets[s].getName().trim().toUpperCase();
+        if (sName === 'KP' || sName === 'PANTAU KP') {
+          sheetKp = sheets[s];
+          break;
+        }
+      }
+      if (!sheetKp) {
+        return ContentService.createTextOutput(JSON.stringify({ data: [] }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      const data = sheetKp.getDataRange().getValues();
       return ContentService.createTextOutput(JSON.stringify({ data: data }))
         .setMimeType(ContentService.MimeType.JSON);
     }
